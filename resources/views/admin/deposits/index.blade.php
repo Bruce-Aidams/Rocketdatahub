@@ -4,13 +4,13 @@
 
 @section('content')
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ 
-                        modalOpen: false, 
-                        deposit: { id: '', user: { name: '' }, amount: '', proof_image: '', status: '' },
-                        openProcess(d) {
-                            this.deposit = d;
-                            this.modalOpen = true;
-                        }
-                    }">
+                            modalOpen: false, 
+                            deposit: { id: '', user: { name: '' }, amount: '', proof_image: '', status: '' },
+                            openProcess(d) {
+                                this.deposit = d;
+                                this.modalOpen = true;
+                            }
+                        }">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -290,10 +290,10 @@
                         window.location.reload();
                     } else {
                         const data = await response.json();
-                        alert(data.message || 'Transaction Security Failure');
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Transaction Security Failure', type: 'error' } }));
                     }
                 } catch (e) {
-                    alert('Network Communication Error');
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Network Communication Error', type: 'error' } }));
                 }
             }
         </script>

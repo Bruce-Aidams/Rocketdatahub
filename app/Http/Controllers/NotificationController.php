@@ -53,7 +53,7 @@ class NotificationController extends Controller
     // Admin: Get all notifications
     public function adminIndex(Request $request)
     {
-        $notifications = Notification::with('user')->latest()->paginate($request->input('per_page', 10));
+        $notifications = Notification::with('user')->latest()->paginate($request->input('per_page', 5));
 
         if ($request->expectsJson() || $request->is('api/*')) {
             return $notifications;

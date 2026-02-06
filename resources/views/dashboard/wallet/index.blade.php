@@ -517,7 +517,7 @@
                             window.location.href = data.authorization_url;
 
                         } catch (e) {
-                            alert(e.message);
+                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: e.message, type: 'error' } }));
                             this.isLoading = false;
                         }
                     }

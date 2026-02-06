@@ -32,15 +32,15 @@
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <!-- Gross Revenue -->
             <div
-                class="relative overflow-hidden bg-slate-900 border border-slate-800 rounded-3xl shadow-lg shadow-slate-900/10 group p-6">
+                class="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-indigo-700 dark:from-indigo-500 dark:to-indigo-600 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-lg shadow-indigo-500/10 group p-6">
                 <div
-                    class="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
+                    class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
                 </div>
                 <div class="relative z-10">
-                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2">Gross Revenue</p>
+                    <p class="text-[8px] font-bold text-indigo-100 uppercase tracking-[0.2em] mb-2">Gross Revenue</p>
                     <h3 class="text-2xl font-black text-white mb-3">GHC {{ number_format($stats['total_revenue'], 2) }}</h3>
                     <div
-                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-[8px] font-bold uppercase">
+                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white/10 text-white text-[8px] font-bold uppercase">
                         Total Sales
                     </div>
                 </div>

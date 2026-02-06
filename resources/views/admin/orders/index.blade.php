@@ -23,14 +23,14 @@
             </div>
 
             <!-- <div class="flex items-center gap-3 w-full md:w-auto">
-                                                                    {{-- New Order Button --}}
-                                                                    <a href="{{ route('admin.orders.create') }}"
-                                                                        class="h-11 px-6 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center gap-2">
-                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                                                                        </svg>
-                                                                        New Order
-                                                                    </a> -->
+                                                                            {{-- New Order Button --}}
+                                                                            <a href="{{ route('admin.orders.create') }}"
+                                                                                class="h-11 px-6 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center gap-2">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                                                                </svg>
+                                                                                New Order
+                                                                            </a> -->
 
             {{-- Export Button --}}
             <a href="{{ route('admin.orders.export', request()->all()) }}"
@@ -120,7 +120,7 @@
                 @foreach(['all', 'awaiting_transfer', 'pending', 'processing', 'completed', 'failed'] as $s)
                     <button onclick="filterBy('status', '{{ $s }}')"
                         class="px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all whitespace-nowrap
-                                                                                                                                                                                                                                                                                            {{ request('status', 'all') == $s ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300' }}">
+                                                                                                                                                                                                                                                                                                            {{ request('status', 'all') == $s ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300' }}">
                         {{ $statusMap[$s] }}
                     </button>
                 @endforeach
@@ -452,10 +452,10 @@
                         window.location.reload();
                     } else {
                         const data = await response.json();
-                        alert(data.message || 'Verification Error');
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Verification Error', type: 'error' } }));
                     }
                 } catch (e) {
-                    alert('Network Communication Error');
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Network Communication Error', type: 'error' } }));
                 }
             }
 
@@ -473,14 +473,13 @@
 
                     if (response.ok) {
                         const data = await response.json();
-                        // Instead of alert, maybe we could use a toast if available, but for now:
                         window.location.reload();
                     } else {
                         const data = await response.json();
-                        alert(data.message || 'Deletion Error');
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Deletion Error', type: 'error' } }));
                     }
                 } catch (e) {
-                    alert('Network Communication Error');
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Network Communication Error', type: 'error' } }));
                 }
             }
 

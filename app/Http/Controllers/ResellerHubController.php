@@ -112,6 +112,18 @@ class ResellerHubController extends Controller
 
         return back()->with('success', 'Store price updated successfully.');
     }
+
+    public function updateStoreName(Request $request)
+    {
+        $request->validate(['store_name' => 'required|string|max:50']);
+        $user = Auth::user();
+        if (!$user->isReseller())
+            abort(403);
+
+        $user->update(['store_name' => $request->store_name]);
+        return back()->with('success', 'Store name updated successfully.');
+    }
+
     public function toggleStoreStatus()
     {
         $user = Auth::user();

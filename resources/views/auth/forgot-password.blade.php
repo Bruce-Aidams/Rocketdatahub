@@ -6,12 +6,12 @@
 @section('content')
     <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
         x-data="{ 
-                loading: false,
-                submit() {
-                    this.loading = true;
-                    this.$refs.forgotForm.submit();
-                }
-             }">
+                    loading: false,
+                    submit() {
+                        this.loading = true;
+                        this.$refs.forgotForm.submit();
+                    }
+                 }">
         <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
             <!-- Logo Header -->
             <div class="flex flex-col items-center gap-3 mb-8">
@@ -64,13 +64,14 @@
                                 <span>Send Reset Link</span>
                             </template>
                             <template x-if="loading">
-                                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
+                                <div class="flex items-center gap-1 animate-pulse-text font-bold">
+                                    <span>Sending Link</span>
+                                    <span class="flex items-center">
+                                        <span class="animate-typing-dot" style="animation-delay: 0s">.</span>
+                                        <span class="animate-typing-dot" style="animation-delay: 0.2s">.</span>
+                                        <span class="animate-typing-dot" style="animation-delay: 0.4s">.</span>
+                                    </span>
+                                </div>
                             </template>
                         </button>
 

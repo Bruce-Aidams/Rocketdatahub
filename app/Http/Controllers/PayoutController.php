@@ -32,13 +32,16 @@ class PayoutController extends Controller
 
         $user = $request->user();
 
-        if ($user->wallet_balance < $request->amount) {
-            return response()->json(['message' => 'Insufficient wallet balance.'], 422);
+        if ($user->commission_balance < $request->amount) {
+            if ($request->expectsJson() || $request->is('api/*') || $request->ajax()) {
+                return response()->json(['message' => 'Insufficient commission balance.'], 422);
+            }
+            return back()->with('error', 'Insufficient commission balance.');
         }
 
         $payout = DB::transaction(function () use ($user, $request) {
-            // Deduct from wallet balance
-            $user->decrement('wallet_balance', $request->amount);
+            // Deduct from commission balance
+            $user->decrement('commission_balance', $request->amount);
 
             // Create Payout record
             return Payout::create([
@@ -91,6 +94,18 @@ class PayoutController extends Controller
         return view('admin.payouts.index', compact('payouts', 'stats'));
     }
 
+    public function approve(Request $request, $id)
+    {
+        $request->merge(['status' => 'completed']);
+        return $this->updateStatus($request, $id);
+    }
+
+    public function reject(Request $request, $id)
+    {
+        $request->merge(['status' => 'rejected']);
+        return $this->updateStatus($request, $id);
+    }
+
     /**
      * Admin: Update payout status (Complete/Reject).
      */
@@ -104,13 +119,16 @@ class PayoutController extends Controller
         $payout = Payout::findOrFail($id);
 
         if ($payout->status === 'completed' || $payout->status === 'rejected') {
-            return response()->json(['message' => 'This payout has already been processed.'], 422);
+            if ($request->expectsJson() || $request->is('api/*') || $request->ajax()) {
+                return response()->json(['message' => 'This payout has already been processed.'], 422);
+            }
+            return back()->with('error', 'This payout has already been processed.');
         }
 
         DB::transaction(function () use ($payout, $request) {
             if ($request->status === 'rejected') {
-                // Refund the amount to wallet balance
-                $payout->user->increment('wallet_balance', $payout->amount);
+                // Refund the amount to commission balance
+                $payout->user->increment('commission_balance', $payout->amount);
             }
 
             $payout->update([
@@ -119,6 +137,10 @@ class PayoutController extends Controller
             ]);
         });
 
-        return response()->json(['message' => 'Payout status updated.', 'payout' => $payout]);
+        if ($request->expectsJson() || $request->is('api/*') || $request->ajax()) {
+            return response()->json(['message' => 'Payout status updated.', 'payout' => $payout]);
+        }
+
+        return back()->with('success', 'Payout status updated to ' . $request->status . '.');
     }
 }

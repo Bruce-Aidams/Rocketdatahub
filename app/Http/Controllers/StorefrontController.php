@@ -22,7 +22,30 @@ class StorefrontController extends Controller
         // Store in session for referral attribution
         session(['referred_by_code' => $referral_code]);
 
-        $bundles = Bundle::where('is_active', true)->get();
+        // Get distinct networks from active bundles
+        $networks = Bundle::where('is_active', true)
+            ->distinct()
+            ->pluck('network');
+
+        return view('reseller.store.index', compact('reseller', 'networks'));
+    }
+
+    public function buy(Request $request, $referral_code, $network)
+    {
+        $reseller = User::where('referral_code', $referral_code)
+            ->whereIn('role', ['agent', 'dealer', 'super_agent'])
+            ->firstOrFail();
+
+        if (!$reseller->store_active) {
+            return view('reseller.store.disabled', compact('reseller'));
+        }
+
+        // Store in session for referral attribution
+        session(['referred_by_code' => $referral_code]);
+
+        $bundles = Bundle::where('is_active', true)
+            ->where('network', $network)
+            ->get();
 
         // Load custom prices
         $customPrices = ResellerPrice::where('user_id', $reseller->id)
@@ -37,6 +60,6 @@ class StorefrontController extends Controller
             }
         });
 
-        return view('reseller.store.index', compact('reseller', 'bundles'));
+        return view('reseller.store.buy', compact('reseller', 'bundles', 'network'));
     }
 }

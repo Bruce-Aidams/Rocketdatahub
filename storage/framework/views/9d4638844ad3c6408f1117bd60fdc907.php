@@ -113,6 +113,49 @@
         </div>
 
         
+        <div
+            class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 md:p-10 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                <svg class="w-32 h-32 text-slate-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+
+            <div class="relative z-10 space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-1 bg-slate-900 dark:bg-white rounded-full"></div>
+                    <h3 class="text-slate-900 dark:text-white font-black uppercase tracking-[0.3em] text-[10px]">Store
+                        Settings</h3>
+                </div>
+
+                <form action="<?php echo e(route('reseller.store.update-name')); ?>" method="POST" class="max-w-xl">
+                    <?php echo csrf_field(); ?>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Store Name</label>
+                            <div class="flex gap-4">
+                                <input type="text" name="store_name"
+                                    value="<?php echo e(old('store_name', $user->store_name ?? $user->name . ' Store')); ?>"
+                                    class="flex-1 h-14 bg-slate-50 dark:bg-slate-950 border-none rounded-2xl px-6 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-200 dark:focus:ring-slate-700 transition-all shadow-inner"
+                                    placeholder="Enter your store name">
+                                <button type="submit"
+                                    class="h-14 px-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:opacity-90 transition-all shadow-lg active:scale-95">
+                                    Update
+                                </button>
+                            </div>
+                            <p class="text-[10px] font-medium text-slate-400">This name will be displayed on your public
+                                storefront.</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        
         <div class="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <?php $__currentLoopData = $bundles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bundle): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div

@@ -40,6 +40,7 @@ class User extends Authenticatable
         'store_active',
         'two_factor_enabled',
         'two_factor_code',
+        'store_name',
     ];
 
     public function isReseller()
@@ -95,6 +96,11 @@ class User extends Authenticatable
     public function apiKeys()
     {
         return $this->hasMany(ApiKey::class);
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
     }
 
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo e($reseller->name); ?>'s Data Hub - <?php echo e(config('app.name')); ?></title>
+    <title><?php echo e($reseller->store_name ?? $reseller->name); ?>'s Data Hub - <?php echo e(config('app.name')); ?></title>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -25,7 +25,8 @@
             </div>
             <h1
                 class="text-3xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <?php echo e($reseller->name); ?>'s <span class="text-primary block md:inline">Data Hub</span>
+                <?php echo e($reseller->store_name ?? $reseller->name); ?>'s <span class="text-primary block md:inline">Data
+                    Hub</span>
             </h1>
             <p
                 class="max-w-2xl mx-auto text-sm md:text-lg text-slate-500 dark:text-slate-400 font-medium animate-in fade-in slide-in-from-bottom-6 duration-1000 px-4">
@@ -35,221 +36,80 @@
         </div>
 
         
-        <div class="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 px-2 md:px-0">
-            <?php $__currentLoopData = $bundles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bundle): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div
-                    class="group relative bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto px-4">
+            <?php $__currentLoopData = $networks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $network): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                    $net = strtoupper($network);
+                    $colors = match ($net) {
+                        'MTN' => [
+                            'bg' => 'bg-yellow-400/10',
+                            'border' => 'border-yellow-200 dark:border-yellow-900/30',
+                            'text' => 'text-yellow-800',
+                            'btn' => 'bg-yellow-400 text-black hover:bg-yellow-300',
+                            'card_bg' => 'bg-gradient-to-br from-yellow-500 to-yellow-600 text-black',
+                            'ring' => 'group-hover:ring-yellow-400'
+                        ],
+                        'TELECEL' => [
+                            'bg' => 'bg-red-500/10',
+                            'border' => 'border-red-200 dark:border-red-900/30',
+                            'text' => 'text-red-600',
+                            'btn' => 'bg-red-600 text-white hover:bg-red-500',
+                            'card_bg' => 'bg-gradient-to-br from-red-600 to-red-700 text-white',
+                            'ring' => 'group-hover:ring-red-600'
+                        ],
+                        'AT', 'AIRTELTIGO' => [
+                            'bg' => 'bg-blue-600/10',
+                            'border' => 'border-blue-200 dark:border-blue-900/30',
+                            'text' => 'text-blue-600',
+                            'btn' => 'bg-blue-600 text-white hover:bg-blue-500',
+                            'card_bg' => 'bg-gradient-to-br from-blue-600 to-blue-700 text-white',
+                            'ring' => 'group-hover:ring-blue-600'
+                        ],
+                        default => [
+                            'bg' => 'bg-slate-100',
+                            'border' => 'border-slate-200',
+                            'text' => 'text-slate-900',
+                            'btn' => 'bg-slate-900 text-white',
+                            'card_bg' => 'bg-slate-800 text-white',
+                            'ring' => 'group-hover:ring-slate-500'
+                        ]
+                    };
+                ?>
+
+                <a href="<?php echo e(route('store.buy', ['referral_code' => $reseller->referral_code, 'network' => $network])); ?>"
+                    class="group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border <?php echo e($colors['border']); ?> shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 p-8 flex flex-col items-center justify-center text-center gap-6 ring-2 ring-transparent <?php echo e($colors['ring']); ?>">
+
                     
                     <div
-                        class="aspect-[4/3] bg-slate-50 dark:bg-slate-800/50 relative flex items-center justify-center overflow-hidden">
-                        <?php if($bundle->image_url): ?>
-                            <img src="<?php echo e($bundle->image_url); ?>"
-                                class="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500">
-                        <?php else: ?>
-                            <div
-                                class="flex flex-col items-center gap-2 opacity-20 group-hover:opacity-40 transition-opacity text-slate-400">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                        <?php endif; ?>
-
-                        
-                        <div class="absolute top-3 left-3">
-                            <?php
-                                $net = strtoupper($bundle->network);
-                                $netColors = [
-                                    'MTN' => 'bg-yellow-400 text-yellow-950',
-                                    'TELECEL' => 'bg-red-500 text-white',
-                                    'AT' => 'bg-blue-600 text-white',
-                                    'AIRTELTIGO' => 'bg-blue-600 text-white',
-                                ];
-                                $nc = $netColors[$net] ?? 'bg-slate-900 text-white';
-                            ?>
-                            <span
-                                class="px-2.5 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase shadow-sm backdrop-blur-md <?php echo e($nc); ?>">
-                                <?php echo e($bundle->network); ?>
-
-                            </span>
-                        </div>
+                        class="w-24 h-24 rounded-full <?php echo e($colors['bg']); ?> flex items-center justify-center shadow-inner mb-4 transition-transform duration-500 group-hover:scale-110">
+                        <span class="text-3xl font-black <?php echo e($colors['text']); ?>"><?php echo e(substr($net, 0, 1)); ?></span>
                     </div>
 
-                    <div class="p-4 md:p-5 space-y-4">
-                        <div>
-                            <h3
-                                class="text-sm md:text-base font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight line-clamp-2">
-                                <?php echo e($bundle->name); ?>
-
-                            </h3>
-                            <p class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-widest">
-                                <?php echo e($bundle->data_amount); ?> Data
-                            </p>
-                        </div>
-
-                        <div class="pt-4 border-t border-slate-50 dark:border-slate-800 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Price</p>
-                                <p class="text-lg font-black text-primary tracking-tighter tabular-nums">
-                                    ₵<?php echo e(number_format($bundle->display_price, 2)); ?></p>
-                            </div>
-                            <!-- Buy Button triggers Modal -->
-                            <button
-                                onclick="openCheckoutModal(<?php echo e($bundle->id); ?>, '<?php echo e(addslashes($bundle->name)); ?>', <?php echo e($bundle->display_price); ?>)"
-                                class="w-full h-9 md:h-10 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-primary dark:hover:bg-primary dark:hover:text-white transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
-                                <span>Buy Now</span>
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="space-y-2 relative z-10">
+                        <h2 class="text-3xl font-black <?php echo e($colors['text']); ?>"><?php echo e($network); ?></h2>
+                        <p class="text-sm font-bold opacity-60 uppercase tracking-widest text-slate-500">Instant Delivery
+                        </p>
                     </div>
-                </div>
+
+                    <div class="w-full mt-4">
+                        <span
+                            class="w-full py-4 rounded-xl font-black uppercase tracking-widest <?php echo e($colors['btn']); ?> shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                            <span>Buy Bundle</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </span>
+                    </div>
+
+                    
+                    <div
+                        class="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none <?php echo e($colors['card_bg']); ?>">
+                    </div>
+                </a>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-        
-        <div x-data="{ 
-                open: false, 
-                step: 'input', 
-                bundleId: null, 
-                bundleName: '', 
-                price: 0, 
-                email: '', 
-                phone: '',
-                get isValidPhone() {
-                    const pattern = /^0(20|23|24|25|26|27|28|50|53|54|55|56|57|59)\d{7}$/;
-                    return pattern.test(this.phone);
-                },
-                get isValidEmail() {
-                    return /^\S+@\S+\.\S+$/.test(this.email);
-                },
-                reset() {
-                    this.step = 'input';
-                    this.email = '';
-                    this.phone = '';
-                }
-            }"
-            @open-checkout.window="open = true; reset(); bundleId = $event.detail.id; bundleName = $event.detail.name; price = $event.detail.price"
-            class="relative z-[100]" aria-labelledby="modal-title" role="dialog" aria-modal="true" x-show="open"
-            x-cloak>
-
-            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-                x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-
-            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-[2rem] bg-white dark:bg-slate-900 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100 dark:border-slate-800"
-                        x-transition:enter="ease-out duration-300"
-                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave="ease-in duration-200"
-                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        @click.away="open = false">
-
-                        <div class="bg-gradient-to-br from-primary/10 to-transparent p-6 md:p-8">
-                            <div class="flex items-center justify-between mb-6">
-                                <div>
-                                    <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight"
-                                        id="modal-title">
-                                        <span x-show="step === 'input'">Secure Checkout</span>
-                                        <span x-show="step === 'confirm'">Verify Details</span>
-                                    </h3>
-                                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider"
-                                        x-text="bundleName"></p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">Total</p>
-                                    <p class="text-2xl font-black text-primary tabular-nums">₵<span
-                                            x-text="price.toFixed(2)"></span></p>
-                                </div>
-                            </div>
-
-                            
-                            <div x-show="step === 'input'" class="space-y-4">
-                                <div class="space-y-1.5">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Email Address</label>
-                                    <input type="email" x-model="email" placeholder="customer@example.com"
-                                        class="w-full h-12 px-5 bg-white dark:bg-slate-950 border-none rounded-xl text-sm font-bold text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:font-normal placeholder:text-slate-400">
-                                </div>
-
-                                <div class="space-y-1.5">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Recipient Number</label>
-                                    <input type="tel" x-model="phone" maxlength="10" placeholder="024XXXXXXX"
-                                        @input="phone = phone.replace(/\D/g, '')"
-                                        :class="phone.length > 0 && !isValidPhone ? 'ring-2 ring-red-500' : ''"
-                                        class="w-full h-12 px-5 bg-white dark:bg-slate-950 border-none rounded-xl text-sm font-bold text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:font-normal placeholder:text-slate-400 font-mono tracking-wide">
-                                    <p x-show="phone.length > 0 && !isValidPhone" 
-                                       class="text-[9px] font-bold text-red-500 mt-1 ml-1 uppercase tracking-tight">
-                                        Enter a valid 10-digit Ghana number (e.g. 024...)
-                                    </p>
-                                </div>
-
-                                <div class="pt-4">
-                                    <button @click="isValidPhone && isValidEmail ? step = 'confirm' : null"
-                                        :class="isValidPhone && isValidEmail ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'"
-                                        class="w-full h-14 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 group/pay">
-                                        <span>Continue to Verify</span>
-                                        <svg class="w-4 h-4 transition-transform group-hover/pay:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            
-                            <div x-show="step === 'confirm'" x-cloak class="space-y-6">
-                                <div
-                                    class="bg-white/50 dark:bg-slate-950/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <span
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Recipient</span>
-                                        <span class="text-sm font-black text-slate-900 dark:text-white font-mono"
-                                            x-text="phone"></span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</span>
-                                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300"
-                                            x-text="email"></span>
-                                    </div>
-                                </div>
-
-                                <div class="flex gap-3">
-                                    <button @click="step = 'input'"
-                                        class="flex-1 h-14 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">
-                                        Edit Details
-                                    </button>
-
-                                    <form action="<?php echo e(route('store.purchase')); ?>" method="POST" class="flex-[2]">
-                                        <?php echo csrf_field(); ?>
-                                        <input type="hidden" name="reseller_code"
-                                            value="<?php echo e($reseller->referral_code); ?>">
-                                        <input type="hidden" name="bundle_id" :value="bundleId">
-                                        <input type="hidden" name="email" :value="email">
-                                        <input type="hidden" name="phone" :value="phone">
-
-                                        <button type="submit"
-                                            class="w-full h-14 bg-primary text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-primary/90 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2">
-                                            <span>Pay ₵<span x-text="price.toFixed(2)"></span></span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <button type="button" @click="open = false"
-                                class="w-full mt-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                                Cancel Transaction
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         
         <?php if(session('success')): ?>
@@ -268,23 +128,41 @@
                             x-transition:leave="ease-in duration-200"
                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
-                            <div
-                                class="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <h3 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight mb-2">
-                                Payment Received!</h3>
-                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8 px-4 leading-relaxed">
-                                <?php echo e(session('success')); ?>
 
-                            </p>
-                            <button @click="show = false"
-                                class="w-full h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-primary dark:hover:bg-primary dark:hover:text-white transition-all shadow-xl active:scale-95">
-                                Great, Thanks!
-                            </button>
+                            
+                            <div class="absolute inset-0 pointer-events-none opacity-50">
+                                <div class="absolute top-0 left-1/4 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+                                <div
+                                    class="absolute top-10 right-1/4 w-3 h-3 bg-purple-500 rounded-full animate-ping delay-100">
+                                </div>
+                                <div class="absolute bottom-10 left-10 w-2 h-2 bg-blue-500 rounded-full animate-bounce">
+                                </div>
+                                <div class="absolute top-1/2 right-4 w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                            </div>
+
+                            <div class="relative">
+                                <div
+                                    class="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/30 animate-in zoom-in duration-500">
+                                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+
+                                <h3
+                                    class="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight mb-2">
+                                    Payment Received!
+                                </h3>
+                                <p class="text-base font-bold text-slate-500 dark:text-slate-400 mb-8 px-2 leading-relaxed">
+                                    <?php echo e(session('success')); ?>
+
+                                </p>
+
+                                <button @click="show = false"
+                                    class="w-full h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-slate-900/20">
+                                    Start New Order
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -310,41 +188,43 @@
                     this.show = true;
                     setTimeout(() => { this.show = false }, 5000);
                 }
-            }" 
-            x-show="show" 
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 translate-y-4"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[120] min-w-[300px]"
-            x-cloak>
-            <div :class="type === 'success' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'bg-red-500 text-white'"
-                 class="px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10">
-                <div x-show="type === 'success'" class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            }" x-show="show" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-[120] min-w-[320px] max-w-sm w-full px-4" x-cloak>
+
+            <div :class="type === 'success' ? 'bg-slate-900/90 dark:bg-white/90 text-white dark:text-slate-900 border-white/10' : 'bg-red-500/90 text-white border-red-400/20'"
+                class="px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md border flex items-center gap-4">
+
+                <div x-show="type === 'success'"
+                    class="shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
-                <div x-show="type === 'error'" class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+
+                <div x-show="type === 'error'"
+                    class="shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </div>
-                <p class="text-[11px] font-black uppercase tracking-widest" x-text="message"></p>
+
+                <div>
+                    <h4 class="text-[10px] font-black uppercase tracking-widest opacity-80"
+                        x-text="type === 'success' ? 'Success' : 'Error'"></h4>
+                    <p class="text-sm font-bold leading-tight mt-0.5" x-text="message"></p>
+                </div>
             </div>
         </div>
 
-        <script>
-            function openCheckoutModal(id, name, price) {
-                window.dispatchEvent(new CustomEvent('open-checkout', { detail: { id, name, price } }));
-            }
-        </script>
 
         
         <div class="pt-12 md:pt-20 border-t border-slate-100 dark:border-slate-800 text-center space-y-4">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Managed by <?php echo e($reseller->name); ?>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Managed by
+                <?php echo e($reseller->store_name ?? $reseller->name); ?>
 
             </p>
             <p class="text-xs text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest">Powered by

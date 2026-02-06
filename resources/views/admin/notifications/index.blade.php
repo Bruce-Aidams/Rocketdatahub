@@ -131,8 +131,8 @@
                             <form action="{{ route('admin.notifications') }}" method="GET">
                                 <select name="per_page" onchange="this.form.submit()"
                                     class="h-10 w-full px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-primary/10 transition-all dark:text-slate-400 appearance-none cursor-pointer">
-                                    @foreach([10, 20, 50, 100, 200] as $val)
-                                        <option value="{{ $val }}" {{ request('per_page', 10) == $val ? 'selected' : '' }}>{{ $val }}
+                                    @foreach([5, 10, 20, 50, 100] as $val)
+                                        <option value="{{ $val }}" {{ request('per_page', 5) == $val ? 'selected' : '' }}>{{ $val }}
                                             Per Page</option>
                                     @endforeach
                                 </select>

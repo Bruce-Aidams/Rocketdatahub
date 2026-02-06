@@ -33,8 +33,9 @@ class ApiKeyController extends Controller
         $key = 'sk_' . env('APP_ENV', 'local') . '_' . Str::random(40);
 
         // Calculate expiration date
-        $expiresAt = $request->expires_in_days
-            ? now()->addDays($request->expires_in_days)
+        // Calculate expiration date
+        $expiresAt = $request->input('expires_in_days')
+            ? now()->addDays((int) $request->input('expires_in_days'))
             : null;
 
         // Create API key
@@ -45,14 +46,21 @@ class ApiKeyController extends Controller
             'expires_at' => $expiresAt,
         ]);
 
-        return response()->json([
-            'message' => 'API key generated successfully',
-            'api_key' => $apiKey->id . '|' . $key, // Return ID|Key for lookup
-            'key_id' => $apiKey->id,
-            'name' => $apiKey->name,
-            'expires_at' => $apiKey->expires_at,
-            'warning' => 'Please save this API key now. You will not be able to see it again.'
-        ], 201);
+        if ($request->wantsJson() && !$request->acceptsHtml()) {
+            return response()->json([
+                'message' => 'API key generated successfully',
+                'api_key' => $apiKey->id . '|' . $key,
+                'key_id' => $apiKey->id,
+                'name' => $apiKey->name,
+                'expires_at' => $apiKey->expires_at,
+                'warning' => 'Please save this API key now. You will not be able to see it again.'
+            ], 201);
+        }
+
+        return back()->with([
+            'success' => 'API Key created successfully.',
+            'new_key' => $apiKey->id . '|' . $key
+        ]);
     }
 
     /**
@@ -79,7 +87,10 @@ class ApiKeyController extends Controller
     {
         $user = $request->user();
 
-        $apiKey = $user->apiKeys()->find($id);
+        // If admin, allow finding any key. Otherwise, only user's keys.
+        $apiKey = $user->isAdmin()
+            ? ApiKey::find($id)
+            : $user->apiKeys()->find($id);
 
         if (!$apiKey) {
             return response()->json([
@@ -89,9 +100,13 @@ class ApiKeyController extends Controller
 
         $apiKey->delete();
 
-        return response()->json([
-            'message' => 'API key revoked successfully'
-        ]);
+        if ($request->wantsJson() && !$request->acceptsHtml()) {
+            return response()->json([
+                'message' => 'API key revoked successfully'
+            ]);
+        }
+
+        return back()->with('success', 'API Key deleted successfully.');
     }
 
     /**
@@ -101,7 +116,10 @@ class ApiKeyController extends Controller
     {
         $user = $request->user();
 
-        $apiKey = $user->apiKeys()->find($id);
+        // If admin, allow finding any key. Otherwise, only user's keys.
+        $apiKey = $user->isAdmin()
+            ? ApiKey::find($id)
+            : $user->apiKeys()->find($id);
 
         if (!$apiKey) {
             return response()->json([
@@ -119,12 +137,19 @@ class ApiKeyController extends Controller
             'last_used_at' => null, // Reset usage
         ]);
 
-        return response()->json([
-            'message' => 'API key regenerated successfully',
-            'api_key' => $apiKey->id . '|' . $key,
-            'key_id' => $apiKey->id,
-            'name' => $apiKey->name,
-            'warning' => 'Please save this API key now. You will not be able to see it again.'
+        if ($request->wantsJson() && !$request->acceptsHtml()) {
+            return response()->json([
+                'message' => 'API key regenerated successfully',
+                'api_key' => $apiKey->id . '|' . $key,
+                'key_id' => $apiKey->id,
+                'name' => $apiKey->name,
+                'warning' => 'Please save this API key now. You will not be able to see it again.'
+            ]);
+        }
+
+        return back()->with([
+            'success' => 'API Key regenerated successfully.',
+            'new_key' => $apiKey->id . '|' . $key
         ]);
     }
 
@@ -135,7 +160,10 @@ class ApiKeyController extends Controller
     {
         $user = $request->user();
 
-        $apiKey = $user->apiKeys()->find($id);
+        // If admin, allow finding any key. Otherwise, only user's keys.
+        $apiKey = $user->isAdmin()
+            ? ApiKey::find($id)
+            : $user->apiKeys()->find($id);
 
         if (!$apiKey) {
             return response()->json([

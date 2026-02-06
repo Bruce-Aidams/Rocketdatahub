@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Transaction;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -81,9 +83,9 @@ class AdminController extends Controller
             ->orderBy('month')
             ->get();
 
-        $monthlyRevenue = [
+        $chartData = [
             'labels' => $monthlyRevenueRaw->pluck('month'),
-            'data' => $monthlyRevenueRaw->pluck('total')
+            'values' => $monthlyRevenueRaw->pluck('total')
         ];
 
         // Top Performing Agents
@@ -116,7 +118,7 @@ class AdminController extends Controller
             'totalRevenueAllTime',
             'totalProfitAllTime',
             'recentOrders',
-            'monthlyRevenue',
+            'chartData',
             'topAgents'
         ));
     }
@@ -355,11 +357,21 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'network_type' => 'nullable|string',
             'base_url' => 'required|url',
+            'request_method' => 'nullable|in:GET,POST,PUT',
+            'request_headers' => 'nullable|string',
+            'request_body' => 'nullable|string',
             'api_key' => 'nullable|string',
             'secret_key' => 'nullable|string',
+            'webhook_url' => 'nullable|string',
             'is_active' => 'required|boolean'
         ]);
+
+        if (isset($data['request_headers']))
+            $data['request_headers'] = json_decode($data['request_headers'], true);
+        if (isset($data['request_body']))
+            $data['request_body'] = json_decode($data['request_body'], true);
 
         $provider = \App\Models\ApiProvider::create($data);
         return response()->json($provider, 201);
@@ -369,12 +381,22 @@ class AdminController extends Controller
     {
         $provider = \App\Models\ApiProvider::findOrFail($id);
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'base_url' => 'required|url',
+            'name' => 'sometimes|required|string|max:255',
+            'network_type' => 'nullable|string',
+            'base_url' => 'sometimes|required|url',
+            'request_method' => 'nullable|in:GET,POST,PUT',
+            'request_headers' => 'nullable|string',
+            'request_body' => 'nullable|string',
             'api_key' => 'nullable|string',
             'secret_key' => 'nullable|string',
-            'is_active' => 'required|boolean'
+            'webhook_url' => 'nullable|string',
+            'is_active' => 'sometimes|required|boolean'
         ]);
+
+        if (isset($data['request_headers']))
+            $data['request_headers'] = json_decode($data['request_headers'], true);
+        if (isset($data['request_body']))
+            $data['request_body'] = json_decode($data['request_body'], true);
 
         $provider->update($data);
         return response()->json($provider);
@@ -520,6 +542,7 @@ class AdminController extends Controller
 
     public function adjustWallet(Request $request, $id)
     {
+        Log::info("Adjusting wallet for user $id", $request->all());
         $request->validate([
             'type' => 'required|in:credit,debit',
             'amount' => 'required|numeric|min:0.01',
@@ -533,11 +556,19 @@ class AdminController extends Controller
         try {
             if ($request->type === 'credit') {
                 $user->wallet_balance += $amount;
+
+                // Sync with wallets table
+                $wallet = $user->wallet ?: $user->wallet()->create(['balance' => 0]);
+                $wallet->credit($amount, 'Manual Adjustment: ' . $request->note);
             } else {
                 if ($user->wallet_balance < $amount) {
                     return response()->json(['message' => 'Insufficient wallet balance'], 400);
                 }
                 $user->wallet_balance -= $amount;
+
+                // Sync with wallets table
+                $wallet = $user->wallet ?: $user->wallet()->create(['balance' => 0]);
+                $wallet->debit($amount, 'Manual Adjustment: ' . $request->note);
             }
             $user->save();
 
@@ -551,10 +582,71 @@ class AdminController extends Controller
             ]);
 
             DB::commit();
+            session()->flash('success', 'Wallet adjusted successfully. New Balance: ' . number_format($user->wallet_balance, 2));
             return response()->json(['message' => 'Wallet adjusted successfully', 'new_balance' => $user->wallet_balance]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Failed to adjust wallet'], 500);
+            Log::error("Wallet Adjustment Error: " . $e->getMessage());
+            return response()->json(['message' => 'Failed to adjust wallet: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function getTransactions(Request $request)
+    {
+        $query = Transaction::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%");
+                    });
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        $transactions = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
+
+        return view('admin.transactions.index', compact('transactions'));
+    }
+
+    public function getInvoices(Request $request)
+    {
+        $query = Transaction::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', "%$search%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%");
+                    });
+            });
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        $transactions = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
+
+        return view('admin.invoices.index', compact('transactions'));
+    }
+
+    public function downloadInvoice($id)
+    {
+        $transaction = Transaction::with('user')->findOrFail($id);
+        return view('invoices.transaction', compact('transaction'));
     }
 }

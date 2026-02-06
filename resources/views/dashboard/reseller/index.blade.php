@@ -199,7 +199,7 @@
                                 <input type="text" readonly value="{{ route('store.show', $user->referral_code) }}"
                                     class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 outline-none">
                                 <button
-                                    onclick="navigator.clipboard.writeText('Check out {{ $user->name }}\'s store on {{ config('app.name') }}: {{ route('store.show', $user->referral_code) }}'); alert('Store link with agent details copied!')"
+                                    onclick="navigator.clipboard.writeText('Check out {{ $user->name }}\'s store on {{ config('app.name') }}: {{ route('store.show', $user->referral_code) }}'); window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Store link with agent details copied!', type: 'success' } }))"
                                     class="h-10 px-4 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all">Copy</button>
                             </div>
                         </div>

@@ -4,24 +4,24 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ 
-                                                                                                        tab: 'providers',
-                                                                                                        modalOpen: false, 
-                                                                                                        editMode: false,
-                                                                                                        provider: { id: '', name: '', base_url: '', webhook_url: '', api_key: '', secret_key: '', is_active: true },
-                                                                                                        resetForm() {
-                                                                                                            this.provider = { id: '', name: '', base_url: '', webhook_url: '', api_key: '', secret_key: '', is_active: true };
-                                                                                                            this.editMode = false;
-                                                                                                        },
-                                                                                                        openAdd() {
-                                                                                                            this.resetForm();
-                                                                                                            this.modalOpen = true;
-                                                                                                        },
-                                                                                                        openEdit(p) {
-                                                                                                            this.provider = JSON.parse(JSON.stringify(p));
-                                                                                                            this.editMode = true;
-                                                                                                            this.modalOpen = true;
-                                                                                                        }
-                                                                                                    }">
+                                                                                                            tab: 'providers',
+                                                                                                            modalOpen: false, 
+                                                                                                            editMode: false,
+                                                                                                            provider: { id: '', name: '', base_url: '', webhook_url: '', api_key: '', secret_key: '', is_active: true },
+                                                                                                            resetForm() {
+                                                                                                                this.provider = { id: '', name: '', base_url: '', webhook_url: '', api_key: '', secret_key: '', is_active: true };
+                                                                                                                this.editMode = false;
+                                                                                                            },
+                                                                                                            openAdd() {
+                                                                                                                this.resetForm();
+                                                                                                                this.modalOpen = true;
+                                                                                                            },
+                                                                                                            openEdit(p) {
+                                                                                                                this.provider = JSON.parse(JSON.stringify(p));
+                                                                                                                this.editMode = true;
+                                                                                                                this.modalOpen = true;
+                                                                                                            }
+                                                                                                        }">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -54,6 +54,11 @@
                 :class="tab === 'providers' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                 class="px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap">
                 Active Providers
+            </button>
+            <button @click="tab = 'user_keys'"
+                :class="tab === 'user_keys' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                class="px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap">
+                User Keys
             </button>
             <button @click="tab = 'connectivity'"
                 :class="tab === 'connectivity' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
@@ -135,16 +140,16 @@
 
                     <div class="pt-4">
                         <button type="button" @click="async () => {
-                                                                                                    const url = document.getElementById('webhook_url').value;
-                                                                                                    const secret = document.getElementById('webhook_secret').value;
-                                                                                                    const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
-                                                                                                        method: 'PUT',
-                                                                                                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                                                                                                        body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
-                                                                                                    });
-                                                                                                    if(response.ok) alert('Webhook configuration synchronized!');
-                                                                                                    else alert('Failed to save webhook settings.');
-                                                                                                }"
+                                                                                                        const url = document.getElementById('webhook_url').value;
+                                                                                                        const secret = document.getElementById('webhook_secret').value;
+                                                                                                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
+                                                                                                            method: 'PUT',
+                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+                                                                                                            body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
+                                                                                                        });
+                                                                                                        if(response.ok) alert('Webhook configuration synchronized!');
+                                                                                                        else alert('Failed to save webhook settings.');
+                                                                                                    }"
                             class="h-12 px-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold text-xs uppercase shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -226,6 +231,70 @@
                             Provider</button>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- User Keys View -->
+        <div x-show="tab === 'user_keys'" class="space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+                <div class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">User API Keys</h3>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                        Manage user-generated access tokens</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                            <tr>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">User</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Key Name</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Preview</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Created</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 dark:divide-slate-800 font-medium">
+                            <?php $__empty_1 = true; $__currentLoopData = $userKeys; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500 border border-slate-200 dark:border-slate-700">
+                                                <?php echo e(substr($key->user->name ?? '?', 0, 1)); ?>
+
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold text-slate-900 dark:text-white"><?php echo e($key->user->name ?? 'Unknown User'); ?></p>
+                                                <p class="text-[10px] text-slate-500"><?php echo e($key->user->email ?? 'No Email'); ?></p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-xs text-slate-700 dark:text-slate-300"><?php echo e($key->name); ?></td>
+                                    <td class="px-6 py-4">
+                                        <code class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-500 border border-slate-200 dark:border-slate-700"><?php echo e($key->key_preview); ?></code>
+                                    </td>
+                                    <td class="px-6 py-4 text-xs text-slate-500"><?php echo e($key->created_at->format('M d, Y')); ?></td>
+                                    <td class="px-6 py-4 text-right">
+                                        <form action="<?php echo e(route('api-keys.destroy', $key->id)); ?>" method="POST" onsubmit="return confirm('Revoke this user API key? This cannot be undone.');">
+                                            <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                                            <button type="submit" class="text-[10px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-widest hover:underline bg-rose-50 dark:bg-rose-900/10 px-3 py-1.5 rounded-lg transition-colors">Revoke</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <tr>
+                                    <td colspan="5" class="px-6 py-24 text-center">
+                                        <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <svg class="w-8 h-8 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                            </svg>
+                                        </div>
+                                        <span class="text-slate-400 dark:text-slate-600 text-xs italic">No user keys found.</span>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

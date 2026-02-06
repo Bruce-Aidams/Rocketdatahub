@@ -81,6 +81,21 @@ Route::middleware('guest')->group(function () {
 
         return redirect()->route('dashboard');
     });
+
+    // Password Reset Routes
+    Route::get('forgot-password', function () {
+        return view('auth.forgot-password');
+    })->name('password.request');
+
+    Route::post('forgot-password', [\App\Http\Controllers\AuthController::class, 'sendResetLinkEmail'])
+        ->name('password.email');
+
+    Route::get('reset-password/{token}', function (Request $request, $token) {
+        return view('auth.reset-password', ['token' => $token, 'email' => $request->email]);
+    })->name('password.reset');
+
+    Route::post('reset-password', [\App\Http\Controllers\AuthController::class, 'resetPasswordBlade'])
+        ->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -93,7 +108,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', function () {
         $user = Auth::user();
-        $balance = $user->wallet->balance ?? 0.00;
+        $balance = $user->wallet_balance;
         $recentOrders = $user->orders()->with('bundle')->latest()->take(5)->get();
 
         $pendingTransactions = $user->transactions()
@@ -161,6 +176,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/reseller-hub', [\App\Http\Controllers\ResellerHubController::class, 'index'])->name('reseller.hub');
     Route::get('/dashboard/reseller-hub/store', [\App\Http\Controllers\ResellerHubController::class, 'manageStore'])->name('reseller.store.manage');
     Route::post('/dashboard/reseller-hub/store/prices', [\App\Http\Controllers\ResellerHubController::class, 'updatePrice'])->name('reseller.store.update-price');
+    Route::post('/dashboard/reseller-hub/store/name', [\App\Http\Controllers\ResellerHubController::class, 'updateStoreName'])->name('reseller.store.update-name');
     Route::post('/dashboard/reseller-hub/store/toggle', [\App\Http\Controllers\ResellerHubController::class, 'toggleStoreStatus'])->name('reseller.store.toggle');
     Route::post('/dashboard/reseller-hub/store/regenerate', [\App\Http\Controllers\ResellerHubController::class, 'regenerateStoreLink'])->name('reseller.store.regenerate');
     Route::get('/dashboard/reseller-hub/customer-orders', [\App\Http\Controllers\ResellerHubController::class, 'customerOrders'])->name('reseller.customer-orders');
@@ -295,7 +311,14 @@ Route::middleware('auth')->group(function () {
 
         // Payouts Management
         Route::get('/payouts', [\App\Http\Controllers\PayoutController::class, 'adminIndex'])->name('admin.payouts');
-        Route::post('/payouts/{id}/process', [\App\Http\Controllers\PayoutController::class, 'process'])->name('admin.payouts.process'); // Hypothetical, need to check PayoutController
+        Route::post('/payouts/{id}/process', [\App\Http\Controllers\PayoutController::class, 'process'])->name('admin.payouts.process');
+        Route::post('/payouts/{id}/approve', [\App\Http\Controllers\PayoutController::class, 'approve'])->name('admin.payouts.approve');
+        Route::post('/payouts/{id}/reject', [\App\Http\Controllers\PayoutController::class, 'reject'])->name('admin.payouts.reject');
+
+        // Transactions & Invoices
+        Route::get('/transactions', [\App\Http\Controllers\AdminController::class, 'getTransactions'])->name('admin.transactions.index');
+        Route::get('/invoices', [\App\Http\Controllers\AdminController::class, 'getInvoices'])->name('admin.invoices.index');
+        Route::get('/invoices/download/{id}', [\App\Http\Controllers\AdminController::class, 'downloadInvoice'])->name('admin.invoices.download');
 
         // Financials & Analytics
         Route::get('/financials', [\App\Http\Controllers\AdminController::class, 'transactions'])->name('admin.financials');
@@ -320,18 +343,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/login-activities', [\App\Http\Controllers\AdminController::class, 'getLoginActivities'])->name('admin.settings.login-activities');
     });
 
-    // Password Reset Routes
-    Route::get('forgot-password', function () {
-        return view('auth.forgot-password');
-    })->name('password.request');
-
-    Route::post('forgot-password', [\App\Http\Controllers\AuthController::class, 'sendResetLinkEmail'])
-        ->name('password.email');
-
-    Route::get('reset-password/{token}', function (Request $request, $token) {
-        return view('auth.reset-password', ['token' => $token, 'email' => $request->email]);
-    })->name('password.reset');
-
-    Route::post('reset-password', [\App\Http\Controllers\AuthController::class, 'resetPasswordBlade'])
-        ->name('password.update');
 });

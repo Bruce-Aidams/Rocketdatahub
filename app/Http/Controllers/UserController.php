@@ -54,20 +54,34 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'role' => 'required|in:user,admin,agent,dealer,super_agent',
             'is_active' => 'boolean',
+            'wallet_balance' => 'nullable|numeric|min:0',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'is_active' => $request->boolean('is_active'),
-            'referral_code' => strtoupper(Str::random(8)),
-            'wallet_balance' => 0,
-        ]);
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+                'is_active' => $request->boolean('is_active'),
+                'referral_code' => strtoupper(Str::random(8)),
+                'wallet_balance' => $request->wallet_balance ?? 0,
+            ]);
 
-        return redirect()->route('admin.users')->with('success', 'User created successfully');
+            // Sync with wallets table
+            $user->wallet()->create([
+                'balance' => $user->wallet_balance,
+            ]);
+
+            \Illuminate\Support\Facades\DB::commit();
+            return redirect()->route('admin.users')->with('success', 'User created successfully');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Illuminate\Support\Facades\Log::error("Error creating user: " . $e->getMessage());
+            return back()->with('error', 'Failed to create user: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -103,9 +117,23 @@ class UserController extends Controller
             $data['wallet_balance'] = $request->wallet_balance;
         }
 
-        $user->update($data);
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            $user->update($data);
 
-        return redirect()->route('admin.users')->with('success', 'User updated successfully');
+            // Sync with wallets table
+            if ($request->has('wallet_balance')) {
+                $wallet = $user->wallet ?: $user->wallet()->create(['balance' => 0]);
+                $wallet->update(['balance' => $request->wallet_balance]);
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+            return redirect()->route('admin.users')->with('success', 'User updated successfully');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Illuminate\Support\Facades\Log::error("Error updating user {$user->id}: " . $e->getMessage());
+            return back()->with('error', 'Failed to update user: ' . $e->getMessage());
+        }
     }
 
     /**

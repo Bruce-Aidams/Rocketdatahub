@@ -83,12 +83,12 @@ class AdminResellerController extends Controller
         DB::beginTransaction();
         try {
             if ($request->type === 'credit') {
-                $user->wallet_balance += $amount;
+                $user->commission_balance += $amount;
             } else {
-                if ($user->wallet_balance < $amount) {
-                    return back()->with('error', 'Insufficient wallet balance');
+                if ($user->commission_balance < $amount) {
+                    return back()->with('error', 'Insufficient commission balance');
                 }
-                $user->wallet_balance -= $amount;
+                $user->commission_balance -= $amount;
             }
             $user->save();
 

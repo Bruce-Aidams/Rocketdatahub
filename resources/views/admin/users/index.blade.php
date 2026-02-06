@@ -4,68 +4,68 @@
 
 @section('content')
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{
-                                    modalOpen: false,
-                                    editMode: false,
-                                    walletModalOpen: false,
-                                    walletUser: { id: '', name: '', balance: 0 },
-                                    walletData: { type: 'credit', amount: '', note: '', isSubmitting: false },
-                                    user: { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '' },
-                                    resetForm() {
-                                        this.user = { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '' };
-                                        this.editMode = false;
-                                    },
-                                    openAdd() {
-                                        this.resetForm();
-                                        this.modalOpen = true;
-                                    },
-                                    openEdit(u) {
-                                        this.user = JSON.parse(JSON.stringify(u));
-                                        this.user.is_active = !!this.user.is_active;
-                                        this.user.password = '';
-                                        this.editMode = true;
-                                        this.modalOpen = true;
-                                    },
-                                    openWallet(u) {
-                                        this.walletUser = { id: u.id, name: u.name, balance: u.wallet_balance };
-                                        this.walletData = { type: 'credit', amount: '', note: '', isSubmitting: false };
-                                        this.walletModalOpen = true;
-                                    },
-                                    async submitWalletAdjustment() {
-                                        if (this.walletData.isSubmitting) return;
-                                        this.walletData.isSubmitting = true;
+                                                            modalOpen: false,
+                                                            editMode: false,
+                                                            walletModalOpen: false,
+                                                            walletUser: { id: '', name: '', balance: 0 },
+                                                            walletData: { type: 'credit', amount: '', note: '', isSubmitting: false },
+                                                            user: { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '', wallet_balance: 0 },
+                                                            resetForm() {
+                                                                this.user = { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '', wallet_balance: 0 };
+                                                                this.editMode = false;
+                                                            },
+                                                            openAdd() {
+                                                                this.resetForm();
+                                                                this.modalOpen = true;
+                                                            },
+                                                            openEdit(u) {
+                                                                this.user = JSON.parse(JSON.stringify(u));
+                                                                this.user.is_active = !!this.user.is_active;
+                                                                this.user.password = '';
+                                                                this.editMode = true;
+                                                                this.modalOpen = true;
+                                                            },
+                                                            openWallet(u) {
+                                                                this.walletUser = { id: u.id, name: u.name, balance: u.wallet_balance };
+                                                                this.walletData = { type: 'credit', amount: '', note: '', isSubmitting: false };
+                                                                this.walletModalOpen = true;
+                                                            },
+                                                            async submitWalletAdjustment() {
+                                                                if (this.walletData.isSubmitting) return;
+                                                                this.walletData.isSubmitting = true;
 
-                                        try {
-                                            const response = await fetch(`/admin/users/${this.walletUser.id}/wallet`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'Accept': 'application/json',
-                                                    'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
-                                                },
-                                                body: JSON.stringify({
-                                                    type: this.walletData.type,
-                                                    amount: this.walletData.amount,
-                                                    note: this.walletData.note
-                                                })
-                                            });
+                                                                try {
+                                                                    const response = await fetch(`/admin/users/${this.walletUser.id}/wallet`, {
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            'Content-Type': 'application/json',
+                                                                            'Accept': 'application/json',
+                                                                            'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
+                                                                        },
+                                                                        body: JSON.stringify({
+                                                                            type: this.walletData.type,
+                                                                            amount: this.walletData.amount,
+                                                                            note: this.walletData.note
+                                                                        })
+                                                                    });
 
-                                            const data = await response.json();
+                                                                    const data = await response.json();
 
-                                            if (response.ok) {
-                                                alert(data.message + '\nNew Balance: GHS ' + parseFloat(data.new_balance).toFixed(2));
-                                                this.walletModalOpen = false;
-                                                window.location.reload();
-                                            } else {
-                                                alert(data.message || 'Failed to adjust wallet');
-                                            }
-                                        } catch (error) {
-                                            alert('An error occurred. Please try again.');
-                                            console.error(error);
-                                        } finally {
-                                            this.walletData.isSubmitting = false;
-                                        }
-                                    }
-                                }">
+                                                                    if (response.ok) {
+                                                                        // Success handled by session flash after reload
+                                                                        this.walletModalOpen = false;
+                                                                        window.location.reload();
+                                                                    } else {
+                                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Failed to adjust wallet', type: 'error' } }));
+                                                                    }
+                                                                } catch (error) {
+                                                                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'An error occurred. Please try again.', type: 'error' } }));
+                                                                    console.error(error);
+                                                                } finally {
+                                                                    this.walletData.isSubmitting = false;
+                                                                }
+                                                            }
+                                                        }">
         {{-- Header Section --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -200,7 +200,7 @@
                                 <td class="px-6 py-4 text-center">
                                     <span
                                         class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold
-                                                                                                                                                                                             {{ $u->is_active ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' }}">
+                                                                                                                                                                                                                                             {{ $u->is_active ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' }}">
                                         <span
                                             class="w-1 h-1 rounded-full {{ $u->is_active ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
                                         {{ $u->is_active ? 'Active' : 'Suspended' }}
@@ -241,7 +241,9 @@
                                         </a>
 
                                         {{-- Credit/Debit Wallet --}}
-                                        <button @click="openWallet({{ $u->toJson() }})" title="Adjust Wallet Balance"
+                                        <button
+                                            @click="openWallet({{ json_encode(['id' => $u->id, 'name' => $u->name, 'wallet_balance' => $u->wallet_balance]) }})"
+                                            title="Adjust Wallet Balance"
                                             class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 transition-all flex items-center justify-center">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -249,7 +251,8 @@
                                             </svg>
                                         </button>
 
-                                        <button @click="openEdit({{ $u->toJson() }})"
+                                        <button
+                                            @click="openEdit({{ json_encode(['id' => $u->id, 'name' => $u->name, 'email' => $u->email, 'phone' => $u->phone, 'role' => $u->role, 'is_active' => !!$u->is_active, 'wallet_balance' => $u->wallet_balance]) }})"
                                             class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-primary/5 dark:hover:bg-primary/10 text-slate-400 hover:text-primary transition-all flex items-center justify-center">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -374,6 +377,15 @@
                         </div>
                     </div>
 
+                    <div class="space-y-1.5">
+                        <label
+                            class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Wallet
+                            Balance (GHS)</label>
+                        <input type="number" name="wallet_balance" x-model="user.wallet_balance" step="0.01" min="0"
+                            required
+                            class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all dark:text-white font-mono">
+                    </div>
+
                     <div class="pt-4 border-t border-slate-50 dark:border-slate-800" x-show="editMode">
                         <label class="flex items-center group cursor-pointer">
                             <div class="relative flex items-center">
@@ -402,7 +414,8 @@
                 </form>
             </div>
         </div>
+
+        @include('admin.users.wallet-modal')
     </div>
 
-    @include('admin.users.wallet-modal')
 @endsection

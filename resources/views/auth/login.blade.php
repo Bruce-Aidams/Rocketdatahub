@@ -6,12 +6,12 @@
 @section('content')
     <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
         x-data="{ 
-            loading: false,
-            submit() {
-                this.loading = true;
-                this.$refs.loginForm.submit();
-            }
-         }">
+                        loading: false,
+                        submit() {
+                            this.loading = true;
+                            this.$refs.loginForm.submit();
+                        }
+                     }">
         <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
             <!-- Logo Header -->
             <div class="flex flex-col items-center gap-3 mb-8">
@@ -20,7 +20,8 @@
                     <img src="{{ asset('favicon.ico') }}" alt="Logo" class="w-8 h-8">
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
-                    {{ config('app.name') }}</h1>
+                    {{ config('app.name') }}
+                </h1>
             </div>
 
             <!-- Login Card -->
@@ -29,9 +30,10 @@
                 <div class="p-8">
                     <div class="mb-8">
                         <h3 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-1">Welcome to
-                            {{ config('app.name') }}! 👋</h3>
+                            {{ config('app.name') }}! 👋
+                        </h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Please sign-in to your account
-                            and start the adventure</p>
+                        </p>
                     </div>
 
                     @if($errors->any())
@@ -98,13 +100,14 @@
                                 <span>Sign in</span>
                             </template>
                             <template x-if="loading">
-                                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
+                                <div class="flex items-center gap-1 animate-pulse-text font-bold">
+                                    <span>Signing in</span>
+                                    <span class="flex items-center">
+                                        <span class="animate-typing-dot" style="animation-delay: 0s">.</span>
+                                        <span class="animate-typing-dot" style="animation-delay: 0.2s">.</span>
+                                        <span class="animate-typing-dot" style="animation-delay: 0.4s">.</span>
+                                    </span>
+                                </div>
                             </template>
                         </button>
 

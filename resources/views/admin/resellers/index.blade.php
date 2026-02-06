@@ -149,7 +149,8 @@
                                         </a>
 
                                         {{-- Adjust Commission --}}
-                                        <button onclick="openCommissionModal({{ $reseller->id }}, '{{ $reseller->name }}')"
+                                        <button
+                                            onclick="openCommissionModal({{ $reseller->id }}, {{ json_encode($reseller->name) }})"
                                             title="Adjust Commission"
                                             class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all flex items-center justify-center">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

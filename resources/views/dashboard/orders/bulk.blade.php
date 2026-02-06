@@ -4,104 +4,105 @@
 
 @section('content')
     <div x-data="{
-                                bundles: {{ $bundles->toJson() }},
-                                networks: {{ $networks->toJson() }},
-                                selectedNetwork: '',
-                                selectedBundleId: '',
-                                inputMethod: 'manual', 
-                                phoneNumbers: '',
-                                csvFile: null,
-                                parsedNumbers: [],
-                                validNumbers: [],
-                                invalidNumbers: [],
-                                processing: false,
+                                    bundles: {{ $bundles->toJson() }},
+                                    networks: {{ $networks->toJson() }},
+                                    selectedNetwork: '',
+                                    selectedBundleId: '',
+                                    inputMethod: 'manual', 
+                                    phoneNumbers: '',
+                                    csvFile: null,
+                                    parsedNumbers: [],
+                                    validNumbers: [],
+                                    invalidNumbers: [],
+                                    processing: false,
 
-                                get filteredBundles() {
-                                    if (!this.selectedNetwork) return [];
-                                    return this.bundles.filter(b => b.network.toLowerCase() === this.selectedNetwork.toLowerCase());
-                                },
+                                    get filteredBundles() {
+                                        if (!this.selectedNetwork) return [];
+                                        return this.bundles.filter(b => b.network.toLowerCase() === this.selectedNetwork.toLowerCase());
+                                    },
 
-                                get selectedBundle() {
-                                    return this.bundles.find(b => b.id == this.selectedBundleId) || null;
-                                },
+                                    get selectedBundle() {
+                                        return this.bundles.find(b => b.id == this.selectedBundleId) || null;
+                                    },
 
-                                get totalCost() {
-                                    if (!this.selectedBundle || this.validNumbers.length === 0) return 0;
-                                    return (parseFloat(this.selectedBundle.price) * this.validNumbers.length).toFixed(2);
-                                },
+                                    get totalCost() {
+                                        if (!this.selectedBundle || this.validNumbers.length === 0) return 0;
+                                        return (parseFloat(this.selectedBundle.price) * this.validNumbers.length).toFixed(2);
+                                    },
 
-                                get prefixes() {
-                                    const net = this.selectedNetwork.toUpperCase();
-                                    switch (net) {
-                                        case 'MTN': return ['024', '054', '055', '059', '053', '025'];
-                                        case 'TELECEL': return ['020', '050'];
-                                        case 'AIRTELTIGO': return ['027', '057', '026', '056'];
-                                        default: return [];
-                                    }
-                                },
-
-                                validatePhoneNumber(phone) {
-                                    const digits = phone.replace(/\D/g, '');
-                                    if (digits.length !== 10) return false;
-                                    return this.prefixes.some(prefix => digits.startsWith(prefix));
-                                },
-
-                                parsePhoneNumbers() {
-                                    if (this.inputMethod === 'manual') {
-                                        const lines = this.phoneNumbers.split('\n').map(l => l.trim()).filter(l => l);
-                                        this.parsedNumbers = [...new Set(lines)];
-                                    }
-
-                                    this.validNumbers = this.parsedNumbers.filter(num => this.validatePhoneNumber(num));
-                                    this.invalidNumbers = this.parsedNumbers.filter(num => !this.validatePhoneNumber(num));
-                                },
-
-                                handleCSVUpload(event) {
-                                    const file = event.target.files[0];
-                                    if (!file) return;
-
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => {
-                                        const text = e.target.result;
-                                        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-                                        this.parsedNumbers = [...new Set(lines.map(line => line.split(',')[0].trim()))];
-                                        this.parsePhoneNumbers();
-                                    };
-                                    reader.readAsText(file);
-                                },
-
-                                async submitBulkOrder() {
-                                    if (this.validNumbers.length === 0 || !this.selectedBundle) return;
-
-                                    this.processing = true;
-
-                                    try {
-                                        const response = await fetch('{{ route('orders.bulk.process') }}', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                            },
-                                            body: JSON.stringify({
-                                                bundle_id: this.selectedBundleId,
-                                                phone_numbers: this.validNumbers
-                                            })
-                                        });
-
-                                        const data = await response.json();
-
-                                        if (data.success) {
-                                            window.location.href = '{{ route('orders.index') }}';
-                                        } else {
-                                            alert(data.message || 'An error occurred');
+                                    get prefixes() {
+                                        const net = this.selectedNetwork.toUpperCase();
+                                        switch (net) {
+                                            case 'MTN': return ['024', '054', '055', '059', '053', '025'];
+                                            case 'TELECEL': return ['020', '050'];
+                                            case 'AIRTELTIGO': return ['027', '057', '026', '056'];
+                                            default: return [];
                                         }
-                                    } catch (error) {
-                                        alert('An error occurred while processing your order');
-                                    } finally {
-                                        this.processing = false;
+                                    },
+
+                                    validatePhoneNumber(phone) {
+                                        const digits = phone.replace(/\D/g, '');
+                                        if (digits.length !== 10) return false;
+                                        return this.prefixes.some(prefix => digits.startsWith(prefix));
+                                    },
+
+                                    parsePhoneNumbers() {
+                                        if (this.inputMethod === 'manual') {
+                                            const lines = this.phoneNumbers.split('\n').map(l => l.trim()).filter(l => l);
+                                            this.parsedNumbers = [...new Set(lines)];
+                                        }
+
+                                        this.validNumbers = this.parsedNumbers.filter(num => this.validatePhoneNumber(num));
+                                        this.invalidNumbers = this.parsedNumbers.filter(num => !this.validatePhoneNumber(num));
+                                    },
+
+                                    handleCSVUpload(event) {
+                                        const file = event.target.files[0];
+                                        if (!file) return;
+
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => {
+                                            const text = e.target.result;
+                                            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+                                            this.parsedNumbers = [...new Set(lines.map(line => line.split(',')[0].trim()))];
+                                            this.parsePhoneNumbers();
+                                        };
+                                        reader.readAsText(file);
+                                    },
+
+                                    async submitBulkOrder() {
+                                        if (this.validNumbers.length === 0 || !this.selectedBundle) return;
+
+                                        this.processing = true;
+
+                                        try {
+                                            const response = await fetch('{{ route('orders.bulk.process') }}', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({
+                                                    bundle_id: this.selectedBundleId,
+                                                    phone_numbers: this.validNumbers
+                                                })
+                                            });
+
+                                            const data = await response.json();
+
+                                            if (data.success) {
+                                                window.location.href = '{{ route('orders.index') }}';
+                                            } else {
+                                                window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'An error occurred', type: 'error' } }));
+                                            }
+                                        } catch (error) {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'An error occurred while processing your order', type: 'error' } }));
+                                        } finally {
+                                            this.processing = false;
+                                        }
                                     }
-                                }
-                            }" class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                }"
+        class="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">

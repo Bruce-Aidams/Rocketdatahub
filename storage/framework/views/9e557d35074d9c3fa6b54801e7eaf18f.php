@@ -6,12 +6,12 @@
 <?php $__env->startSection('content'); ?>
     <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
         x-data="{ 
-            loading: false,
-            submit() {
-                this.loading = true;
-                this.$refs.loginForm.submit();
-            }
-         }">
+                    loading: false,
+                    submit() {
+                        this.loading = true;
+                        this.$refs.loginForm.submit();
+                    }
+                 }">
         <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
             <!-- Logo Header -->
             <div class="flex flex-col items-center gap-3 mb-8">
@@ -20,7 +20,9 @@
                     <img src="<?php echo e(asset('favicon.ico')); ?>" alt="Logo" class="w-8 h-8">
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
-                    <?php echo e(config('app.name')); ?></h1>
+                    <?php echo e(config('app.name')); ?>
+
+                </h1>
             </div>
 
             <!-- Login Card -->
@@ -29,9 +31,10 @@
                 <div class="p-8">
                     <div class="mb-8">
                         <h3 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-1">Welcome to
-                            <?php echo e(config('app.name')); ?>! 👋</h3>
+                            <?php echo e(config('app.name')); ?>! 👋
+                        </h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Please sign-in to your account
-                            and start the adventure</p>
+                        </p>
                     </div>
 
                     <?php if($errors->any()): ?>
