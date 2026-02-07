@@ -17,8 +17,8 @@
                 </div>
                 <div>
                     <h2 class="text-3xl font-black tracking-tight text-blue-900 dark:text-white uppercase">Reseller Hub</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Strategic business tools for our
-                        elite partners.</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Business tools for our partners.
+                    </p>
                 </div>
             </div>
 
@@ -133,7 +133,7 @@
                                 d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-black text-foreground uppercase tracking-tight">E-Commerce Toolkit</h3>
+                    <h3 class="text-xl font-black text-foreground uppercase tracking-tight">Business Toolkit</h3>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4">
@@ -149,7 +149,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-black text-foreground uppercase tracking-tight">Customer Ledger
+                                    <p class="text-sm font-black text-foreground uppercase tracking-tight">Order History
                                     </p>
                                     <p class="text-xs font-bold text-muted-foreground mt-0.5">Track every storefront and
                                         network sale.</p>
@@ -198,13 +198,13 @@
                                 </p>
                                 <span
                                     class="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase rounded-lg border border-emerald-500/10">Active
-                                    Gateway</span>
+                                    Link</span>
                             </div>
                             <div class="flex items-center gap-3">
                                 <input type="text" readonly value="<?php echo e(route('store.show', $user->referral_code)); ?>"
                                     class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 outline-none">
                                 <button
-                                    onclick="navigator.clipboard.writeText('Check out <?php echo e($user->name); ?>\'s store on <?php echo e(config('app.name')); ?>: <?php echo e(route('store.show', $user->referral_code)); ?>'); alert('Store link with agent details copied!')"
+                                    onclick="navigator.clipboard.writeText('Check out <?php echo e($user->name); ?>\'s store on <?php echo e(config('app.name')); ?>: <?php echo e(route('store.show', $user->referral_code)); ?>'); window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Store link with agent details copied!', type: 'success' } }))"
                                     class="h-10 px-4 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all">Copy</button>
                             </div>
                         </div>

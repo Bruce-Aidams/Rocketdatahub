@@ -50,10 +50,10 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Compose Alert</h3>
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Compose Notification</h3>
                                 <p
                                     class="text-xs text-slate-500 dark:text-slate-500 mt-1 uppercase tracking-widest font-bold">
-                                    Transmission Terminal</p>
+                                    Broadcast Terminal</p>
                             </div>
                         </div>
 
@@ -61,11 +61,10 @@
                             @csrf
                             <div class="space-y-1.5">
                                 <label
-                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Target
-                                    Personnel</label>
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Recipients</label>
                                 <select name="user_id"
                                     class="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white">
-                                    <option value="all">Broadcast: All Active Entities</option>
+                                    <option value="all">Broadcast: All Active Users</option>
                                     @foreach($users as $user)
                                         <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                                     @endforeach
@@ -97,7 +96,7 @@
                                 <label
                                     class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Message
                                     Content</label>
-                                <textarea name="message" required rows="5" placeholder="Payload details..."
+                                <textarea name="message" required rows="5" placeholder="Message details..."
                                     class="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none dark:text-white"></textarea>
                             </div>
 
@@ -107,7 +106,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                                 </svg>
-                                Engage Transmission
+                                Send Notification
                             </button>
                         </form>
                     </div>
@@ -121,10 +120,10 @@
                     <div
                         class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
                         <div>
-                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Transmission History</h3>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Order History</h3>
                             <p
                                 class="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">
-                                Communication Ledger</p>
+                                Notification Logs</p>
                         </div>
 
                         <div class="relative min-w-[140px]">
@@ -196,7 +195,7 @@
                                         </div>
 
                                         <form action="{{ route('admin.notifications.destroy', $n->id) }}" method="POST"
-                                            onsubmit="return confirm('Purge this record?');">
+                                            onsubmit="return confirm('Delete this record?');">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                 class="p-1.5 text-slate-300 hover:text-rose-500 transition-colors">
@@ -216,7 +215,7 @@
                                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4a2 2 0 012-2m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
                                     </path>
                                 </svg>
-                                <p class="font-bold text-sm uppercase tracking-widest italic">Silenced History</p>
+                                <p class="font-bold text-sm uppercase tracking-widest italic">No notifications found</p>
                             </div>
                         @endforelse
                     </div>

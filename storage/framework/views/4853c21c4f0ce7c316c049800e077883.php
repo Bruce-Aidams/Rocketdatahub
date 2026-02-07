@@ -1,8 +1,8 @@
-@extends('layouts.admin')
 
-@section('title', 'System Settings')
 
-@section('content')
+<?php $__env->startSection('title', 'System Settings'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="max-w-6xl mx-auto space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="settingsForm()">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -30,20 +30,21 @@
 
         <!-- System Navigation -->
         <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit overflow-x-auto">
-            @foreach([
+            <?php $__currentLoopData = [
                     'general' => ['icon' => 'globe-alt', 'label' => 'General'],
                     'security' => ['icon' => 'shield-check', 'label' => 'Security'],
                     'financials' => ['icon' => 'credit-card', 'label' => 'Financials'],
                     'notifications' => ['icon' => 'bell', 'label' => 'Notifications'],
                     'history' => ['icon' => 'clock', 'label' => 'Login History']
-                ] as $t => $info)
-                                                                        <button @click="tab = '{{ $t }}'"
-                                                                            :class="tab === '{{ $t }}' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t => $info): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <button @click="tab = '<?php echo e($t); ?>'"
+                                                                            :class="tab === '<?php echo e($t); ?>' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                                                                             class="px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap">
-                                                                            <span x-show="tab === '{{ $t }}'" class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                                                                            {{ $info['label'] }}
+                                                                            <span x-show="tab === '<?php echo e($t); ?>'" class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                                                            <?php echo e($info['label']); ?>
+
                                                                         </button>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
         <!-- Configuration Panels -->
@@ -51,7 +52,7 @@
             <!-- Left: Settings Form -->
             <div class="lg:col-span-8 space-y-6">
 
-                {{-- General Settings --}}
+                
                 <div x-show="tab === 'general'" class="space-y-6">
                     <div class="space-y-6">
                          <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
@@ -105,9 +106,9 @@
                                             @change="
                                                 settings.maintenance_mode = $event.target.checked ? '1' : '0';
                                                 mmLoading = true;
-                                                fetch('{{ route('admin.settings.update') }}', {
+                                                fetch('<?php echo e(route('admin.settings.update')); ?>', {
                                                     method: 'PUT',
-                                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
                                                     body: JSON.stringify({ settings: { maintenance_mode: settings.maintenance_mode } })
                                                 })
                                                 .then(res => res.json())
@@ -125,7 +126,7 @@
                     </div>
                 </div>
 
-                {{-- Security Settings --}}
+                
                 <div x-show="tab === 'security'" class="space-y-6">
                     <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
@@ -148,7 +149,7 @@
                     </div>
                 </div>
 
-                {{-- Financials Settings --}}
+                
                 <div x-show="tab === 'financials'" class="space-y-6">
                     <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
@@ -216,7 +217,7 @@
                     </div>
                 </div>
 
-                {{-- Notifications Settings --}}
+                
                 <div x-show="tab === 'notifications'" class="space-y-6">
                     <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
@@ -234,7 +235,7 @@
                     </div>
                 </div>
 
-                {{-- Login History --}}
+                
                 <div x-show="tab === 'history'" class="space-y-6" x-data="{ historySearch: '' }">
                     <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -383,7 +384,7 @@
             return {
                 tab: 'general',
                 loading: false,
-                settings: @json($settings),
+                settings: <?php echo json_encode($settings, 15, 512) ?>,
                 successMessage: '',
                 errorMessage: '',
                 showKey: false,
@@ -405,7 +406,7 @@
                 async loadActivities(page = 1, search = '') {
                     this.activitiesLoading = true;
                     try {
-                        let url = `{{ route('admin.settings.login-activities') }}?page=${page}`;
+                        let url = `<?php echo e(route('admin.settings.login-activities')); ?>?page=${page}`;
                         if (search) url += `&search=${encodeURIComponent(search)}`;
 
                         const response = await fetch(url);
@@ -425,9 +426,9 @@
                     this.loading = true; // reusing main loading or could verify separate one
 
                     try {
-                        const response = await fetch('{{ route('admin.settings.update') }}', {
+                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
                             method: 'PUT',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
                             body: JSON.stringify({ settings: { maintenance_mode: this.settings.maintenance_mode } })
                         });
 
@@ -447,11 +448,11 @@
                     this.errorMessage = '';
 
                     try {
-                        const response = await fetch('{{ route('admin.settings.update') }}', {
+                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                             },
                             body: JSON.stringify({ settings: this.settings })
                         });
@@ -472,4 +473,5 @@
             }
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/admin/settings.blade.php ENDPATH**/ ?>

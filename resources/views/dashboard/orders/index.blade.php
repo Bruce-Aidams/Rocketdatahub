@@ -347,8 +347,8 @@
                             </div>
                         </div>
                     @empty
-                        <div class="py-12 text-center text-[10px] font-black uppercase text-slate-300 tracking-widest">Zero
-                            Transmission History</div>
+                        <div class="py-12 text-center text-[10px] font-black uppercase text-slate-300 tracking-widest">No order
+                            activity recorded</div>
                     @endforelse
                 </div>
             </div>

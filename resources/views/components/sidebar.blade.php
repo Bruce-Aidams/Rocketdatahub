@@ -1,9 +1,9 @@
 @php
     $menuItems = [
         ['name' => 'Dashboard', 'href' => '/dashboard', 'icon' => 'layout-dashboard', 'color' => 'indigo'],
-        ['name' => 'Reseller Hub', 'href' => '/dashboard/reseller-hub', 'icon' => 'globe', 'color' => 'indigo', 'reseller_only' => true],
+        ['name' => 'Partner Hub', 'href' => '/dashboard/reseller-hub', 'icon' => 'globe', 'color' => 'indigo', 'reseller_only' => true],
         ['name' => 'Customer Orders', 'href' => '/dashboard/reseller-hub/customer-orders', 'icon' => 'clipboard-list', 'color' => 'emerald', 'reseller_only' => true],
-        ['name' => 'Usage Reports', 'href' => '/dashboard/analytics', 'icon' => 'bar-chart', 'color' => 'indigo'],
+        ['name' => 'Usage Statistics', 'href' => '/dashboard/analytics', 'icon' => 'bar-chart', 'color' => 'indigo'],
         ['name' => 'Buy Data', 'href' => '/dashboard/orders/new', 'icon' => 'shopping-cart', 'color' => 'orange'],
         ['name' => 'Order History', 'href' => '/dashboard/orders', 'icon' => 'clipboard-list', 'color' => 'blue'],
         ['name' => 'My Wallet', 'href' => '/dashboard/wallet', 'icon' => 'credit-card', 'color' => 'emerald'],

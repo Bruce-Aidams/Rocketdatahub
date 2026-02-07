@@ -125,7 +125,7 @@
                     <h4 class="text-[10px] md:text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">
                         Quick Actions</h4>
                     <span
-                        class="text-[7px] md:text-[9px] font-black bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg uppercase">Shortcuts</span>
+                        class="text-[7px] md:text-[9px] font-black bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg uppercase tracking-widest">Options</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 md:block md:space-y-2">
                     <a href="{{ route('orders.new') }}"
@@ -165,7 +165,7 @@
                             </svg>
                         </div>
                         <span
-                            class="text-[9px] md:text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-tighter">Alerts</span>
+                            class="text-[9px] md:text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-tighter">Notifications</span>
                     </a>
                 </div>
             </div>

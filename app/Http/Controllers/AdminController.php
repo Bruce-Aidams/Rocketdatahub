@@ -525,7 +525,7 @@ class AdminController extends Controller
             });
         }
 
-        return $query->latest()->paginate($request->input('per_page', 20));
+        return $query->latest()->paginate($request->input('per_page', 5));
     }
 
     public function deleteOldOrders(Request $request)
@@ -615,9 +615,74 @@ class AdminController extends Controller
             $query->where('type', $request->type);
         }
 
-        $transactions = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
+        $transactions = $query->latest()->paginate($request->input('per_page', 5))->withQueryString();
 
         return view('admin.transactions.index', compact('transactions'));
+    }
+
+    public function exportTransactions(Request $request)
+    {
+        $query = Transaction::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%");
+                    });
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        $transactions = $query->latest()->get();
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=transactions_" . now()->format('Y-m-d_H-i-s') . ".csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['ID', 'Reference', 'User', 'Description', 'Amount', 'Type', 'Status', 'Timestamp']);
+
+            // We need to fetch the query again or pass it in. Let's use the local $transactions variable.
+            // But anonymous functions in PHP need 'use' for outer variables.
+        };
+
+        // Re-implementing callback properly with 'use'
+        $callback = function () use ($transactions) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['ID', 'Reference', 'User', 'Description', 'Amount', 'Type', 'Status', 'Timestamp']);
+
+            foreach ($transactions as $trx) {
+                fputcsv($file, [
+                    $trx->id,
+                    $trx->reference,
+                    $trx->user->name ?? 'System',
+                    $trx->description,
+                    $trx->amount,
+                    $trx->type,
+                    $trx->status,
+                    $trx->created_at
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function getInvoices(Request $request)

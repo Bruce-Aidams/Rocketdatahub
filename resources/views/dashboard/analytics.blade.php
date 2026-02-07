@@ -91,7 +91,7 @@
                 <div class="flex items-center justify-between mb-12 relative z-10">
                     <div>
                         <h3 class="text-[10px] font-black uppercase tracking-[.3em] text-slate-400 dark:text-slate-600">
-                            Order Activity</h3>
+                            Activity Breakdown</h3>
                         <p class="text-sm font-bold text-slate-900 dark:text-white mt-1">30-Day Activity Breakdown</p>
                     </div>
                     <div
@@ -101,7 +101,7 @@
                 </div>
 
                 <div class="h-[350px] w-full relative z-10">
-                    <canvas id="temporalChart"></canvas>
+                    <canvas id="activityChart"></canvas>
                 </div>
             </div>
 
@@ -170,7 +170,7 @@
                 const tickColor = isDark ? 'rgb(100 116 139)' : 'rgb(148 163 184)';
 
                 // Order Activity
-                const temporalCtx = document.getElementById('temporalChart').getContext('2d');
+                const temporalCtx = document.getElementById('activityChart').getContext('2d');
                 const gradient = temporalCtx.createLinearGradient(0, 0, 0, 400);
                 gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
                 gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');

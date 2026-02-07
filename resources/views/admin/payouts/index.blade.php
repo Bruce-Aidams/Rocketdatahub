@@ -13,15 +13,14 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-blue-900 dark:text-white">Capital Disbursement</h2>
+                    <h2 class="text-3xl font-bold tracking-tight text-blue-900 dark:text-white">Payout Management</h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Review and process user withdrawal requests.</p>
                 </div>
             </div>
             <div
                 class="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-full border border-amber-100 dark:border-amber-800/50">
                 <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Audit
-                    Protocol Active</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Audit Status Active</span>
             </div>
         </div>
 
@@ -31,7 +30,7 @@
                 <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                 </svg>
-                Disbursement status localized and updated.
+                Payout status updated.
             </div>
         @endif
 
@@ -47,8 +46,7 @@
                     </svg>
                 </div>
                 <div class="relative z-10 space-y-2">
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Validating
-                        Disbursals</p>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pending Payouts</p>
                     <h3 class="text-3xl font-black text-amber-600 dark:text-amber-500 tabular-nums">{{ $stats['pending'] }}
                     </h3>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">Awaiting authorization</p>
@@ -65,10 +63,10 @@
                 </div>
                 <div class="relative z-10 space-y-2">
                     <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Settled
-                        Requests</p>
+                        Completed Payouts</p>
                     <h3 class="text-3xl font-black text-emerald-600 dark:text-emerald-500 tabular-nums">
                         {{ $stats['approved'] }}</h3>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Successfully projected</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Successfully processed</p>
                 </div>
             </div>
 
@@ -83,9 +81,9 @@
                     </svg>
                 </div>
                 <div class="relative z-10 space-y-2">
-                    <p class="text-[10px] font-bold text-white/50 uppercase tracking-widest">Aggregate Yield Outflow</p>
+                    <p class="text-[10px] font-bold text-white/50 uppercase tracking-widest">Total Payout Volume</p>
                     <h3 class="text-3xl font-black tabular-nums">GHC {{ number_format($stats['total_amount'], 2) }}</h3>
-                    <p class="text-[9px] text-white/40 font-bold uppercase">Cumulative disbursement volume</p>
+                    <p class="text-[9px] text-white/40 font-bold uppercase">Total amount paid out</p>
                 </div>
             </div>
         </div>
@@ -131,10 +129,10 @@
                         <tr>
                             <th
                                 class="px-8 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                Entity</th>
+                                User</th>
                             <th
                                 class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                Quantum</th>
+                                Amount</th>
                             <th
                                 class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                                 Bank Details</th>
@@ -201,12 +199,12 @@
                                             <form action="{{ route('admin.payouts.approve', $payout->id) }}" method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="h-9 px-4 bg-primary text-white rounded-xl font-bold text-[10px] uppercase tracking-wide hover:opacity-90 transition-all shadow-lg shadow-primary/10 active:scale-95">Authorize</button>
+                                                    class="h-9 px-4 bg-primary text-white rounded-xl font-bold text-[10px] uppercase tracking-wide hover:opacity-90 transition-all shadow-lg shadow-primary/10 active:scale-95">Approve</button>
                                             </form>
                                             <form action="{{ route('admin.payouts.reject', $payout->id) }}" method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="h-9 px-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl font-bold text-[10px] uppercase tracking-wide hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-all active:scale-95">Purge</button>
+                                                    class="h-9 px-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl font-bold text-[10px] uppercase tracking-wide hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-all active:scale-95">Reject</button>
                                             </form>
                                         </div>
                                     @else
@@ -225,7 +223,7 @@
                                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                         </path>
                                     </svg>
-                                    <p class="font-bold uppercase tracking-widest italic text-sm">Disbursement Stream Empty</p>
+                                    <p class="font-bold uppercase tracking-widest italic text-sm">No Payout Requests Found</p>
                                 </td>
                             </tr>
                         @endforelse

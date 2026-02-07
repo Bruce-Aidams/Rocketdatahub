@@ -1,10 +1,10 @@
-@extends('layouts.admin')
 
-@section('title', 'Analytics')
 
-@section('content')
+<?php $__env->startSection('title', 'Analytics'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        {{-- Header --}}
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="flex items-center gap-4">
                 <div
@@ -23,18 +23,19 @@
             </div>
 
             <div class="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl w-fit">
-                @foreach(['24H', '7D', '30D', '1Y'] as $range)
-                    <a href="{{ route('admin.analytics', ['range' => $range]) }}"
-                        class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all {{ request('range', '30D') === $range ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300' }}">
-                        {{ $range }}
+                <?php $__currentLoopData = ['24H', '7D', '30D', '1Y']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $range): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <a href="<?php echo e(route('admin.analytics', ['range' => $range])); ?>"
+                        class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all <?php echo e(request('range', '30D') === $range ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'); ?>">
+                        <?php echo e($range); ?>
+
                     </a>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
 
-        {{-- Stat Matrix --}}
+        
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {{-- Gross Revenue --}}
+            
             <div
                 class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
                 <div
@@ -50,18 +51,19 @@
                         <span
                             class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400 dark:text-slate-500">Gross
                             Revenue</span>
-                        @if(isset($revenueGrowth) && $revenueGrowth > 0)
+                        <?php if(isset($revenueGrowth) && $revenueGrowth > 0): ?>
                             <span
-                                class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black rounded-lg">+{{ $revenueGrowth }}%</span>
-                        @endif
+                                class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black rounded-lg">+<?php echo e($revenueGrowth); ?>%</span>
+                        <?php endif; ?>
                     </div>
                     <h3 class="text-3xl font-black text-slate-900 dark:text-white leading-none">GHS
-                        {{ number_format($totalRevenue, 2) }}
+                        <?php echo e(number_format($totalRevenue, 2)); ?>
+
                     </h3>
                 </div>
             </div>
 
-            {{-- User Base --}}
+            
             <div
                 class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
                 <div
@@ -77,18 +79,19 @@
                         <span
                             class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400 dark:text-slate-500">Entity
                             Base</span>
-                        @if(isset($usersGrowth) && $usersGrowth > 0)
+                        <?php if(isset($usersGrowth) && $usersGrowth > 0): ?>
                             <span
-                                class="px-2 py-0.5 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 text-[9px] font-black rounded-lg">+{{ $usersGrowth }}%</span>
-                        @endif
+                                class="px-2 py-0.5 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 text-[9px] font-black rounded-lg">+<?php echo e($usersGrowth); ?>%</span>
+                        <?php endif; ?>
                     </div>
                     <h3 class="text-3xl font-black text-slate-900 dark:text-white leading-none">
-                        {{ number_format($totalUsers) }}
+                        <?php echo e(number_format($totalUsers)); ?>
+
                     </h3>
                 </div>
             </div>
 
-            {{-- Density --}}
+            
             <div
                 class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
                 <div
@@ -102,13 +105,14 @@
                     <p class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400 dark:text-slate-500">Total
                         Orders</p>
                     <h3 class="text-3xl font-black text-slate-900 dark:text-white leading-none">
-                        {{ number_format($totalOrders) }}
+                        <?php echo e(number_format($totalOrders)); ?>
+
                     </h3>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">Completed Transactions</p>
                 </div>
             </div>
 
-            {{-- Actions --}}
+            
             <div
                 class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
                 <div
@@ -123,16 +127,17 @@
                     <p class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400 dark:text-slate-500">Critical
                         Actions</p>
                     <h3 class="text-3xl font-black text-rose-600 dark:text-rose-500 leading-none">
-                        {{ $pendingDeposits + $pendingOrders }}
+                        <?php echo e($pendingDeposits + $pendingOrders); ?>
+
                     </h3>
                     <p class="text-[9px] text-rose-500 font-bold uppercase">Attention Required</p>
                 </div>
             </div>
         </div>
 
-        {{-- Trends matrix --}}
+        
         <div class="grid gap-8 lg:grid-cols-3">
-            {{-- Performance Graph --}}
+            
             <div
                 class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 shadow-sm lg:col-span-2 h-[460px] flex flex-col">
                 <div class="mb-10">
@@ -145,7 +150,7 @@
                 </div>
             </div>
 
-            {{-- Node Health --}}
+            
             <div
                 class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
                 <div class="mb-10">
@@ -155,26 +160,26 @@
                 </div>
 
                 <div class="space-y-6">
-                    @foreach($orderStatus as $item)
+                    <?php $__currentLoopData = $orderStatus; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="group">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-2">
                                     <div
-                                        class="w-1.5 h-1.5 rounded-full {{ $item->status === 'completed' ? 'bg-emerald-500' : ($item->status === 'pending' ? 'bg-amber-500' : ($item->status === 'processing' ? 'bg-blue-500' : 'bg-rose-500')) }}">
+                                        class="w-1.5 h-1.5 rounded-full <?php echo e($item->status === 'completed' ? 'bg-emerald-500' : ($item->status === 'pending' ? 'bg-amber-500' : ($item->status === 'processing' ? 'bg-blue-500' : 'bg-rose-500'))); ?>">
                                     </div>
                                     <span
-                                        class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">{{ $item->status === 'pending' ? 'Validating' : ($item->status === 'completed' ? 'Delivered' : $item->status) }}</span>
+                                        class="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest"><?php echo e($item->status === 'pending' ? 'Validating' : ($item->status === 'completed' ? 'Delivered' : $item->status)); ?></span>
                                 </div>
-                                <span class="text-xs font-black text-slate-900 dark:text-white">{{ $item->count }}</span>
+                                <span class="text-xs font-black text-slate-900 dark:text-white"><?php echo e($item->count); ?></span>
                             </div>
                             <div
                                 class="w-full bg-slate-50 dark:bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-100 dark:border-slate-700">
-                                <div class="h-full rounded-full transition-all duration-1000 {{ $item->status === 'completed' ? 'bg-emerald-500' : ($item->status === 'pending' ? 'bg-amber-500' : ($item->status === 'processing' ? 'bg-blue-500' : 'bg-rose-500')) }}"
-                                    style="width: {{ $totalOrders > 0 ? ($item->count / $totalOrders) * 100 : 0 }}%">
+                                <div class="h-full rounded-full transition-all duration-1000 <?php echo e($item->status === 'completed' ? 'bg-emerald-500' : ($item->status === 'pending' ? 'bg-amber-500' : ($item->status === 'processing' ? 'bg-blue-500' : 'bg-rose-500'))); ?>"
+                                    style="width: <?php echo e($totalOrders > 0 ? ($item->count / $totalOrders) * 100 : 0); ?>%">
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
 
                 <div
@@ -186,7 +191,7 @@
             </div>
         </div>
 
-        {{-- Reseller Analytics Table --}}
+        
         <div
             class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 shadow-sm overflow-hidden">
             <div class="mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
@@ -197,28 +202,29 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                    {{-- Role Filters --}}
+                    
                     <div
                         class="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl overflow-x-auto max-w-full no-scrollbar">
-                        <a href="{{ route('admin.analytics', array_merge(request()->query(), ['role' => 'all'])) }}"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all whitespace-nowrap {{ !request('role') || request('role') === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300' }}">
+                        <a href="<?php echo e(route('admin.analytics', array_merge(request()->query(), ['role' => 'all']))); ?>"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all whitespace-nowrap <?php echo e(!request('role') || request('role') === 'all' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'); ?>">
                             All
                         </a>
-                        @foreach(['user', 'agent', 'dealer', 'super_agent', 'admin'] as $role)
-                            <a href="{{ route('admin.analytics', array_merge(request()->query(), ['role' => $role])) }}"
-                                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all whitespace-nowrap {{ request('role') === $role ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300' }}">
-                                {{ str_replace('_', ' ', $role) }}
+                        <?php $__currentLoopData = ['user', 'agent', 'dealer', 'super_agent', 'admin']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <a href="<?php echo e(route('admin.analytics', array_merge(request()->query(), ['role' => $role]))); ?>"
+                                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all whitespace-nowrap <?php echo e(request('role') === $role ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'); ?>">
+                                <?php echo e(str_replace('_', ' ', $role)); ?>
+
                             </a>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
 
-                    <form action="{{ route('admin.analytics') }}" method="GET"
+                    <form action="<?php echo e(route('admin.analytics')); ?>" method="GET"
                         class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full sm:w-auto">
-                        @if(request('role'))
-                            <input type="hidden" name="role" value="{{ request('role') }}">
-                        @endif
+                        <?php if(request('role')): ?>
+                            <input type="hidden" name="role" value="<?php echo e(request('role')); ?>">
+                        <?php endif; ?>
                         <div class="relative flex-1 sm:flex-none">
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search users..."
+                            <input type="text" name="search" value="<?php echo e(request('search')); ?>" placeholder="Search users..."
                                 class="h-10 pl-4 pr-10 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-black placeholder:text-slate-400 placeholder:font-bold focus:ring-2 focus:ring-indigo-500/20 w-full sm:w-64 transition-all">
                             <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -230,10 +236,11 @@
                         <div class="relative">
                             <select name="per_page" onchange="this.form.submit()"
                                 class="w-full sm:w-auto h-10 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all dark:text-slate-400 appearance-none cursor-pointer pr-10">
-                                @foreach([10, 20, 50, 100, 200] as $val)
-                                    <option value="{{ $val }}" {{ request('per_page', 10) == $val ? 'selected' : '' }}>{{ $val }}
+                                <?php $__currentLoopData = [10, 20, 50, 100, 200]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($val); ?>" <?php echo e(request('per_page', 10) == $val ? 'selected' : ''); ?>><?php echo e($val); ?>
+
                                         Entries</option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,21 +288,24 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50 dark:divide-slate-800">
-                        @forelse($resellers as $reseller)
+                        <?php $__empty_1 = true; $__currentLoopData = $resellers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reseller): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <tr
                                 class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all border-b border-transparent hover:border-indigo-500/10">
                                 <td class="px-6 py-6">
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/10 dark:to-blue-900/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs border border-indigo-100/50 dark:border-indigo-900/30">
-                                            {{ strtoupper(substr($reseller->name, 0, 1)) }}
+                                            <?php echo e(strtoupper(substr($reseller->name, 0, 1))); ?>
+
                                         </div>
                                         <div>
                                             <p class="text-sm font-black text-slate-900 dark:text-white leading-tight">
-                                                {{ $reseller->name }}
+                                                <?php echo e($reseller->name); ?>
+
                                             </p>
                                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-0.5">
-                                                {{ $reseller->email }}
+                                                <?php echo e($reseller->email); ?>
+
                                             </p>
                                         </div>
                                     </div>
@@ -303,34 +313,36 @@
                                 <td class="px-6 py-6 text-center">
                                     <span
                                         class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
-                                        {{ str_replace('_', ' ', $reseller->role) }}
+                                        <?php echo e(str_replace('_', ' ', $reseller->role)); ?>
+
                                     </span>
                                 </td>
                                 <td class="px-6 py-6 text-right whitespace-nowrap">
                                     <div class="space-y-1">
                                         <span
-                                            class="text-xs font-black text-slate-700 dark:text-slate-300">{{ number_format($reseller->total_orders) }}
+                                            class="text-xs font-black text-slate-700 dark:text-slate-300"><?php echo e(number_format($reseller->total_orders)); ?>
+
                                             Orders</span>
                                         <p class="text-[9px] font-black text-emerald-500/80 uppercase tracking-tighter">
-                                            {{ number_format($reseller->completed_orders_count) }} Completed
+                                            <?php echo e(number_format($reseller->completed_orders_count)); ?> Completed
                                         </p>
                                     </div>
                                 </td>
                                 <td class="px-6 py-6 text-right whitespace-nowrap">
                                     <span class="text-xs font-black text-slate-900 dark:text-white">GHS
-                                        {{ number_format($reseller->total_spent, 2) }}</span>
+                                        <?php echo e(number_format($reseller->total_spent, 2)); ?></span>
                                 </td>
                                 <td class="px-6 py-6 text-right whitespace-nowrap">
                                     <span class="text-xs font-black text-emerald-500">GHS
-                                        {{ number_format($reseller->total_commission_earned, 2) }}</span>
+                                        <?php echo e(number_format($reseller->total_commission_earned, 2)); ?></span>
                                 </td>
                                 <td class="px-6 py-6 text-right whitespace-nowrap">
                                     <span class="text-xs font-black text-indigo-500">GHS
-                                        {{ number_format($reseller->wallet_balance, 2) }}</span>
+                                        <?php echo e(number_format($reseller->wallet_balance, 2)); ?></span>
                                 </td>
                                 <td class="px-6 py-6">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ route('admin.orders', ['user_id' => $reseller->id]) }}"
+                                        <a href="<?php echo e(route('admin.orders', ['user_id' => $reseller->id])); ?>"
                                             title="View Transactions"
                                             class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-600 text-slate-400 transition-all flex items-center justify-center shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,7 +351,7 @@
                                                 </path>
                                             </svg>
                                         </a>
-                                        <a href="{{ route('admin.users', ['search' => $reseller->email]) }}"
+                                        <a href="<?php echo e(route('admin.users', ['search' => $reseller->email])); ?>"
                                             title="Manage Profile"
                                             class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-600 text-slate-400 transition-all flex items-center justify-center shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +363,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
                                 <td colspan="7" class="px-6 py-32 text-center">
                                     <div class="flex flex-col items-center gap-6">
@@ -374,21 +386,22 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
-            @if($resellers->hasPages())
+            <?php if($resellers->hasPages()): ?>
                 <div class="px-6 py-6 border-t border-slate-50 dark:border-slate-800">
-                    {{ $resellers->links() }}
+                    <?php echo e($resellers->links()); ?>
+
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -396,7 +409,7 @@
             if (!ctx) return;
 
             const isDark = document.documentElement.classList.contains('dark');
-            const velocityData = @json($velocity);
+            const velocityData = <?php echo json_encode($velocity, 15, 512) ?>;
 
             const labels = velocityData.map(item => {
                 const date = new Date(item.date);
@@ -446,4 +459,5 @@
             });
         });
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/admin/analytics/index.blade.php ENDPATH**/ ?>

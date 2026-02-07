@@ -73,7 +73,7 @@
                                     class="inline-block h-4 w-4 rounded-full ring-2 ring-white dark:ring-slate-900 bg-sky-500">
                                 </div>
                             </div>
-                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Secured Wallet</span>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Wallet</span>
                         </div>
                     </div>
                 </div>
@@ -210,7 +210,7 @@
                                         d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                             </template>
-                            <span x-text="isLoading ? 'Preparing Secure Gateway...' : 'Initialize Payment'"></span>
+                            <span x-text="isLoading ? 'Preparing Secure Gateway...' : 'Pay Now'"></span>
                         </button>
 
                         {{-- SaaS Alert --}}
@@ -334,7 +334,7 @@
 
                             <button type="submit"
                                 class="w-full h-18 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.5rem] font-black text-sm uppercase tracking-widest shadow-xl hover:shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all duration-300">
-                                Verify Deposit Request
+                                Submit Deposit Request
                             </button>
                         </form>
                     </div>
@@ -366,9 +366,9 @@
                             <tr
                                 class="text-[10px] text-slate-400 uppercase bg-slate-50/30 dark:bg-slate-900/30 border-b border-slate-200/50 dark:border-slate-800/50">
                                 <th class="px-8 py-6 font-black tracking-[0.2em]">Action</th>
-                                <th class="px-8 py-6 font-black tracking-[0.2em]">Trace Code</th>
-                                <th class="px-8 py-6 font-black tracking-[0.2em]">Entry Detail</th>
-                                <th class="px-8 py-6 font-black tracking-[0.2em] text-right">Settlement</th>
+                                <th class="px-8 py-6 font-black tracking-[0.2em]">Transaction ID</th>
+                                <th class="px-8 py-6 font-black tracking-[0.2em]">Description</th>
+                                <th class="px-8 py-6 font-black tracking-[0.2em] text-right">Amount</th>
                                 <th class="px-8 py-6 font-black tracking-[0.2em] text-right">Timestamp</th>
                             </tr>
                         </thead>

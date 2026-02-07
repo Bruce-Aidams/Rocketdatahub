@@ -9,7 +9,7 @@
         ['name' => 'API Management', 'href' => '/admin/api-management', 'icon' => 'chip', 'color' => 'cyan'],
         ['name' => 'Analytics', 'href' => '/admin/analytics', 'icon' => 'bar-chart', 'color' => 'violet'],
         ['name' => 'Financials', 'href' => '/admin/financials', 'icon' => 'clipboard-list', 'color' => 'green'],
-        ['name' => 'System Ledger', 'href' => '/admin/transactions', 'icon' => 'wallet', 'color' => 'amber'],
+        ['name' => 'Transaction History', 'href' => '/admin/transactions', 'icon' => 'wallet', 'color' => 'amber'],
         ['name' => 'Invoices', 'href' => '/admin/invoices', 'icon' => 'landmark', 'color' => 'blue'],
         ['name' => 'Deposits', 'href' => '/admin/deposits', 'icon' => 'banknotes', 'color' => 'teal'],
         ['name' => 'Payouts', 'href' => '/admin/payouts', 'icon' => 'landmark', 'color' => 'teal'],

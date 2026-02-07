@@ -5,29 +5,29 @@
 <?php $__env->startSection('content'); ?>
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700"
         x-data="{ 
-                                                                                                                                                                        tab: 'providers',
-                                                                                                                                                                        modalOpen: false, 
-                                                                                                                                                                        modalTab: 'general',
-                                                                                                                                                                        editMode: false,
-                                                                                                                                                                        provider: { id: '', name: '', network_type: '', base_url: '', request_method: 'POST', request_headers: '', request_body: '', webhook_url: '', api_key: '', secret_key: '', is_active: true },
-                                                                                                                                                                        resetForm() {
-                                                                                                                                                                            this.provider = { id: '', name: '', network_type: '', base_url: '', request_method: 'POST', request_headers: '', request_body: '', webhook_url: '', api_key: '', secret_key: '', is_active: true };
-                                                                                                                                                                            this.editMode = false;
-                                                                                                                                                                            this.modalTab = 'general';
-                                                                                                                                                                        },
-                                                                                                                                                                        openAdd() {
-                                                                                                                                                                            this.resetForm();
-                                                                                                                                                                            this.modalOpen = true;
-                                                                                                                                                                        },
-                                                                                                                                                                        openEdit(p) {
-                                                                                                                                                                            this.provider = JSON.parse(JSON.stringify(p));
-                                                                                                                                                                            this.provider.request_headers = p.request_headers ? JSON.stringify(p.request_headers, null, 2) : '';
-                                                                                                                                                                            this.provider.request_body = p.request_body ? JSON.stringify(p.request_body, null, 2) : '';
-                                                                                                                                                                            this.editMode = true;
-                                                                                                                                                                            this.modalTab = 'general';
-                                                                                                                                                                            this.modalOpen = true;
-                                                                                                                                                                        }
-                                                                                                                                                                    }">
+                                                                                                                                                                                    tab: 'providers',
+                                                                                                                                                                                    modalOpen: false, 
+                                                                                                                                                                                    modalTab: 'general',
+                                                                                                                                                                                    editMode: false,
+                                                                                                                                                                                    provider: { id: '', name: '', network_type: '', base_url: '', request_method: 'POST', request_headers: '', request_body: '', webhook_url: '', api_key: '', secret_key: '', is_active: true },
+                                                                                                                                                                                    resetForm() {
+                                                                                                                                                                                        this.provider = { id: '', name: '', network_type: '', base_url: '', request_method: 'POST', request_headers: '', request_body: '', webhook_url: '', api_key: '', secret_key: '', is_active: true };
+                                                                                                                                                                                        this.editMode = false;
+                                                                                                                                                                                        this.modalTab = 'general';
+                                                                                                                                                                                    },
+                                                                                                                                                                                    openAdd() {
+                                                                                                                                                                                        this.resetForm();
+                                                                                                                                                                                        this.modalOpen = true;
+                                                                                                                                                                                    },
+                                                                                                                                                                                    openEdit(p) {
+                                                                                                                                                                                        this.provider = JSON.parse(JSON.stringify(p));
+                                                                                                                                                                                        this.provider.request_headers = p.request_headers ? JSON.stringify(p.request_headers, null, 2) : '';
+                                                                                                                                                                                        this.provider.request_body = p.request_body ? JSON.stringify(p.request_body, null, 2) : '';
+                                                                                                                                                                                        this.editMode = true;
+                                                                                                                                                                                        this.modalTab = 'general';
+                                                                                                                                                                                        this.modalOpen = true;
+                                                                                                                                                                                    }
+                                                                                                                                                                                }">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -39,9 +39,9 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-blue-900 dark:text-white">API Infrastructure</h2>
+                    <h2 class="text-3xl font-bold tracking-tight text-blue-900 dark:text-white">API Management</h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage external provider connections and
-                        transmission logs.</p>
+                        transaction logs.</p>
                 </div>
             </div>
 
@@ -99,7 +99,7 @@
                     <div>
                         <h4 class="text-xl font-bold text-slate-900 dark:text-white">Global Webhooks</h4>
                         <p class="text-xs text-slate-500 dark:text-slate-500 mt-1 uppercase tracking-widest font-bold">
-                            External Event Sync</p>
+                            External Event Integration</p>
                     </div>
                 </div>
 
@@ -130,7 +130,7 @@
                     <div
                         class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                         <h5 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-5">
-                            Events to Transmit</h5>
+                            Events to Monitor</h5>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <?php $__currentLoopData = ['Order Created', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $event): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <label
@@ -147,16 +147,16 @@
                     <div class="pt-4">
                         <button type="button"
                             @click="async () => {
-                                                                                                                                                                    const url = document.getElementById('webhook_url').value;
-                                                                                                                                                                    const secret = document.getElementById('webhook_secret').value;
-                                                                                                                                                                    const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
-                                                                                                                                                                        method: 'PUT',
-                                                                                                                                                                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                                                                                                                                                                        body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
-                                                                                                                                                                    });
-                                                                                                                                                                    if(response.ok) alert('Webhook configuration synchronized!');
-                                                                                                                                                                    else alert('Failed to save webhook settings.');
-                                                                                                                                                                }"
+                                                                                                                                                                                const url = document.getElementById('webhook_url').value;
+                                                                                                                                                                                const secret = document.getElementById('webhook_secret').value;
+                                                                                                                                                                                const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
+                                                                                                                                                                                    method: 'PUT',
+                                                                                                                                                                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+                                                                                                                                                                                    body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
+                                                                                                                                                                                });
+                                                                                                                                                                                if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
+                                                                                                                                                                                else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
+                                                                                                                                                                            }"
                             class="h-12 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-bold text-xs uppercase shadow-lg shadow-emerald-500/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-3 border-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -186,9 +186,8 @@
                                                 d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                         </svg>
                                     </div>
-                                    <div
-                                        class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
-                                                                                                                                                                            <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
+                                    <div class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
+                                                                                                                                                                                                                    <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
                     ($p->network_type === 'TELECEL' ? 'bg-rose-100 text-rose-600' :
                         ($p->network_type === 'AT' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'))); ?>">
                                         <?php echo e($p->network_type ?: 'Global'); ?>
@@ -196,15 +195,20 @@
                                     </div>
                                 </div>
 
-                                <button
-                                    @click="async () => {
-                                                                                                                                                                                        const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
-                                                                                                                                                                                            method: 'PUT',
-                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                                                                                                                                                                                            body: JSON.stringify({ is_active: !<?php echo e($p->is_active ? 'true' : 'false'); ?> })
-                                                                                                                                                                                        });
-                                                                                                                                                                                        if(response.ok) window.location.reload();
-                                                                                                                                                                                    }"
+                                <button @click="async () => {
+                                                    const newState = !<?php echo e($p->is_active ? 'true' : 'false'); ?>;
+                                                    const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
+                                                        method: 'PUT',
+                                                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+                                                        body: JSON.stringify({ is_active: newState })
+                                                    });
+                                                    if(response.ok) {
+                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Provider status updated!', type: 'success' } }));
+                                                        setTimeout(() => window.location.reload(), 500);
+                                                    } else {
+                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Update failed.', type: 'error' } }));
+                                                    }
+                                                }"
                                     class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none <?php echo e($p->is_active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'); ?>">
                                     <span class="sr-only">Toggle Status</span>
                                     <span
@@ -247,9 +251,9 @@
                                     d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Empty Infrastructure</h3>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">No Providers Found</h3>
                         <p class="text-sm text-slate-500 dark:text-slate-500 mt-2 max-w-xs mx-auto">Establish a new API
-                            connection to begin processing transaction flows.</p>
+                            connection to begin processing transactions.</p>
                         <button @click="openAdd()"
                             class="mt-8 px-6 py-3 bg-primary text-white rounded-2xl font-bold text-xs uppercase shadow-xl shadow-primary/20 hover:opacity-90 transition-all">Add
                             Provider</button>
@@ -355,7 +359,7 @@
                         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Traffic Logs</h3>
                         <p
                             class="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">
-                            Real-time Traffic Analysis</p>
+                            Real-time Transaction Analysis</p>
                     </div>
 
                     <div class="relative min-w-[140px]">

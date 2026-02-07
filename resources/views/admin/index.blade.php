@@ -83,7 +83,7 @@
                 <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-8">Quick Actions</h4>
                 <div class="space-y-4 flex-1">
                     @foreach([
-                        ['route' => 'admin.orders', 'label' => 'Manage Orders', 'desc' => 'Validating data orders', 'icon' => '1'],
+                        ['route' => 'admin.orders', 'label' => 'Manage Orders', 'desc' => 'Pending data orders', 'icon' => '1'],
                         ['route' => 'admin.deposits', 'label' => 'Manage Deposits', 'desc' => 'Confirm user funding', 'icon' => '2'],
                         ['route' => 'admin.api', 'label' => 'API Management', 'desc' => 'Monitor API connections', 'icon' => '3'],
                         ['route' => 'admin.notifications', 'label' => 'Send Notifications', 'desc' => 'Platform alerts', 'icon' => '4'],

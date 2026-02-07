@@ -1,29 +1,29 @@
-@php($hideNav = true)
-@extends('layouts.app')
+<?php ($hideNav = true); ?>
 
-@section('title', 'Forgot Password')
 
-@section('content')
+<?php $__env->startSection('title', 'Forgot Password'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
         x-data="{ 
-                        loading: false,
-                        submit() {
-                            this.loading = true;
-                            this.$refs.forgotForm.submit();
-                        }
-                     }">
+                    loading: false,
+                    submit() {
+                        this.loading = true;
+                        this.$refs.forgotForm.submit();
+                    }
+                 }">
         <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
             <!-- Logo Header -->
-            <a href="{{ url('/') }}" class="flex flex-col items-center gap-3 mb-8 group">
+            <div class="flex flex-col items-center gap-3 mb-8">
                 <div
-                    class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 transition-transform group-hover:scale-105 duration-300">
-                    <img src="{{ asset('favicon.ico') }}" alt="Logo"
-                        class="w-8 h-8 transition-transform group-hover:rotate-12">
+                    class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 transition-transform hover:scale-105 duration-300">
+                    <img src="<?php echo e(asset('favicon.ico')); ?>" alt="Logo" class="w-8 h-8">
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
-                    {{ config('app.name') }}
+                    <?php echo e(config('app.name')); ?>
+
                 </h1>
-            </a>
+            </div>
 
             <!-- Forgot Password Card -->
             <div
@@ -35,26 +35,26 @@
                             send you instructions to reset your password</p>
                     </div>
 
-                    @if (session('status'))
+                    <?php if(session('status')): ?>
                         <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">{{ session('status') }}</p>
+                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider"><?php echo e(session('status')); ?></p>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    @if($errors->any())
+                    <?php if($errors->any()): ?>
                         <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">{{ $errors->first() }}</p>
+                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider"><?php echo e($errors->first()); ?></p>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    <form method="POST" action="{{ route('password.email') }}" x-ref="forgotForm" @submit.prevent="submit"
+                    <form method="POST" action="<?php echo e(route('password.email')); ?>" x-ref="forgotForm" @submit.prevent="submit"
                         class="space-y-5">
-                        @csrf
+                        <?php echo csrf_field(); ?>
 
                         <div class="space-y-2">
                             <label for="email"
                                 class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">Email</label>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                            <input id="email" type="email" name="email" value="<?php echo e(old('email')); ?>" required autofocus
                                 class="w-full h-11 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/10 transition-all text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-300"
                                 placeholder="Enter your email">
                         </div>
@@ -77,7 +77,7 @@
                         </button>
 
                         <div class="pt-2 text-center">
-                            <a href="{{ route('login') }}"
+                            <a href="<?php echo e(route('login')); ?>"
                                 class="flex items-center justify-center gap-2 text-sm text-primary font-bold hover:underline">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,4 +91,5 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/auth/forgot-password.blade.php ENDPATH**/ ?>

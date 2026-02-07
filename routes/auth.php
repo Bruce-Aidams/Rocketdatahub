@@ -17,10 +17,13 @@ Route::middleware('guest')->group(function () {
     })->name('login');
 
     Route::post('login', function (Request $request) {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $loginInput = $request->input('login');
+        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+
+        $credentials = [
+            $field => $loginInput,
+            'password' => $request->input('password'),
+        ];
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
@@ -35,7 +38,7 @@ Route::middleware('guest')->group(function () {
         }
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.failed'),
+            'login' => trans('auth.failed'),
         ]);
     });
 
@@ -317,6 +320,7 @@ Route::middleware('auth')->group(function () {
 
         // Transactions & Invoices
         Route::get('/transactions', [\App\Http\Controllers\AdminController::class, 'getTransactions'])->name('admin.transactions.index');
+        Route::get('/transactions/export', [\App\Http\Controllers\AdminController::class, 'exportTransactions'])->name('admin.transactions.export');
         Route::get('/invoices', [\App\Http\Controllers\AdminController::class, 'getInvoices'])->name('admin.invoices.index');
         Route::get('/invoices/download/{id}', [\App\Http\Controllers\AdminController::class, 'downloadInvoice'])->name('admin.invoices.download');
 

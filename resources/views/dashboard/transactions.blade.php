@@ -204,7 +204,7 @@
                                     <p class="font-mono text-[10px] font-black text-primary tracking-widest">
                                         #{{ strtoupper(substr($trx->reference, 0, 12)) }}</p>
                                     <p class="text-[9px] font-black text-slate-400 mt-1 uppercase tracking-tighter">
-                                        NODE-{{ $trx->id }}</p>
+                                        TXN-{{ $trx->id }}</p>
                                 </td>
                                 <td class="px-10 py-6">
                                     <p class="font-black text-sm text-foreground mb-1">{{$trx->description}}</p>

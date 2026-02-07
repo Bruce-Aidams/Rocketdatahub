@@ -69,11 +69,10 @@
             </div>
 
             <div class="grid gap-12 md:grid-cols-2">
-                <!-- Data Transmission Alerts -->
                 <div
                     class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-10 shadow-sm">
                     <h3 class="text-[10px] font-black uppercase tracking-[.3em] text-slate-400 dark:text-slate-600 mb-10">
-                        Notifications</h3>
+                        Notification Settings</h3>
 
                     <form action="{{ route('settings.update') }}" method="POST" id="notifications-form" class="space-y-10">
                         @csrf
@@ -131,7 +130,7 @@
                         </div>
                         <h3
                             class="text-[10px] font-black uppercase tracking-[.3em] text-slate-400 dark:text-slate-600 mb-10">
-                            UI Environment</h3>
+                            Interface Theme</h3>
 
                         <div class="space-y-8">
                             <div class="flex items-center justify-between group">
@@ -145,17 +144,17 @@
                                 </div>
 
                                 <div x-data="{
-                                                theme: localStorage.getItem('theme') || 'system',
-                                                toggle() {
-                                                    this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
-                                                },
-                                                setTheme(val) {
-                                                    this.theme = val;
-                                                    localStorage.setItem('theme', val);
-                                                    document.documentElement.classList.toggle('dark', val === 'dark' || (val === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
-                                                    window.dispatchEvent(new CustomEvent('theme-changed', { detail: val }));
-                                                }
-                                            }" @theme-changed.window="theme = $event.detail">
+                                                    theme: localStorage.getItem('theme') || 'system',
+                                                    toggle() {
+                                                        this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
+                                                    },
+                                                    setTheme(val) {
+                                                        this.theme = val;
+                                                        localStorage.setItem('theme', val);
+                                                        document.documentElement.classList.toggle('dark', val === 'dark' || (val === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+                                                        window.dispatchEvent(new CustomEvent('theme-changed', { detail: val }));
+                                                    }
+                                                }" @theme-changed.window="theme = $event.detail">
                                     <button type="button" @click="toggle()"
                                         class="inline-flex h-7 w-14 items-center rounded-full border-2 border-transparent transition-all"
                                         :class="theme === 'dark' ? 'bg-primary' : 'bg-slate-100 dark:bg-slate-800'">
@@ -167,7 +166,6 @@
                         </div>
                     </div>
 
-                    <!-- Terminal Decommissioning -->
                     <div
                         class="bg-rose-50/20 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-900/30 rounded-[2.5rem] p-10 transition-all hover:border-rose-500/20">
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-8 py-2">
