@@ -82,7 +82,8 @@
             <h1
                 class="text-8xl md:text-9xl font-black tracking-tighter bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
                 404</h1>
-            <h2 class="text-3xl md:text-4xl font-black tracking-tight text-slate-800 dark:text-white">Page Not Found</h2>
+            <h2 class="text-3xl md:text-4xl font-black tracking-tight text-slate-800 dark:text-white">Page Not Found
+            </h2>
             <p class="text-lg font-bold text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 Oops! The page you're looking for seems to have wandered off. Let's get you back on track.
             </p>
@@ -109,24 +110,11 @@
             </a>
         </div>
 
-        <!-- Search Suggestion -->
+        <!-- Back Links -->
         <div class="pt-4">
-            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4">Try searching for
-                what you
-                need:</p>
-            <form action="{{ url('/search') }}" method="GET" class="max-w-md mx-auto">
-                <div class="relative">
-                    <input type="text" name="q" placeholder="Search..."
-                        class="w-full h-12 px-6 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl focus:outline-none focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-bold placeholder-slate-300 dark:placeholder-slate-600 shadow-lg shadow-slate-200/20 dark:shadow-none">
-                    <button type="submit"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </button>
-                </div>
-            </form>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Need help?
+                <a href="https://wa.me/233000000000" class="text-indigo-600 hover:underline">Contact Support</a>
+            </p>
         </div>
     </div>
 </body>

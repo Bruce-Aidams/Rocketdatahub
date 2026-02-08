@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Hash;
 
-Route::middleware('guest')->group(function () {
+Route::middleware(['guest', 'auth_throttle'])->group(function () {
     Route::get('login', function (Request $request) {
         if ($request->has('ref')) {
             session(['referred_by_code' => $request->ref]);

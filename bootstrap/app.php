@@ -19,14 +19,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\CheckMaintenanceMode::class,
             \App\Http\Middleware\CheckUserStatus::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         $middleware->api(append: [
             \App\Http\Middleware\CheckMaintenanceMode::class,
             \App\Http\Middleware\CheckUserStatus::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
         $middleware->alias([
             'auth.apikey' => \App\Http\Middleware\ValidateApiKey::class,
+        ]);
+
+        $middleware->throttleApi('api', 60);
+
+        $middleware->group('auth_throttle', [
+            // Throttling disabled for local development to prevent timeout issues
         ]);
 
         $middleware->redirectTo(

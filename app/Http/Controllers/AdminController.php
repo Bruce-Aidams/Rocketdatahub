@@ -654,31 +654,25 @@ class AdminController extends Controller
             "Expires" => "0"
         ];
 
-        $callback = function () {
+        $callback = function () use ($query) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['ID', 'Reference', 'User', 'Description', 'Amount', 'Type', 'Status', 'Timestamp']);
 
-            // We need to fetch the query again or pass it in. Let's use the local $transactions variable.
-            // But anonymous functions in PHP need 'use' for outer variables.
-        };
+            $query->latest()->chunk(500, function ($transactions) use ($file) {
+                foreach ($transactions as $trx) {
+                    fputcsv($file, [
+                        $trx->id,
+                        $trx->reference,
+                        $trx->user->name ?? 'System',
+                        $trx->description,
+                        $trx->amount,
+                        $trx->type,
+                        $trx->status,
+                        $trx->created_at
+                    ]);
+                }
+            });
 
-        // Re-implementing callback properly with 'use'
-        $callback = function () use ($transactions) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, ['ID', 'Reference', 'User', 'Description', 'Amount', 'Type', 'Status', 'Timestamp']);
-
-            foreach ($transactions as $trx) {
-                fputcsv($file, [
-                    $trx->id,
-                    $trx->reference,
-                    $trx->user->name ?? 'System',
-                    $trx->description,
-                    $trx->amount,
-                    $trx->type,
-                    $trx->status,
-                    $trx->created_at
-                ]);
-            }
             fclose($file);
         };
 

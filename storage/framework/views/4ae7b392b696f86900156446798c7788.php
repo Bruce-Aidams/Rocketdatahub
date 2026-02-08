@@ -59,7 +59,8 @@
 <?php unset($__componentOriginal2880b66d47486b4bfeaf519598a469d6); ?>
 <?php endif; ?>
 
-        <div class="flex flex-col min-h-screen transition-all duration-300" :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'">
+        <div class="flex flex-col min-h-screen transition-all duration-300"
+            :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'">
 
             <?php if (isset($component)) { $__componentOriginald37f1b809d8dad08d9600a37cd72bf8e = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald37f1b809d8dad08d9600a37cd72bf8e = $attributes; } ?>

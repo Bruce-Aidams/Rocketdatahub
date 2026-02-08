@@ -143,8 +143,9 @@
                                 <label class="text-[10px] font-black uppercase tracking-[0.2em] pl-1 text-slate-400">Your
                                     Location</label>
                                 <div class="relative group">
-                                    <input type="text" value="Accra, GH" readonly
-                                        class="w-full h-14 px-6 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-black tracking-tight outline-none transition-all dark:text-white opacity-50 cursor-default">
+                                    <input type="text" name="location" value="{{ $user->location }}" :readonly="!isEditing"
+                                        class="w-full h-14 px-6 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-black tracking-tight focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white"
+                                        :class="isEditing ? 'bg-white dark:bg-slate-900 shadow-xl' : 'cursor-default'">
                                 </div>
                             </div>
                         </div>

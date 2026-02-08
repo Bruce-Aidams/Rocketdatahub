@@ -63,7 +63,7 @@
 
                         <!-- Network logos showcase -->
                         <div x-show="show" x-transition:enter="transition ease-out duration-700 delay-800"
-                            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" id="networks"
                             class="pt-4 md:pt-8 w-full">
                             <p
                                 class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 md:mb-8">

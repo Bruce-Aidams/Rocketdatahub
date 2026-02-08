@@ -40,7 +40,8 @@
     <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950 transition-all duration-300">
         <x-sidebar />
 
-        <div class="flex flex-col min-h-screen transition-all duration-300" :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'">
+        <div class="flex flex-col min-h-screen transition-all duration-300"
+            :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'">
 
             <x-dashboard-header />
 

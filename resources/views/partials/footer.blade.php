@@ -25,25 +25,29 @@
                 <h4 class="font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">
                     Services</h4>
                 <nav class="flex flex-col gap-3 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/') }}#networks"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
                         MTN Offers
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/') }}#networks"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
                         Telecel Bundles
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/') }}#networks"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
                         AT Packages
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/dashboard/settings') }}"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        Bulk SMS
+                        Notifications
                     </a>
                 </nav>
             </div>
@@ -52,22 +56,26 @@
                 <h4 class="font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">Company
                 </h4>
                 <nav class="flex flex-col gap-3 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/') }}#features"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
                         About CloudTech
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="https://wa.me/233000000000" target="_blank"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
                         Contact Sales
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/register') }}"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
                         Join as Agent
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/dashboard/api-keys') }}"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
                         Developer API
@@ -79,22 +87,26 @@
                 <h4 class="font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">Support
                 </h4>
                 <nav class="flex flex-col gap-3 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="https://t.me/+KUnX1Gs5cvQ5NDE8" target="_blank"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
                         Help Center
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/') }}#pricing"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
                         Terms of Service
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/') }}#pricing"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
                         Privacy Policy
                     </a>
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-2 group/link">
+                    <a href="{{ url('/dashboard') }}"
+                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
                         <span
                             class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
                         System Status
