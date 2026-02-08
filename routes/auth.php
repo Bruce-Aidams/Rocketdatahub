@@ -335,6 +335,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/api-management/providers/{id}', [\App\Http\Controllers\ApiController::class, 'update'])->name('admin.api.providers.update');
         Route::delete('/api-management/providers/{id}', [\App\Http\Controllers\ApiController::class, 'destroy'])->name('admin.api.providers.destroy');
 
+        // Data Integration
+        Route::get('/api-management/data-integration', [\App\Http\Controllers\AdminController::class, 'getDataIntegration'])->name('admin.api.data-integration.get');
+        Route::post('/api-management/data-integration', [\App\Http\Controllers\AdminController::class, 'updateDataIntegration'])->name('admin.api.data-integration.update');
+        Route::post('/api-management/data-integration/test', [\App\Http\Controllers\AdminController::class, 'testDataIntegrationConnection'])->name('admin.api.data-integration.test');
+
         // Notifications
         Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'adminIndex'])->name('admin.notifications');
         Route::post('/notifications', [\App\Http\Controllers\NotificationController::class, 'store'])->name('admin.notifications.store');

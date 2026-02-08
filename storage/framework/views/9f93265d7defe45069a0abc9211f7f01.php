@@ -1,8 +1,8 @@
-@extends('layouts.admin')
 
-@section('title', 'API Management')
 
-@section('content')
+<?php $__env->startSection('title', 'API Management'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700"
         x-data="{ 
                                                                                                                                                                                             tab: 'providers',
@@ -436,7 +436,7 @@
                                 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[.2em]">Webhook
                                 Endpoint URL</label>
                             <input type="url" name="webhook_url" id="webhook_url"
-                                value="{{ \App\Models\Setting::where('key', 'webhook_url')->first()?->value }}"
+                                value="<?php echo e(\App\Models\Setting::where('key', 'webhook_url')->first()?->value); ?>"
                                 placeholder="https://external-service.com/api/webhook"
                                 class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-mono focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white">
                             <p class="text-[9px] text-slate-400 italic">Target URL for automated outbound POST requests.</p>
@@ -447,7 +447,7 @@
                                 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[.2em]">Signing
                                 Secret Key</label>
                             <input type="text" name="webhook_secret" id="webhook_secret"
-                                value="{{ \App\Models\Setting::where('key', 'webhook_secret')->first()?->value }}"
+                                value="<?php echo e(\App\Models\Setting::where('key', 'webhook_secret')->first()?->value); ?>"
                                 placeholder="WH_SECRET_KEY..."
                                 class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-mono focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white">
                         </div>
@@ -458,15 +458,15 @@
                         <h5 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-5">
                             Events to Monitor</h5>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            @foreach(['Order Created', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment'] as $event)
+                            <?php $__currentLoopData = ['Order Created', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $event): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <label
                                     class="flex items-center p-3.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer hover:border-primary/50 transition-all group">
                                     <input type="checkbox"
                                         class="w-4 h-4 text-primary rounded-md border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-primary/20">
                                     <span
-                                        class="ml-3 text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">{{ $event }}</span>
+                                        class="ml-3 text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors"><?php echo e($event); ?></span>
                                 </label>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
 
@@ -475,9 +475,9 @@
                             @click="async () => {
                                                                                                                                                                                         const url = document.getElementById('webhook_url').value;
                                                                                                                                                                                         const secret = document.getElementById('webhook_secret').value;
-                                                                                                                                                                                        const response = await fetch('{{ route('admin.settings.update') }}', {
+                                                                                                                                                                                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
                                                                                                                                                                                             method: 'PUT',
-                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
                                                                                                                                                                                             body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
                                                                                                                                                                                         });
                                                                                                                                                                                         if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
@@ -499,7 +499,7 @@
         <!-- Providers View -->
         <div x-show="tab === 'providers'" class="space-y-6">
             <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                @forelse($providers as $p)
+                <?php $__empty_1 = true; $__currentLoopData = $providers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div
                             class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col hover:shadow-md transition-all group overflow-hidden relative">
                             <!-- Status Toggle & Network Badge -->
@@ -513,18 +513,19 @@
                                         </svg>
                                     </div>
                                     <div class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
-                                                                                                                                                                                                                                            {{ $p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                                                                                            <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
                     ($p->network_type === 'TELECEL' ? 'bg-rose-100 text-rose-600' :
-                        ($p->network_type === 'AT' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500')) }}">
-                                        {{ $p->network_type ?: 'Global' }}
+                        ($p->network_type === 'AT' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'))); ?>">
+                                        <?php echo e($p->network_type ?: 'Global'); ?>
+
                                     </div>
                                 </div>
 
                                 <button @click="async () => {
-                                                                            const newState = !{{ $p->is_active ? 'true' : 'false' }};
-                                                                            const response = await fetch('{{ route('admin.api.providers.update', $p->id) }}', {
+                                                                            const newState = !<?php echo e($p->is_active ? 'true' : 'false'); ?>;
+                                                                            const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
                                                                                 method: 'PUT',
-                                                                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                                                                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
                                                                                 body: JSON.stringify({ is_active: newState })
                                                                             });
                                                                             if(response.ok) {
@@ -534,27 +535,28 @@
                                                                                 window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Update failed.', type: 'error' } }));
                                                                             }
                                                                         }"
-                                    class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none {{ $p->is_active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700' }}">
+                                    class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none <?php echo e($p->is_active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'); ?>">
                                     <span class="sr-only">Toggle Status</span>
                                     <span
-                                        class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform {{ $p->is_active ? 'translate-x-5' : 'translate-x-1' }}"></span>
+                                        class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform <?php echo e($p->is_active ? 'translate-x-5' : 'translate-x-1'); ?>"></span>
                                 </button>
                             </div>
 
                             <div class="space-y-1 mb-6">
-                                <h4 class="text-lg font-bold text-slate-900 dark:text-white leading-tight truncate">{{ $p->name }}
+                                <h4 class="text-lg font-bold text-slate-900 dark:text-white leading-tight truncate"><?php echo e($p->name); ?>
+
                                 </h4>
-                                <p class="text-[10px] text-slate-500 font-mono truncate opacity-60">{{ $p->base_url }}</p>
+                                <p class="text-[10px] text-slate-500 font-mono truncate opacity-60"><?php echo e($p->base_url); ?></p>
                             </div>
 
                             <div class="mt-auto pt-4 flex items-center gap-2 border-t border-slate-50 dark:border-slate-800/50">
-                                <button @click="openEdit({{ $p->toJson() }})"
+                                <button @click="openEdit(<?php echo e($p->toJson()); ?>)"
                                     class="flex-1 h-10 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 shadow-md shadow-indigo-500/10 transition-all border-none">
                                     Config
                                 </button>
-                                <form action="{{ route('admin.api.providers.destroy', $p->id) }}" method="POST"
+                                <form action="<?php echo e(route('admin.api.providers.destroy', $p->id)); ?>" method="POST"
                                     onsubmit="return confirm('Terminate this provider connection?')">
-                                    @csrf @method('DELETE')
+                                    <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                                     <button type="submit"
                                         class="w-10 h-10 flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -565,7 +567,7 @@
                                 </form>
                             </div>
                         </div>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <div class="col-span-full py-24 text-center">
                         <div
                             class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -582,7 +584,7 @@
                             class="mt-8 px-6 py-3 bg-primary text-white rounded-2xl font-bold text-xs uppercase shadow-xl shadow-primary/20 hover:opacity-90 transition-all">Add
                             Provider</button>
                     </div>
-                @endforelse
+                <?php endif; ?>
             </div>
         </div>
 
@@ -617,38 +619,40 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50 dark:divide-slate-800 font-medium">
-                            @forelse($userKeys as $key)
+                            <?php $__empty_1 = true; $__currentLoopData = $userKeys; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500 border border-slate-200 dark:border-slate-700">
-                                                {{ substr($key->user->name ?? '?', 0, 1) }}
+                                                <?php echo e(substr($key->user->name ?? '?', 0, 1)); ?>
+
                                             </div>
                                             <div>
                                                 <p class="text-xs font-bold text-slate-900 dark:text-white">
-                                                    {{ $key->user->name ?? 'Unknown User' }}
+                                                    <?php echo e($key->user->name ?? 'Unknown User'); ?>
+
                                                 </p>
-                                                <p class="text-[10px] text-slate-500">{{ $key->user->email ?? 'No Email' }}</p>
+                                                <p class="text-[10px] text-slate-500"><?php echo e($key->user->email ?? 'No Email'); ?></p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-xs text-slate-700 dark:text-slate-300">{{ $key->name }}</td>
+                                    <td class="px-6 py-4 text-xs text-slate-700 dark:text-slate-300"><?php echo e($key->name); ?></td>
                                     <td class="px-6 py-4">
                                         <code
-                                            class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-500 border border-slate-200 dark:border-slate-700">{{ $key->key_preview }}</code>
+                                            class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-500 border border-slate-200 dark:border-slate-700"><?php echo e($key->key_preview); ?></code>
                                     </td>
-                                    <td class="px-6 py-4 text-xs text-slate-500">{{ $key->created_at->format('M d, Y') }}</td>
+                                    <td class="px-6 py-4 text-xs text-slate-500"><?php echo e($key->created_at->format('M d, Y')); ?></td>
                                     <td class="px-6 py-4 text-right">
-                                        <form action="{{ route('api-keys.destroy', $key->id) }}" method="POST"
+                                        <form action="<?php echo e(route('api-keys.destroy', $key->id)); ?>" method="POST"
                                             onsubmit="return confirm('Revoke this user API key? This cannot be undone.');">
-                                            @csrf @method('DELETE')
+                                            <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                                             <button type="submit"
                                                 class="text-[10px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-widest hover:underline bg-rose-50 dark:bg-rose-900/10 px-3 py-1.5 rounded-lg transition-colors">Revoke</button>
                                         </form>
                                     </td>
                                 </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="5" class="px-6 py-24 text-center">
                                         <div
@@ -664,7 +668,7 @@
                                             found.</span>
                                     </td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -685,14 +689,15 @@
                     </div>
 
                     <div class="relative min-w-[140px]">
-                        <form action="{{ route('admin.api') }}" method="GET">
+                        <form action="<?php echo e(route('admin.api')); ?>" method="GET">
                             <input type="hidden" name="tab" value="logs">
                             <select name="per_page" onchange="this.form.submit()"
                                 class="h-10 w-full px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-primary/10 transition-all dark:text-slate-400 appearance-none cursor-pointer">
-                                @foreach([10, 20, 50, 100, 200] as $val)
-                                    <option value="{{ $val }}" {{ request('per_page', 10) == $val ? 'selected' : '' }}>{{ $val }}
+                                <?php $__currentLoopData = [10, 20, 50, 100, 200]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($val); ?>" <?php echo e(request('per_page', 10) == $val ? 'selected' : ''); ?>><?php echo e($val); ?>
+
                                         Per Page</option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </form>
                     </div>
@@ -721,65 +726,69 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50 dark:divide-slate-800 font-medium">
-                            @forelse($logs as $log)
+                            <?php $__empty_1 = true; $__currentLoopData = $logs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                                     <td class="px-6 py-4">
                                         <span
-                                            class="text-sm font-bold text-slate-900 dark:text-white block">{{ $log->created_at->format('M d, H:i') }}</span>
+                                            class="text-sm font-bold text-slate-900 dark:text-white block"><?php echo e($log->created_at->format('M d, H:i')); ?></span>
                                         <span
-                                            class="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-tighter">{{ $log->created_at->format('s.u') }}ms</span>
+                                            class="text-[10px] text-slate-500 dark:text-slate-500 uppercase tracking-tighter"><?php echo e($log->created_at->format('s.u')); ?>ms</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="inline-flex px-2 py-1 rounded-lg text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50">
-                                            {{ $log->provider->name ?? 'SYSTEM' }}
+                                            <?php echo e($log->provider->name ?? 'SYSTEM'); ?>
+
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
                                             <span
                                                 class="px-1.5 py-0.5 rounded text-[8px] font-black bg-slate-900 dark:bg-white text-white dark:text-slate-900 uppercase">
-                                                {{ $log->method }}
+                                                <?php echo e($log->method); ?>
+
                                             </span>
                                             <code class="text-[10px] text-slate-500 font-mono truncate max-w-[200px]"
-                                                title="{{ $log->endpoint }}">{{ $log->endpoint }}</code>
+                                                title="<?php echo e($log->endpoint); ?>"><?php echo e($log->endpoint); ?></code>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        @php
+                                        <?php
                                             $hc = $log->status_code >= 400 ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600';
-                                        @endphp
+                                        ?>
                                         <span
-                                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black {{ $hc }}">
-                                            {{ $log->status_code }}
+                                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black <?php echo e($hc); ?>">
+                                            <?php echo e($log->status_code); ?>
+
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <button @click="$dispatch('open-log-modal', {{ $log->toJson() }})"
+                                        <button @click="$dispatch('open-log-modal', <?php echo e($log->toJson()); ?>)"
                                             class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline">
                                             View
                                         </button>
                                     </td>
                                 </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="5" class="px-6 py-24 text-center text-slate-400 dark:text-slate-600 italic">No
                                         logs available.</td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
 
-                @if($logs->isNotEmpty())
+                <?php if($logs->isNotEmpty()): ?>
                     <div
                         class="px-8 py-4 border-t border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Total Records:
-                            {{ $logs->total() }}
+                            <?php echo e($logs->total()); ?>
+
                         </div>
-                        <div>{{ $logs->links() }}</div>
+                        <div><?php echo e($logs->links()); ?></div>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
@@ -821,9 +830,9 @@
                 </div>
 
                 <form
-                    :action="editMode ? '{{ url('admin/api-management/providers') }}/' + provider.id : '{{ route('admin.api.providers.store') }}'"
+                    :action="editMode ? '<?php echo e(url('admin/api-management/providers')); ?>/' + provider.id : '<?php echo e(route('admin.api.providers.store')); ?>'"
                     method="POST">
-                    @csrf
+                    <?php echo csrf_field(); ?>
                     <template x-if="editMode"><input type="hidden" name="_method" value="PUT"></template>
 
                     <div class="p-6 md:p-8 max-h-[60vh] overflow-y-auto custom-scrollbar space-y-6">
@@ -1087,8 +1096,8 @@
                             </div>
                             <div
                                 class="bg-slate-950 rounded-2xl p-6 font-mono text-xs text-emerald-400 border border-slate-800 flex items-center justify-between group">
-                                <span>{{ url('/api') }}</span>
-                                <button onclick="navigator.clipboard.writeText('{{ url('/api') }}')"
+                                <span><?php echo e(url('/api')); ?></span>
+                                <button onclick="navigator.clipboard.writeText('<?php echo e(url('/api')); ?>')"
                                     class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 hover:text-white">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -1305,4 +1314,5 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/admin/api/index.blade.php ENDPATH**/ ?>

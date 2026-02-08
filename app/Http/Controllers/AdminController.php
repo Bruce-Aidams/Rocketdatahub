@@ -414,6 +414,142 @@ class AdminController extends Controller
         return \App\Models\ApiLog::with('provider')->latest()->paginate(50);
     }
 
+    // Data Integration Management
+    public function getDataIntegration()
+    {
+        $settings = DB::table('data_integration_settings')->first();
+
+        if (!$settings) {
+            // Return default empty configuration
+            return response()->json([
+                'base_url' => '',
+                'api_key' => '',
+                'webhook_url' => url('/webhooks/data-integration'),
+                'is_active' => false,
+                'last_tested_at' => null,
+                'test_status' => null,
+                'test_message' => null
+            ]);
+        }
+
+        return response()->json([
+            'base_url' => $settings->base_url ?? '',
+            'api_key' => $settings->api_key ?? '',
+            'webhook_url' => $settings->webhook_url ?? url('/webhooks/data-integration'),
+            'is_active' => (bool) $settings->is_active,
+            'last_tested_at' => $settings->last_tested_at,
+            'test_status' => $settings->test_status,
+            'test_message' => $settings->test_message
+        ]);
+    }
+
+    public function updateDataIntegration(Request $request)
+    {
+        $validated = $request->validate([
+            'base_url' => 'nullable|url',
+            'api_key' => 'nullable|string',
+            'is_active' => 'boolean'
+        ]);
+
+        $webhookUrl = url('/webhooks/data-integration');
+
+        $existing = DB::table('data_integration_settings')->first();
+
+        if ($existing) {
+            DB::table('data_integration_settings')
+                ->where('id', $existing->id)
+                ->update([
+                    'base_url' => $validated['base_url'] ?? null,
+                    'api_key' => $validated['api_key'] ?? null,
+                    'webhook_url' => $webhookUrl,
+                    'is_active' => $validated['is_active'] ?? false,
+                    'updated_at' => now()
+                ]);
+        } else {
+            DB::table('data_integration_settings')->insert([
+                'base_url' => $validated['base_url'] ?? null,
+                'api_key' => $validated['api_key'] ?? null,
+                'webhook_url' => $webhookUrl,
+                'is_active' => $validated['is_active'] ?? false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+
+        return response()->json(['message' => 'Data integration settings updated successfully']);
+    }
+
+    public function testDataIntegrationConnection(Request $request)
+    {
+        $settings = DB::table('data_integration_settings')->first();
+
+        if (!$settings || !$settings->base_url || !$settings->api_key) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please configure Base URL and API Key before testing connection'
+            ], 400);
+        }
+
+        try {
+            // Test connection to the external data provider
+            $response = \Illuminate\Support\Facades\Http::timeout(10)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $settings->api_key,
+                    'Accept' => 'application/json'
+                ])
+                ->get(rtrim($settings->base_url, '/') . '/api/health');
+
+            if ($response->successful()) {
+                // Update test status
+                DB::table('data_integration_settings')
+                    ->where('id', $settings->id)
+                    ->update([
+                        'last_tested_at' => now(),
+                        'test_status' => 'success',
+                        'test_message' => 'Connection successful',
+                        'updated_at' => now()
+                    ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Connection test successful! The data provider is reachable.'
+                ]);
+            } else {
+                $errorMessage = 'Connection failed with status: ' . $response->status();
+
+                DB::table('data_integration_settings')
+                    ->where('id', $settings->id)
+                    ->update([
+                        'last_tested_at' => now(),
+                        'test_status' => 'failed',
+                        'test_message' => $errorMessage,
+                        'updated_at' => now()
+                    ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            $errorMessage = 'Connection error: ' . $e->getMessage();
+
+            DB::table('data_integration_settings')
+                ->where('id', $settings->id)
+                ->update([
+                    'last_tested_at' => now(),
+                    'test_status' => 'failed',
+                    'test_message' => $errorMessage,
+                    'updated_at' => now()
+                ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $errorMessage
+            ], 500);
+        }
+    }
+
 
     // ... existing code ...
 
