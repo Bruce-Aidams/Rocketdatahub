@@ -3,31 +3,75 @@
 <?php $__env->startSection('title', 'API Management'); ?>
 
 <?php $__env->startSection('content'); ?>
-    <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700"
-        x-data="{ 
-                                                                                                                                                                                            tab: 'providers',
-                                                                                                                                                                                            modalOpen: false, 
-                                                                                                                                                                                            modalTab: 'general',
-                                                                                                                                                                                            editMode: false,
-                                                                                                                                                                                            provider: { id: '', name: '', network_type: '', base_url: '', request_method: 'POST', request_headers: '', request_body: '', webhook_url: '', api_key: '', secret_key: '', is_active: true },
-                                                                                                                                                                                            resetForm() {
-                                                                                                                                                                                                this.provider = { id: '', name: '', network_type: '', base_url: '', request_method: 'POST', request_headers: '', request_body: '', webhook_url: '', api_key: '', secret_key: '', is_active: true };
-                                                                                                                                                                                                this.editMode = false;
-                                                                                                                                                                                                this.modalTab = 'general';
-                                                                                                                                                                                            },
-                                                                                                                                                                                            openAdd() {
-                                                                                                                                                                                                this.resetForm();
-                                                                                                                                                                                                this.modalOpen = true;
-                                                                                                                                                                                            },
-                                                                                                                                                                                            openEdit(p) {
-                                                                                                                                                                                                this.provider = JSON.parse(JSON.stringify(p));
-                                                                                                                                                                                                this.provider.request_headers = p.request_headers ? JSON.stringify(p.request_headers, null, 2) : '';
-                                                                                                                                                                                                this.provider.request_body = p.request_body ? JSON.stringify(p.request_body, null, 2) : '';
-                                                                                                                                                                                                this.editMode = true;
-                                                                                                                                                                                                this.modalTab = 'general';
-                                                                                                                                                                                                this.modalOpen = true;
-                                                                                                                                                                                            }
-                                                                                                                                                                                        }">
+    <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ 
+                                tab: 'providers',
+                                modalOpen: false, 
+                                modalTab: 'general',
+                                editMode: false,
+                                loading: false,
+                                provider: { 
+                                    id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
+                                    request_headers: '', request_body: '', request_body_template: '',
+                                    timeout_seconds: 30, retry_attempts: 3,
+                                    response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
+                                    webhook_url: '', api_key: '', secret_key: '', is_active: true 
+                                },
+                                resetForm() {
+                                    this.provider = { 
+                                        id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
+                                        request_headers: '', request_body: '', request_body_template: '',
+                                        timeout_seconds: 30, retry_attempts: 3,
+                                        response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
+                                        webhook_url: '', api_key: '', secret_key: '', is_active: true 
+                                    };
+                                    this.editMode = false;
+                                    this.modalTab = 'general';
+                                },
+                                openAdd() {
+                                    this.resetForm();
+                                    this.modalOpen = true;
+                                },
+                                openEdit(p) {
+                                    this.provider = JSON.parse(JSON.stringify(p));
+                                    this.provider.request_headers = p.request_headers ? (typeof p.request_headers === 'string' ? p.request_headers : JSON.stringify(p.request_headers, null, 2)) : '';
+                                    this.provider.request_body = p.request_body ? (typeof p.request_body === 'string' ? p.request_body : JSON.stringify(p.request_body, null, 2)) : '';
+                                    // Ensure defaults for new fields if they are missing
+                                    this.provider.timeout_seconds = p.timeout_seconds || 30;
+                                    this.provider.retry_attempts = p.retry_attempts || 3;
+                                    this.provider.response_success_field = p.response_success_field || 'success';
+                                    this.provider.response_data_field = p.response_data_field || 'data';
+                                    this.provider.response_error_field = p.response_error_field || 'error';
+
+                                    this.editMode = true;
+                                    this.modalTab = 'general';
+                                    this.modalOpen = true;
+                                },
+                                async testProviderConnection() {
+                                    this.loading = true;
+                                    try {
+                                        const response = await fetch('/api/admin/api-providers/test', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                                'Accept': 'application/json'
+                                            },
+                                            body: JSON.stringify(this.provider)
+                                        });
+                                        const data = await response.json();
+
+                                        if (response.ok && data.success) {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Connection Successful! ' + (data.message || ''), type: 'success' } }));
+                                        } else {
+                                            throw new Error(data.message || 'Connection failed');
+                                        }
+                                    } catch (error) {
+                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: error.message || 'Connection Test Failed', type: 'error' } }));
+                                    } finally {
+                                        this.loading = false;
+                                    }
+                                }
+                            }">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -55,7 +99,7 @@
         </div>
 
         <!-- Tab Controls -->
-        <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit overflow-x-auto">
+        <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit max-w-full overflow-x-auto">
             <button @click="tab = 'providers'"
                 :class="tab === 'providers' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                 class="px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap">
@@ -90,80 +134,81 @@
 
         <!-- Data Integration View -->
         <div x-show="tab === 'data_integration'" class="space-y-6" x-data="{
-                config: {
-                    base_url: '',
-                    api_key: '',
-                    webhook_url: '',
-                    is_active: false,
-                    last_tested_at: null,
-                    test_status: null,
-                    test_message: null
-                },
-                showApiKey: false,
-                testing: false,
-                saving: false,
-                showInstructions: false,
-                async loadConfig() {
-                    try {
-                        const response = await fetch('/admin/api-management/data-integration');
-                        this.config = await response.json();
-                    } catch (error) {
-                        console.error('Failed to load data integration config:', error);
-                    }
-                },
-                async saveConfig() {
-                    this.saving = true;
-                    try {
-                        const response = await fetch('/admin/api-management/data-integration', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                            },
-                            body: JSON.stringify({
-                                base_url: this.config.base_url,
-                                api_key: this.config.api_key,
-                                is_active: this.config.is_active
-                            })
-                        });
-                        const data = await response.json();
-                        window.showToast(data.message || 'Configuration saved successfully', 'success');
-                        await this.loadConfig();
-                    } catch (error) {
-                        window.showToast('Failed to save configuration', 'error');
-                    } finally {
-                        this.saving = false;
-                    }
-                },
-                async testConnection() {
-                    this.testing = true;
-                    try {
-                        const response = await fetch('/admin/api-management/data-integration/test', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                            }
-                        });
-                        const data = await response.json();
-                        if (data.success) {
-                            window.showToast(data.message, 'success');
-                        } else {
-                            window.showToast(data.message, 'error');
-                        }
-                        await this.loadConfig();
-                    } catch (error) {
-                        window.showToast('Connection test failed', 'error');
-                    } finally {
-                        this.testing = false;
-                    }
-                },
-                copyWebhookUrl() {
-                    navigator.clipboard.writeText(this.config.webhook_url);
-                    window.showToast('Webhook URL copied to clipboard', 'success');
-                }
-            }" x-init="loadConfig()">
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                                    config: {
+                                        base_url: '',
+                                        api_key: '',
+                                        webhook_url: '',
+                                        is_active: false,
+                                        last_tested_at: null,
+                                        test_status: null,
+                                        test_message: null
+                                    },
+                                    showApiKey: false,
+                                    testing: false,
+                                    saving: false,
+                                    showInstructions: false,
+                                    async loadConfig() {
+                                        try {
+                                            const response = await fetch('/admin/api-management/data-integration');
+                                            this.config = await response.json();
+                                        } catch (error) {
+                                            console.error('Failed to load data integration config:', error);
+                                        }
+                                    },
+                                    async saveConfig() {
+                                        this.saving = true;
+                                        try {
+                                            const response = await fetch('/admin/api-management/data-integration', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                },
+                                                body: JSON.stringify({
+                                                    base_url: this.config.base_url,
+                                                    api_key: this.config.api_key,
+                                                    is_active: this.config.is_active
+                                                })
+                                            });
+                                            const data = await response.json();
+                                            window.showToast(data.message || 'Configuration saved successfully', 'success');
+                                            await this.loadConfig();
+                                        } catch (error) {
+                                            window.showToast('Failed to save configuration', 'error');
+                                        } finally {
+                                            this.saving = false;
+                                        }
+                                    },
+                                    async testConnection() {
+                                        this.testing = true;
+                                        try {
+                                            const response = await fetch('/admin/api-management/data-integration/test', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                }
+                                            });
+                                            const data = await response.json();
+                                            if (data.success) {
+                                                window.showToast(data.message, 'success');
+                                            } else {
+                                                window.showToast(data.message, 'error');
+                                            }
+                                            await this.loadConfig();
+                                        } catch (error) {
+                                            window.showToast('Connection test failed', 'error');
+                                        } finally {
+                                            this.testing = false;
+                                        }
+                                    },
+                                    copyWebhookUrl() {
+                                        navigator.clipboard.writeText(this.config.webhook_url);
+                                        window.showToast('Webhook URL copied to clipboard', 'success');
+                                    }
+                                }" x-init="loadConfig()">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div class="flex items-center gap-4 mb-8">
                     <div
                         class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -412,7 +457,7 @@
         <!-- Connectivity View -->
         <div x-show="tab === 'connectivity'" class="space-y-6">
             <div
-                class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
                 <div class="flex items-center gap-4 mb-10">
                     <div
                         class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-transform hover:scale-105">
@@ -473,16 +518,16 @@
                     <div class="pt-4">
                         <button type="button"
                             @click="async () => {
-                                                                                                                                                                                        const url = document.getElementById('webhook_url').value;
-                                                                                                                                                                                        const secret = document.getElementById('webhook_secret').value;
-                                                                                                                                                                                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
-                                                                                                                                                                                            method: 'PUT',
-                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                                                                                                                                                                                            body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
-                                                                                                                                                                                        });
-                                                                                                                                                                                        if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
-                                                                                                                                                                                        else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
-                                                                                                                                                                                    }"
+                                                                                                                                                                                                            const url = document.getElementById('webhook_url').value;
+                                                                                                                                                                                                            const secret = document.getElementById('webhook_secret').value;
+                                                                                                                                                                                                            const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
+                                                                                                                                                                                                                method: 'PUT',
+                                                                                                                                                                                                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+                                                                                                                                                                                                                body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
+                                                                                                                                                                                                            });
+                                                                                                                                                                                                            if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
+                                                                                                                                                                                                            else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
+                                                                                                                                                                                                        }"
                             class="h-12 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-bold text-xs uppercase shadow-lg shadow-emerald-500/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-3 border-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -513,7 +558,7 @@
                                         </svg>
                                     </div>
                                     <div class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
-                                                                                                                                                                                                                                            <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                                                                                                                                                                    <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
                     ($p->network_type === 'TELECEL' ? 'bg-rose-100 text-rose-600' :
                         ($p->network_type === 'AT' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'))); ?>">
                                         <?php echo e($p->network_type ?: 'Global'); ?>
@@ -521,20 +566,21 @@
                                     </div>
                                 </div>
 
-                                <button @click="async () => {
-                                                                            const newState = !<?php echo e($p->is_active ? 'true' : 'false'); ?>;
-                                                                            const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
-                                                                                method: 'PUT',
-                                                                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
-                                                                                body: JSON.stringify({ is_active: newState })
-                                                                            });
-                                                                            if(response.ok) {
-                                                                                window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Provider status updated!', type: 'success' } }));
-                                                                                setTimeout(() => window.location.reload(), 500);
-                                                                            } else {
-                                                                                window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Update failed.', type: 'error' } }));
-                                                                            }
-                                                                        }"
+                                <button
+                                    @click="async () => {
+                                                                                                                                                    const newState = !<?php echo e($p->is_active ? 'true' : 'false'); ?>;
+                                                                                                                                                    const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
+                                                                                                                                                        method: 'PUT',
+                                                                                                                                                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+                                                                                                                                                        body: JSON.stringify({ is_active: newState })
+                                                                                                                                                    });
+                                                                                                                                                    if(response.ok) {
+                                                                                                                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Provider status updated!', type: 'success' } }));
+                                                                                                                                                        setTimeout(() => window.location.reload(), 500);
+                                                                                                                                                    } else {
+                                                                                                                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Update failed.', type: 'error' } }));
+                                                                                                                                                    }
+                                                                                                                                                }"
                                     class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none <?php echo e($p->is_active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'); ?>">
                                     <span class="sr-only">Toggle Status</span>
                                     <span
@@ -592,7 +638,8 @@
         <div x-show="tab === 'user_keys'" class="space-y-6">
             <div
                 class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-                <div class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+                <div
+                    class="px-6 md:px-8 py-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
                     <h3 class="text-xl font-bold text-slate-900 dark:text-white">User API Keys</h3>
                     <p class="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">
                         Manage user-generated access tokens</p>
@@ -680,7 +727,7 @@
             <div
                 class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
                 <div
-                    class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
+                    class="px-6 md:px-6 md:px-8 py-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Traffic Logs</h3>
                         <p
@@ -781,7 +828,7 @@
 
                 <?php if($logs->isNotEmpty()): ?>
                     <div
-                        class="px-8 py-4 border-t border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
+                        class="px-6 md:px-8 py-4 border-t border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Total Records:
                             <?php echo e($logs->total()); ?>
 
@@ -907,22 +954,68 @@
                                 </div>
                             </div>
 
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Timeout
+                                        (Seconds)</label>
+                                    <input type="number" name="timeout_seconds" x-model="provider.timeout_seconds" min="5"
+                                        max="300"
+                                        class="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all dark:text-white">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Retry
+                                        Attempts</label>
+                                    <input type="number" name="retry_attempts" x-model="provider.retry_attempts" min="0"
+                                        max="10"
+                                        class="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all dark:text-white">
+                                </div>
+                            </div>
+
                             <div class="space-y-1.5">
                                 <label
                                     class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Request
                                     Headers (JSON)</label>
-                                <textarea name="request_headers" x-model="provider.request_headers" rows="4"
+                                <textarea name="request_headers" x-model="provider.request_headers" rows="3"
                                     class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-[11px] font-mono focus:ring-2 focus:ring-primary/20 transition-all dark:text-white custom-scrollbar"
                                     placeholder='{ "Authorization": "Bearer ...", "Content-Type": "application/json" }'></textarea>
                             </div>
 
                             <div class="space-y-1.5">
                                 <label
-                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Body
-                                    Template (JSON)</label>
-                                <textarea name="request_body" x-model="provider.request_body" rows="6"
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Request
+                                    Body Template (JSON with Placeholders)</label>
+                                <textarea name="request_body_template" x-model="provider.request_body_template" rows="4"
                                     class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-[11px] font-mono focus:ring-2 focus:ring-primary/20 transition-all dark:text-white custom-scrollbar"
-                                    placeholder='{ "network": "MTN", "phone": "@phone", "data_code": "@data_code" }'></textarea>
+                                    placeholder='{ "network": "MTN", "phone": "{phone}", "amount": "{amount}", "package": "{package}" }'></textarea>
+                                <p class="text-[9px] text-slate-400 italic">Available placeholders: {phone}, {amount},
+                                    {package}, {network}, {api_key}, {api_secret}</p>
+                            </div>
+
+                            <div
+                                class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                                <h5 class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest">Response
+                                    Field Mapping</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-bold text-slate-500 uppercase">Success Field</label>
+                                        <input type="text" name="response_success_field"
+                                            x-model="provider.response_success_field"
+                                            class="w-full h-10 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-bold text-slate-500 uppercase">Data Field</label>
+                                        <input type="text" name="response_data_field" x-model="provider.response_data_field"
+                                            class="w-full h-10 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-bold text-slate-500 uppercase">Error Field</label>
+                                        <input type="text" name="response_error_field"
+                                            x-model="provider.response_error_field"
+                                            class="w-full h-10 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -961,11 +1054,27 @@
 
                     <div
                         class="p-6 bg-slate-50 dark:bg-slate-800/20 border-t border-slate-50 dark:border-slate-800 flex flex-col md:flex-row gap-4">
-                        <button type="button" @click="modalOpen = false"
-                            class="flex-1 h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">Cancel</button>
-                        <button type="submit"
-                            class="flex-[2] h-12 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:opacity-90 transition-all border-none"
-                            x-text="editMode ? 'Update Provider' : 'Save Provider'"></button>
+                        <button type="button" @click="testProviderConnection()" :disabled="loading"
+                            class="h-12 px-6 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-cyan-500/20 transition-all flex items-center justify-center gap-2">
+                            <svg x-show="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <svg x-show="loading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                </path>
+                            </svg>
+                            <span x-text="loading ? 'Testing...' : 'Test Connection'"></span>
+                        </button>
+                        <div class="flex-1 flex gap-4">
+                            <button type="button" @click="modalOpen = false"
+                                class="flex-1 h-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">Cancel</button>
+                            <button type="submit"
+                                class="flex-[2] h-12 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:opacity-90 transition-all border-none"
+                                x-text="editMode ? 'Update Provider' : 'Save Provider'"></button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -979,7 +1088,7 @@
             <div
                 class="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-slate-100 dark:border-slate-800 animate-in zoom-in-95 duration-200">
                 <div
-                    class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+                    class="px-6 md:px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Transaction Details</h3>
                         <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold font-mono tracking-widest mt-0.5"
@@ -994,7 +1103,7 @@
                     </button>
                 </div>
 
-                <div class="p-8 overflow-y-auto space-y-8 custom-scrollbar">
+                <div class="p-6 md:p-8 overflow-y-auto space-y-8 custom-scrollbar">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div
                             class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50">
@@ -1044,7 +1153,7 @@
                 </div>
 
                 <div
-                    class="px-8 py-5 border-t border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex justify-end">
+                    class="px-6 md:px-8 py-5 border-t border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex justify-end">
                     <button @click="open = false"
                         class="px-6 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-bold uppercase text-slate-700 dark:text-slate-300">Close</button>
                 </div>
@@ -1053,7 +1162,7 @@
         <!-- CloudTech API Documentation View -->
         <div x-show="tab === 'docs'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div
-                class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-12 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
 
                 <!-- Documentation Header -->
                 <div class="flex items-center gap-6 mb-12">
@@ -1241,7 +1350,7 @@
                         </div>
                         <div class="grid lg:grid-cols-2 gap-8">
                             <div
-                                class="p-8 rounded-3xl bg-indigo-50/30 dark:bg-indigo-950/10 border border-indigo-100/50 dark:border-indigo-900/30 space-y-4">
+                                class="p-6 md:p-8 rounded-3xl bg-indigo-50/30 dark:bg-indigo-950/10 border border-indigo-100/50 dark:border-indigo-900/30 space-y-4">
                                 <h5 class="text-[10px] font-black uppercase text-indigo-600 tracking-widest">Outgoing Events
                                 </h5>
                                 <p class="text-xs text-slate-500 font-medium leading-relaxed">External systems receive
@@ -1257,7 +1366,7 @@
                             </div>
 
                             <div
-                                class="p-8 rounded-3xl bg-emerald-50/30 dark:bg-emerald-950/10 border border-emerald-100/50 dark:border-emerald-900/30 space-y-4">
+                                class="p-6 md:p-8 rounded-3xl bg-emerald-50/30 dark:bg-emerald-950/10 border border-emerald-100/50 dark:border-emerald-900/30 space-y-4">
                                 <h5 class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Incoming
                                     Webhooks</h5>
                                 <p class="text-xs text-slate-500 font-medium leading-relaxed">Providers push transaction

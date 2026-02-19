@@ -5,7 +5,10 @@
         <main class="flex-1 pt-16">
             <!-- Hero Section -->
             <section class="relative overflow-hidden py-16 md:py-24 lg:py-40">
-                <!-- Abstract Background Elements -->
+                <!-- Unique UI Signature: Digital Neural Network Animation -->
+                <x-hero-network-animation />
+
+                <!-- Abstract Background Elements (Reduced opacity/blur for cleaner look with network) -->
                 <div
                     class="absolute top-0 right-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-primary/5 rounded-full blur-[80px] md:blur-[120px] -z-10 animate-pulse">
                 </div>
@@ -34,7 +37,7 @@
                                 class="text-3xl sm:text-4xl md:text-7xl font-black tracking-tight leading-[1.1] text-foreground">
                                 The smartest way to <br />
                                 <span
-                                    class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-purple-600 italic">refill
+                                    class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-purple-600 italic text-gradient-animate text-glitch">refill
                                     your data.</span>
                             </h1>
                             <p x-show="show" x-transition:enter="transition ease-out duration-700 delay-400"
@@ -184,71 +187,91 @@
                             money. Instant activation guaranteed.</p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="grid grid-cols-2 gap-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4">
                         @foreach($bundles as $product)
+                            @php
+                                $net = strtoupper($product->network);
+                                $netMap = [
+                                    'MTN' => ['bg' => 'bg-yellow-400', 'text' => 'text-yellow-950', 'ring' => 'ring-yellow-400/50'],
+                                    'TELECEL' => ['bg' => 'bg-red-600', 'text' => 'text-white', 'ring' => 'ring-red-600/50'],
+                                    'AT' => ['bg' => 'bg-blue-600', 'text' => 'text-white', 'ring' => 'ring-blue-600/50'],
+                                    'AIRTELTIGO' => ['bg' => 'bg-blue-600', 'text' => 'text-white', 'ring' => 'ring-blue-600/50'],
+                                ];
+                                $theme = $netMap[$net] ?? ['bg' => 'bg-slate-900', 'text' => 'text-white', 'ring' => 'ring-slate-500/50'];
+                            @endphp
+
                             <div
-                                class="group relative bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-                                {{-- Image Section --}}
+                                class="group relative bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300">
+
+                                {{-- Image / Visual Header --}}
                                 <div
-                                    class="aspect-[4/3] bg-slate-50 dark:bg-slate-800/50 relative flex items-center justify-center overflow-hidden">
+                                    class="aspect-[4/3] bg-slate-50 dark:bg-slate-800/50 relative flex items-center justify-center overflow-hidden group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors">
                                     @if($product->image_url)
                                         <img src="{{ $product->image_url }}"
-                                            class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700">
+                                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                                     @else
                                         <div
-                                            class="flex flex-col items-center gap-2 opacity-20 group-hover:opacity-40 transition-opacity text-slate-400">
-                                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
+                                            class="absolute inset-0 bg-gradient-to-tr from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900/50 opacity-50">
+                                        </div>
+                                        <div
+                                            class="flex flex-col items-center gap-2 opacity-30 group-hover:opacity-50 transition-opacity text-slate-400 z-10">
+                                            <!-- Dynamic Network Icon Placeholder if no image -->
+                                            <span
+                                                class="text-xs font-black uppercase tracking-widest">{{ $product->network }}</span>
                                         </div>
                                     @endif
 
                                     {{-- Network Badge --}}
-                                    <div class="absolute top-2 left-2 md:top-4 md:left-4">
-                                        @php
-                                            $net = strtoupper($product->network);
-                                            $netColors = [
-                                                'MTN' => 'bg-yellow-400 text-yellow-950',
-                                                'TELECEL' => 'bg-red-500 text-white',
-                                                'AT' => 'bg-blue-600 text-white',
-                                                'AIRTELTIGO' => 'bg-blue-600 text-white',
-                                            ];
-                                            $nc = $netColors[$net] ?? 'bg-slate-900 text-white';
-                                        @endphp
+                                    <div class="absolute top-3 left-3 md:top-4 md:left-4 z-20">
                                         <span
-                                            class="px-1.5 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-[8px] md:text-[10px] font-black tracking-widest uppercase shadow-xl backdrop-blur-md {{ $nc }}">
+                                            class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black tracking-widest uppercase shadow-lg backdrop-blur-md {{ $theme['bg'] }} {{ $theme['text'] }}">
                                             {{ $product->network }}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div class="p-4 md:p-8 space-y-4 md:space-y-6">
+                                {{-- Card Content --}}
+                                <div class="p-4 md:p-6 space-y-4">
                                     <div>
                                         <h3
-                                            class="text-sm md:text-xl font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight truncate">
+                                            class="text-base md:text-lg font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight line-clamp-1 group-hover:text-primary transition-colors">
                                             {{ $product->name }}
                                         </h3>
-                                        <p
-                                            class="text-[10px] md:text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">
-                                            {{ $product->data_amount }} Data Allocation
-                                        </p>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-wide">
+                                                {{ $product->data_amount }}
+                                            </span>
+                                            @if($product->validity)
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-wide">
+                                                    {{ $product->validity }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     <div
-                                        class="pt-4 md:pt-6 border-t border-slate-50 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
+                                        class="pt-4 border-t border-slate-50 dark:border-slate-800/50 flex items-end justify-between gap-2">
                                         <div>
-                                            <p
-                                                class="hidden md:block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
                                                 Price</p>
                                             <p
-                                                class="text-lg md:text-2xl font-black text-primary tracking-tighter tabular-nums">
-                                                ₵{{ number_format($product->price, 2) }}</p>
+                                                class="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
+                                                ₵{{ number_format($product->price, 2) }}
+                                            </p>
                                         </div>
+
                                         <a href="{{ url('/login?redirect=purchase&bundle=' . $product->id) }}"
-                                            class="w-full md:w-auto h-10 md:h-12 px-0 md:px-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl md:rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-primary dark:hover:bg-primary dark:hover:text-white transition-all shadow-xl shadow-slate-900/10 dark:shadow-none flex items-center justify-center">
-                                            Buy
-                                            <span class="hidden md:inline ml-1">Now</span>
+                                            class="h-10 px-5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:bg-primary dark:hover:bg-primary dark:hover:text-white transition-all shadow-lg shadow-slate-900/10 dark:shadow-none flex items-center justify-center group/btn relative overflow-hidden">
+                                            <span class="relative z-10 flex items-center gap-1">
+                                                Buy
+                                                <svg class="w-3 h-3 transition-transform group-hover/btn:translate-x-1"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                        d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </span>
                                         </a>
                                     </div>
                                 </div>

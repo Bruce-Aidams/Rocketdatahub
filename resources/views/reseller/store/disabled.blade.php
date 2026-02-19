@@ -74,8 +74,12 @@
             class="p-6 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-[2rem] border border-white dark:border-slate-800 shadow-sm">
             <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Notice</p>
             <p class="text-sm text-slate-600 dark:text-slate-300 font-medium">
-                Please contact the reseller directly or try again later. If you are the owner, you can enable your store
-                from the <a href="{{ route('login') }}" class="text-primary hover:underline font-bold">Reseller Hub</a>.
+                Please contact the reseller directly or try again later.
+                @if($reseller->phone)
+                    <br><span class="text-xs font-black uppercase tracking-[0.1em] text-slate-400">Contact:</span>
+                    <a href="tel:{{ $reseller->phone }}"
+                        class="text-primary hover:underline font-bold">{{ $reseller->phone }}</a>
+                @endif
             </p>
         </div>
 

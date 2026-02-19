@@ -325,6 +325,13 @@ class WalletController extends Controller
         return view('invoices.transaction', compact('transaction'));
     }
 
+    public function downloadInvoice($id)
+    {
+        $transaction = Transaction::where('user_id', auth()->id())->findOrFail($id);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.transaction', compact('transaction'));
+        return $pdf->download('invoice-' . $transaction->reference . '.pdf');
+    }
+
     public function billingHistory(Request $request)
     {
         $user = $request->user();

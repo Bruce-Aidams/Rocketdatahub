@@ -29,7 +29,7 @@
         </div>
 
         <!-- System Navigation -->
-        <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit overflow-x-auto">
+        <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit max-w-full overflow-x-auto">
             @foreach([
                     'general' => ['icon' => 'globe-alt', 'label' => 'General'],
                     'security' => ['icon' => 'shield-check', 'label' => 'Security'],
@@ -54,7 +54,7 @@
                 {{-- General Settings --}}
                 <div x-show="tab === 'general'" class="space-y-6">
                     <div class="space-y-6">
-                         <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                         <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                             <div class="space-y-6">
                                 <div class="grid md:grid-cols-2 gap-6">
                                     <div class="space-y-1.5">
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm" x-data="{ mmLoading: false }">
+                        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm" x-data="{ mmLoading: false }">
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
                                 <span class="w-2 h-2 rounded-full" :class="(settings.maintenance_mode == '1' || settings.maintenance_mode == 'true') ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'"></span>
                                 System Status
@@ -127,7 +127,7 @@
 
                 {{-- Security Settings --}}
                 <div x-show="tab === 'security'" class="space-y-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
                             <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 012 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -150,7 +150,7 @@
 
                 {{-- Financials Settings --}}
                 <div x-show="tab === 'financials'" class="space-y-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
                             <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -218,7 +218,7 @@
 
                 {{-- Notifications Settings --}}
                 <div x-show="tab === 'notifications'" class="space-y-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
                             <div class="w-8 h-8 rounded-xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -236,7 +236,7 @@
 
                 {{-- Login History --}}
                 <div x-show="tab === 'history'" class="space-y-6" x-data="{ historySearch: '' }">
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                             <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-500">
@@ -266,8 +266,8 @@
                                 </svg>
                             </div>
 
-                            <div class="space-y-4">
-                            <table class="w-full text-left border-collapse">
+                            <div class="space-y-4 overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[600px]">
                                 <thead>
                                     <tr class="border-b border-slate-100 dark:border-slate-800">
                                         <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">User</th>
@@ -342,7 +342,7 @@
 
             <!-- Right: Info/Sidebar -->
             <div class="lg:col-span-4 space-y-6">
-                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-white relative overflow-hidden group">
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden group">
                     <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-all"></div>
                     <div class="relative z-10">
                         <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
@@ -362,7 +362,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                     <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-6">System Health</h4>
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">

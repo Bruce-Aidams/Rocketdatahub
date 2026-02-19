@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\Services\ApiService;
 
 class ProcessOrder implements ShouldQueue
 {
@@ -27,7 +28,7 @@ class ProcessOrder implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(ApiService $apiService): void
     {
         // Skip if order is already completed or failed to prevent state overwrite
         if (in_array($this->order->status, ['completed', 'failed'])) {
@@ -35,24 +36,28 @@ class ProcessOrder implements ShouldQueue
             return;
         }
 
-        // Simulate processing flow
         Log::info("Processing Order ID: " . $this->order->id);
-
         $this->order->update(['status' => 'processing']);
 
-        // Simulate external API call delay
-        sleep(5);
+        try {
+            $result = $apiService->processOrder($this->order);
 
-        // Success condition (User said "get responsed ... and change stats to complete")
-        // We simulate a successful response
-        $response = [
-            'status' => 'success',
-            'external_id' => 'EXT-' . uniqid(),
-            'message' => 'Bundle sent successfully'
-        ];
-
-        $this->order->complete($response);
-
-        Log::info("Order ID: " . $this->order->id . " completed.");
+            if ($result['success']) {
+                $this->order->complete($result);
+                Log::info("Order ID: " . $this->order->id . " completed successfully.");
+            } else {
+                $this->order->update([
+                    'status' => 'failed',
+                    'response_data' => $result
+                ]);
+                Log::warning("Order ID: " . $this->order->id . " failed. Message: " . ($result['message'] ?? 'Unknown error'));
+            }
+        } catch (\Exception $e) {
+            Log::error("Order ID: " . $this->order->id . " exception: " . $e->getMessage());
+            $this->order->update([
+                'status' => 'failed',
+                'response_data' => ['error' => $e->getMessage()]
+            ]);
+        }
     }
 }

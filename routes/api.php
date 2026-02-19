@@ -127,6 +127,8 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
         Route::post('/api-providers', [App\Http\Controllers\ApiController::class, 'store']);
         Route::put('/api-providers/{id}', [App\Http\Controllers\ApiController::class, 'update']);
         Route::delete('/api-providers/{id}', [App\Http\Controllers\ApiController::class, 'destroy']);
+        Route::post('/api-providers/test', [App\Http\Controllers\ApiController::class, 'testConnection']);
+        Route::post('/api-providers/{id}/toggle', [App\Http\Controllers\ApiController::class, 'toggleActive']);
         Route::get('/api-logs', [App\Http\Controllers\ApiController::class, 'logs']);
     });
 });

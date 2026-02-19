@@ -756,6 +756,38 @@ class AdminController extends Controller
         return view('admin.transactions.index', compact('transactions'));
     }
 
+    public function getInvoices(Request $request)
+    {
+        // Reuse transaction logic for invoices view, but specifically focused on accessible records
+        $query = Transaction::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'like', "%$search%")
+                            ->orWhere('email', 'like', "%$search%");
+                    });
+            });
+        }
+
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        $transactions = $query->latest()->paginate(10);
+        return view('admin.invoices.index', compact('transactions'));
+    }
+
+    public function downloadInvoice($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.transaction', compact('transaction'));
+        return $pdf->download('invoice-' . $transaction->reference . '.pdf');
+    }
+
     public function exportTransactions(Request $request)
     {
         $query = Transaction::with('user');
@@ -813,35 +845,5 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
-    }
-
-    public function getInvoices(Request $request)
-    {
-        $query = Transaction::with('user');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('reference', 'like', "%$search%")
-                    ->orWhereHas('user', function ($u) use ($search) {
-                        $u->where('name', 'like', "%$search%")
-                            ->orWhere('email', 'like', "%$search%");
-                    });
-            });
-        }
-
-        if ($request->filled('type') && $request->type !== 'all') {
-            $query->where('type', $request->type);
-        }
-
-        $transactions = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
-
-        return view('admin.invoices.index', compact('transactions'));
-    }
-
-    public function downloadInvoice($id)
-    {
-        $transaction = Transaction::with('user')->findOrFail($id);
-        return view('invoices.transaction', compact('transaction'));
     }
 }

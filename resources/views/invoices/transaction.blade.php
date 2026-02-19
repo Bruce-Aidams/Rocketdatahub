@@ -3,309 +3,179 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - {{ $transaction->reference }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 14px;
             color: #333;
-            line-height: 1.6;
-            padding: 40px;
+            line-height: 1.4;
+            padding: 0;
+            margin: 0;
         }
 
-        .invoice-container {
+        .invoice-box {
             max-width: 800px;
-            margin: 0 auto;
-            background: white;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            background: #fff;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #6366f1;
+        .invoice-box table {
+            width: 100%;
+            line-height: inherit;
+            text-align: left;
+            border-collapse: collapse;
         }
 
-        .company-info h1 {
-            font-size: 32px;
-            font-weight: bold;
-            color: #6366f1;
-            margin-bottom: 5px;
+        .invoice-box table td {
+            padding: 5px;
+            vertical-align: top;
         }
 
-        .company-info p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .invoice-info {
+        .invoice-box table tr td:nth-child(2) {
             text-align: right;
         }
 
-        .invoice-info h2 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 10px;
+        .invoice-box table tr.top table td {
+            padding-bottom: 20px;
         }
 
-        .invoice-info p {
-            font-size: 12px;
-            color: #666;
-            margin: 3px 0;
-        }
-
-        .details-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-
-        .details-box {
-            width: 48%;
-        }
-
-        .details-box h3 {
-            font-size: 14px;
+        .invoice-box table tr.top table td.title {
+            font-size: 35px;
+            line-height: 35px;
+            color: #6366f1;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-            text-transform: uppercase;
         }
 
-        .details-box p {
-            font-size: 13px;
-            color: #666;
-            margin: 5px 0;
+        .invoice-box table tr.information table td {
+            padding-bottom: 40px;
         }
 
-        .transaction-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        .transaction-table thead {
-            background-color: #f8f9fa;
-        }
-
-        .transaction-table th {
-            padding: 15px;
-            text-align: left;
-            font-size: 12px;
+        .invoice-box table tr.heading td {
+            background: #f8f9fa;
+            border-bottom: 2px solid #eee;
             font-weight: bold;
-            color: #333;
             text-transform: uppercase;
-            border-bottom: 2px solid #e5e7eb;
+            font-size: 12px;
         }
 
-        .transaction-table td {
-            padding: 15px;
-            font-size: 13px;
-            color: #666;
-            border-bottom: 1px solid #f3f4f6;
+        .invoice-box table tr.details td {
+            padding-bottom: 20px;
         }
 
-        .transaction-table tr:last-child td {
+        .invoice-box table tr.item td {
+            border-bottom: 1px solid #eee;
+        }
+
+        .invoice-box table tr.item.last td {
             border-bottom: none;
         }
 
-        .totals-section {
-            margin-top: 30px;
-            text-align: right;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: flex-end;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-        .total-label {
-            width: 200px;
-            text-align: right;
-            padding-right: 20px;
-            color: #666;
-        }
-
-        .total-value {
-            width: 150px;
-            text-align: right;
+        .invoice-box table tr.total td:nth-child(2) {
+            border-top: 2px solid #eee;
             font-weight: bold;
-            color: #333;
-        }
-
-        .grand-total {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #e5e7eb;
-        }
-
-        .grand-total .total-label {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .grand-total .total-value {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 18px;
             color: #6366f1;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
         .status-success {
-            background-color: #d1fae5;
             color: #065f46;
+            background: #d1fae5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
         }
 
         .status-pending {
-            background-color: #fef3c7;
             color: #92400e;
+            background: #fef3c7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
         }
 
         .status-failed {
-            background-color: #fee2e2;
             color: #991b1b;
+            background: #fee2e2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
         }
 
         .footer {
             margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
             text-align: center;
-            font-size: 11px;
-            color: #999;
-        }
-
-        .footer p {
-            margin: 5px 0;
-        }
-
-        .type-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .type-credit {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .type-debit {
-            background-color: #fee2e2;
-            color: #991b1b;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
         }
     </style>
 </head>
 
 <body>
-    <div class="invoice-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="company-info">
-                <h1>CloudTech</h1>
-                <p>Data Bundle Services</p>
-                <p>Ghana</p>
-            </div>
-            <div class="invoice-info">
-                <h2>INVOICE</h2>
-                <p><strong>Invoice #:</strong> {{ $transaction->reference }}</p>
-                <p><strong>Date:</strong> {{ $transaction->created_at->format('M d, Y') }}</p>
-                <p><strong>Status:</strong>
-                    <span class="status-badge status-{{ $transaction->status }}">
-                        {{ $transaction->status === 'success' ? 'Delivered' : ($transaction->status === 'pending' ? 'Validating' : ucfirst($transaction->status)) }}
-                    </span>
-                </p>
-            </div>
-        </div>
+    <div class="invoice-box">
+        <table>
+            <tr class="top">
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td class="title">CloudTech</td>
+                            <td>
+                                Invoice #: {{ $transaction->reference }}<br>
+                                Date: {{ $transaction->created_at->format('M d, Y') }}<br>
+                                Status: <span
+                                    class="status-{{ $transaction->status }}">{{ ucfirst($transaction->status) }}</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
 
-        <!-- Details Section -->
-        <div class="details-section">
-            <div class="details-box">
-                <h3>Bill To:</h3>
-                <p><strong>{{ auth()->user()->name }}</strong></p>
-                <p>{{ auth()->user()->email }}</p>
-                @if(auth()->user()->phone)
-                    <p>{{ auth()->user()->phone }}</p>
-                @endif
-            </div>
-            <div class="details-box">
-                <h3>Transaction Details:</h3>
-                <p><strong>Reference:</strong> {{ $transaction->reference }}</p>
-                <p><strong>Type:</strong>
-                    <span class="type-badge type-{{ $transaction->type }}">
-                        {{ ucfirst($transaction->type) }}
-                    </span>
-                </p>
-                <p><strong>Date:</strong> {{ $transaction->created_at->format('F d, Y h:i A') }}</p>
-            </div>
-        </div>
+            <tr class="information">
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td>
+                                <strong>Bill To:</strong><br>
+                                {{ $transaction->user->name ?? 'User' }}<br>
+                                {{ $transaction->user->email ?? '' }}<br>
+                                {{ $transaction->user->phone ?? '' }}
+                            </td>
+                            <td>
+                                <strong>Platform:</strong><br>
+                                CloudTech Data Services<br>
+                                Support: support@cloudtech.com
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
 
-        <!-- Transaction Table -->
-        <table class="transaction-table">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Reference</th>
-                    <th>Type</th>
-                    <th style="text-align: right;">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ $transaction->description ?? 'Transaction' }}</td>
-                    <td>{{ $transaction->reference }}</td>
-                    <td>
-                        <span class="type-badge type-{{ $transaction->type }}">
-                            {{ ucfirst($transaction->type) }}
-                        </span>
-                    </td>
-                    <td style="text-align: right; font-weight: bold;">
-                        GHC {{ number_format($transaction->amount, 2) }}
-                    </td>
-                </tr>
-            </tbody>
+            <tr class="heading">
+                <td>Description</td>
+                <td>Amount</td>
+            </tr>
+
+            <tr class="item">
+                <td>
+                    {{ $transaction->description ?? 'Data Bundle Purchase' }}<br>
+                    <small style="color: #777;">Ref: {{ $transaction->reference }}</small>
+                </td>
+                <td>GHC {{ number_format($transaction->amount, 2) }}</td>
+            </tr>
+
+            <tr class="total">
+                <td></td>
+                <td>Total: GHC {{ number_format($transaction->amount, 2) }}</td>
+            </tr>
         </table>
 
-        <!-- Totals Section -->
-        <div class="totals-section">
-            <div class="total-row">
-                <div class="total-label">Subtotal:</div>
-                <div class="total-value">GHC {{ number_format($transaction->amount, 2) }}</div>
-            </div>
-            <div class="total-row grand-total">
-                <div class="total-label">Total Amount:</div>
-                <div class="total-value">GHC {{ number_format($transaction->amount, 2) }}</div>
-            </div>
-        </div>
-
-        <!-- Footer -->
         <div class="footer">
-            <p><strong>CloudTech - Data Bundle Services</strong></p>
-            <p>Thank you for your business!</p>
+            <p>Thank you for using CloudTech!</p>
             <p>This is a computer-generated invoice and does not require a signature.</p>
-            <p>For any queries, please contact support.</p>
         </div>
     </div>
 </body>

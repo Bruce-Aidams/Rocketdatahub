@@ -112,6 +112,11 @@
         font-feature-settings: "rlig" 1, "calt" 1;
     }
 
+    .dark body {
+        background-image: linear-gradient(to bottom right, #020617, #0f172a, #1e1b4b);
+        background-attachment: fixed;
+    }
+
     h1,
     h2,
     h3,
@@ -226,13 +231,29 @@
 }
 
 @keyframes pulse-text {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
 }
 
 @keyframes typing-dot {
-    0%, 100% { opacity: 0; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-2px); }
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-2px);
+    }
 }
 
 .animate-pulse-text {
@@ -241,4 +262,47 @@
 
 .animate-typing-dot {
     animation: typing-dot 1.2s ease-in-out infinite;
+}
+
+@layer utilities {
+    .text-glitch {
+        animation: glitch 3s infinite;
+    }
+
+    @keyframes glitch {
+        0% {
+            text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff;
+        }
+
+        2% {
+            text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff;
+        }
+
+        4% {
+            text-shadow: none;
+        }
+
+        100% {
+            text-shadow: none;
+        }
+    }
+
+    .text-gradient-animate {
+        background-size: 200% auto;
+        animation: gradient-flow 3s linear infinite;
+    }
+
+    @keyframes gradient-flow {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
 }

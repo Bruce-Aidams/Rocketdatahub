@@ -300,7 +300,7 @@
                                             @endif
                                         </td>
                                         <td class="px-10 py-6 text-right">
-                                            <a href="{{ route('billing.invoice', $transaction->id) }}"
+                                            <a href="{{ route('billing.invoice.download', $transaction->id) }}"
                                                 class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all duration-300 group shadow-inner">
                                                 <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24">

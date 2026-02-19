@@ -157,6 +157,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/paystack/verify', [\App\Http\Controllers\PaystackController::class, 'verifyPaymentWeb'])->name('paystack.verify');
     Route::get('/dashboard/wallet/verify-web', [\App\Http\Controllers\PaystackController::class, 'verifyPaymentWeb'])->name('wallet.verify_web');
     Route::get('/dashboard/billing/invoice/{id}', [\App\Http\Controllers\WalletController::class, 'invoice'])->name('billing.invoice');
+    Route::get('/dashboard/billing/invoice/{id}/download', [\App\Http\Controllers\WalletController::class, 'downloadInvoice'])->name('billing.invoice.download');
 
     Route::get('/dashboard/commissions', function (Request $request) {
         $user = Auth::user();
