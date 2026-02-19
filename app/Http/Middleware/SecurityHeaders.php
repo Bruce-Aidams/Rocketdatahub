@@ -26,11 +26,14 @@ class SecurityHeaders
         $isProduction = config('app.env') === 'production';
 
         if (!$isProduction) {
-            // Very permissive for local development
-            $csp = "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; ";
-            $csp .= "connect-src * 'unsafe-inline' 'unsafe-eval' ws: wss:; ";
+            // Very permissive for local development but with basic safety
+            $csp = "default-src 'self'; ";
+            $csp .= "script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; ";
+            $csp .= "style-src * 'unsafe-inline'; ";
             $csp .= "img-src * data: blob:; ";
+            $csp .= "connect-src * 'unsafe-inline' 'unsafe-eval' ws: wss:; ";
             $csp .= "frame-src *; ";
+            $csp .= "object-src 'none'; ";
         } else {
             // Strict for production
             $csp = "upgrade-insecure-requests; ";
@@ -40,7 +43,9 @@ class SecurityHeaders
             $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
             $csp .= "img-src 'self' data: https:; ";
             $csp .= "connect-src 'self' https://api.paystack.co; ";
-            $csp .= "frame-src 'self' https://js.paystack.co;";
+            $csp .= "frame-src 'self' https://js.paystack.co; ";
+            $csp .= "object-src 'none'; ";
+            $csp .= "require-trusted-types-for 'script';";
 
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
             $response->headers->set('X-Content-Type-Options', 'nosniff');
