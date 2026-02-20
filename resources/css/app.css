@@ -305,4 +305,81 @@
             background-position: 0% 50%;
         }
     }
+
+    @keyframes bubble-rise {
+        0% {
+            transform: translateY(0) scale(0.5);
+            opacity: 0;
+            filter: blur(4px);
+        }
+
+        15% {
+            opacity: 1;
+            filter: blur(0px);
+        }
+
+        85% {
+            opacity: 1;
+            filter: blur(0px);
+        }
+
+        100% {
+            transform: translateY(-130vh) scale(1.8);
+            opacity: 0;
+            filter: blur(8px);
+        }
+    }
+
+    @keyframes bubble-sway {
+
+        0%,
+        100% {
+            margin-left: 0px;
+        }
+
+        50% {
+            margin-left: var(--sway-distance, 50px);
+        }
+    }
+
+    @keyframes bubble-wobble {
+
+        0%,
+        100% {
+            border-radius: 50%;
+        }
+
+        25% {
+            border-radius: 45% 55% 45% 55% / 55% 45% 55% 45%;
+        }
+
+        50% {
+            border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%;
+        }
+
+        75% {
+            border-radius: 55% 45% 55% 45% / 45% 55% 45% 55%;
+        }
+    }
+
+    .animate-bubble {
+        animation:
+            bubble-rise var(--rise-duration, 20s) linear infinite,
+            bubble-sway var(--sway-duration, 4s) ease-in-out infinite,
+            bubble-wobble var(--wobble-duration, 3s) ease-in-out infinite;
+        will-change: transform, opacity, filter, margin-left, border-radius;
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Global Visual Polish: Subtle Background Interaction */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(var(--primary), 0.03), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(var(--secondary), 0.03), transparent 40%);
+    pointer-events: none;
+    z-index: -20;
 }

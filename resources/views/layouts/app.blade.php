@@ -63,6 +63,7 @@
     </div>
 
     @stack('scripts')
+    <x-floating-bubbles />
 </body>
 
 </html>

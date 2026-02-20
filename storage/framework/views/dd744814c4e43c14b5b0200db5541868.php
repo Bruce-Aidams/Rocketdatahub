@@ -82,6 +82,26 @@
     </div>
 
     <?php echo $__env->yieldPushContent('scripts'); ?>
+    <?php if (isset($component)) { $__componentOriginal27fed67fb0d552f1b2531d66c5770e02 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal27fed67fb0d552f1b2531d66c5770e02 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.floating-bubbles','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('floating-bubbles'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal27fed67fb0d552f1b2531d66c5770e02)): ?>
+<?php $attributes = $__attributesOriginal27fed67fb0d552f1b2531d66c5770e02; ?>
+<?php unset($__attributesOriginal27fed67fb0d552f1b2531d66c5770e02); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal27fed67fb0d552f1b2531d66c5770e02)): ?>
+<?php $component = $__componentOriginal27fed67fb0d552f1b2531d66c5770e02; ?>
+<?php unset($__componentOriginal27fed67fb0d552f1b2531d66c5770e02); ?>
+<?php endif; ?>
 </body>
 
 </html><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/layouts/app.blade.php ENDPATH**/ ?>

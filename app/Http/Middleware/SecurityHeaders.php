@@ -31,6 +31,7 @@ class SecurityHeaders
             $csp .= "script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; ";
             $csp .= "style-src * 'unsafe-inline'; ";
             $csp .= "img-src * data: blob:; ";
+            $csp .= "font-src * data:; ";
             $csp .= "connect-src * 'unsafe-inline' 'unsafe-eval' ws: wss:; ";
             $csp .= "frame-src *; ";
             $csp .= "object-src 'none'; ";
@@ -39,8 +40,8 @@ class SecurityHeaders
             $csp = "upgrade-insecure-requests; ";
             $csp .= "default-src 'self'; ";
             $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://js.paystack.co; ";
-            $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; ";
-            $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
+            $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; ";
+            $csp .= "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com data:; ";
             $csp .= "img-src 'self' data: https:; ";
             $csp .= "connect-src 'self' https://api.paystack.co; ";
             $csp .= "frame-src 'self' https://js.paystack.co; ";
