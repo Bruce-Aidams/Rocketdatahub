@@ -4,7 +4,7 @@
 @endphp
 
 @if($notifications->count() > 0)
-    <div x-data="notificationManager()" x-init="init()" class="fixed top-24 right-6 z-50 space-y-4 max-w-sm pointer-events-none">
+    <div x-data="notificationManager()" x-init="init()" x-show="dismissed.length < {{ $notifications->count() }}" x-transition:leave="transition ease-in duration-300 delay-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed top-24 right-6 z-50 space-y-4 max-w-sm pointer-events-none">
         @foreach($notifications as $notification)
             <div x-show="!dismissed.includes({{ $notification->id }})"
                 x-transition:enter="transform ease-out duration-500"
@@ -50,7 +50,7 @@
             </div>
         @endforeach
         
-        <a href="{{ route('notifications.index') }}" class="block text-center py-2 text-[10px] font-black text-slate-500 hover:text-primary uppercase tracking-widest bg-white/50 backdrop-blur-md rounded-xl hover:bg-white/80 transition-all">
+        <a href="{{ route('notifications.index') }}" class="block text-center py-2 text-[10px] font-black text-slate-500 hover:text-primary uppercase tracking-widest bg-white/50 backdrop-blur-md rounded-xl hover:bg-white/80 transition-all pointer-events-auto shadow-xl">
             See All Notifications
         </a>
     </div>

@@ -44,6 +44,7 @@
 
     <!-- Sonner Toasts -->
     <x-toaster />
+    <x-announcement-modal />
     {{-- <x-notifications /> --}}
 
 

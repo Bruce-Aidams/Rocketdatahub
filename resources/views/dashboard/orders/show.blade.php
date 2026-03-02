@@ -17,10 +17,10 @@
                     <div class="flex items-center gap-3">
                         <h2 class="text-3xl font-black tracking-tight text-blue-900 dark:text-white uppercase">Order <span
                                 class="text-primary">#{{ $order->reference }}</span></h2>
-                        @if($order->status === 'completed')
+                        @if($order->status === 'delivered')
                             <span
                                 class="inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/20">Delivered</span>
-                        @elseif($order->status === 'pending' || $order->status === 'processing')
+                        @elseif($order->status === 'pending' || $order->status === 'processing' || $order->status === 'validation')
                             <span
                                 class="inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-100 dark:border-amber-900/20">Validating</span>
                         @elseif($order->status === 'failed')

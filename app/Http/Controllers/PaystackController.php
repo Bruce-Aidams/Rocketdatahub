@@ -22,8 +22,8 @@ class PaystackController extends Controller
     {
         try {
             // Try to get from database first, fallback to config
-            $this->secretKey = Setting::where('key', 'paystack_secret')->value('value') ?: config('paystack.secret_key');
-            $this->publicKey = Setting::where('key', 'paystack_public')->value('value') ?: config('paystack.public_key');
+            $this->secretKey = Setting::getCached('paystack_secret') ?: config('paystack.secret_key');
+            $this->publicKey = Setting::getCached('paystack_public') ?: config('paystack.public_key');
         } catch (Exception $e) {
             Log::error('PaystackController constructor error', ['error' => $e->getMessage()]);
             $this->secretKey = config('paystack.secret_key');
@@ -94,7 +94,7 @@ class PaystackController extends Controller
         $baseAmount = (float) $request->amount;
 
         // Fetch limits and charges from settings
-        $settings = Setting::whereIn('key', ['min_payment', 'max_payment', 'charge_type', 'charge_value'])->get()->pluck('value', 'key');
+        $settings = Setting::getManyCached(['min_payment', 'max_payment', 'charge_type', 'charge_value']);
 
         $min = (float) ($settings['min_payment'] ?? 20);
         $max = (float) ($settings['max_payment'] ?? 50000);
@@ -315,10 +315,10 @@ class PaystackController extends Controller
                             /** @var \App\Models\Order $order */
                             foreach ($orders as $order) {
                                 if ($order->status === 'pending_payment') {
-                                    $order->complete([
-                                        'method' => 'paystack',
-                                        'gateway_response' => $data,
-                                        'auto_completed' => true
+                                    $order->update([
+                                        'status' => 'validation',
+                                        'payment_reference' => $reference,
+                                        'response_data' => $data
                                     ]);
                                     \App\Jobs\ProcessOrder::dispatch($order);
                                 }
@@ -468,11 +468,10 @@ class PaystackController extends Controller
             /** @var \App\Models\Order $order */
             foreach ($orders as $order) {
                 if ($order->status === 'pending_payment') {
-                    $order->complete([
-                        'method' => 'paystack_webhook',
-                        'gateway_event' => $data,
-                        'auto_completed' => true,
-                        'message' => 'Paystack webhook received. Order completed.'
+                    $order->update([
+                        'status' => 'validation',
+                        'payment_reference' => $reference,
+                        'response_data' => $data
                     ]);
                     \App\Jobs\ProcessOrder::dispatch($order);
                 }

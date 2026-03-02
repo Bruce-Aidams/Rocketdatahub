@@ -54,7 +54,7 @@ class ReferralController extends Controller
             'active_referrers' => User::whereHas('referrals')->count(),
         ];
 
-        $commissionRate = \App\Models\Setting::where('key', 'commission_rate')->value('value') ?? 0;
+        $commissionRate = \App\Models\Setting::getCached('commission_rate', 0);
 
         return view('admin.referrals.index', compact('referrals', 'stats', 'commissionRate'));
     }

@@ -33,7 +33,7 @@ class PaystackWebhookController extends Controller
 
     protected function verifySignature($payload, $signature)
     {
-        $secret = Setting::where('key', 'paystack_secret')->value('value') ?: env('PAYSTACK_SECRET_KEY');
+        $secret = Setting::getCached('paystack_secret') ?: env('PAYSTACK_SECRET_KEY');
         return hash_hmac('sha512', $payload, $secret) === $signature;
     }
 
@@ -61,9 +61,9 @@ class PaystackWebhookController extends Controller
                         return response()->json(['message' => 'Already processed']);
                     }
 
-                    // Finalize Order
+                    // Finalize Order and start validation flow
                     $order->update([
-                        'status' => 'pending',
+                        'status' => 'validation',
                         'payment_reference' => $data['reference'],
                         'response_data' => $data
                     ]);

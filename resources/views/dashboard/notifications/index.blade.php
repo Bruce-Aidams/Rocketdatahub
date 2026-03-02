@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <form action="{{ route('notifications.user_index') }}" method="GET" class="relative min-w-[120px]">
+                <form action="{{ route('notifications.index') }}" method="GET" class="relative min-w-[120px]">
                     <select name="per_page" onchange="this.form.submit()" class="w-full h-10 px-4 bg-white dark:bg-[#2b2c40] border border-slate-100 dark:border-[#444564] rounded-xl text-[10px] font-black uppercase tracking-[0.2em] outline-none focus:ring-2 focus:ring-primary/20 transition-all dark:text-[#a3a4cc] appearance-none cursor-pointer shadow-sm">
                         @foreach([15, 30, 50, 100] as $val)
                             <option value="{{ $val }}" {{ request('per_page', 15) == $val ? 'selected' : '' }}>{{ $val }} Per Page</option>

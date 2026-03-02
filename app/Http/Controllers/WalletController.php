@@ -78,8 +78,7 @@ class WalletController extends Controller
         $reference = 'TOPUP-' . strtoupper(Str::random(12));
 
         // Fetch limits and charges
-        $settings = Setting::whereIn('key', ['min_payment', 'max_payment', 'charge_type', 'charge_value', 'paystack_secret', 'paystack_public'])
-            ->get()->pluck('value', 'key');
+        $settings = Setting::getManyCached(['min_payment', 'max_payment', 'charge_type', 'charge_value', 'paystack_secret', 'paystack_public', 'enable_paystack', 'enable_momo_deposits']);
 
         $min = (float) ($settings['min_payment'] ?? 1);
         $max = (float) ($settings['max_payment'] ?? 100000);
@@ -236,7 +235,7 @@ class WalletController extends Controller
             return redirect()->route('wallet.index')->with('success', 'Wallet already updated successfully.');
         }
 
-        $settings = Setting::whereIn('key', ['paystack_secret'])->get()->pluck('value', 'key');
+        $settings = Setting::getManyCached(['paystack_secret']);
         $secretKey = trim($settings['paystack_secret'] ?? config('paystack.secret_key') ?? config('services.paystack.secret_key') ?? '');
 
         if (!$secretKey) {

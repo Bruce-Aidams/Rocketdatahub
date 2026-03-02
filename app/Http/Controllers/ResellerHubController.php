@@ -36,11 +36,11 @@ class ResellerHubController extends Controller
                     ->orWhere(function ($sub) use ($user) {
                         $sub->where('user_id', $user->id)->where('source', 'storefront');
                     });
-            })->where('status', 'completed')->count(),
+            })->where('status', 'delivered')->count(),
 
             'storefront_profit' => Order::where('user_id', $user->id)
                 ->where('source', 'storefront')
-                ->where('status', 'completed')
+                ->where('status', 'delivered')
                 ->sum('profit'),
 
             'referral_earnings' => Commission::where('user_id', $user->id)->sum('amount'),

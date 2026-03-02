@@ -42,7 +42,7 @@ class WebhookController extends Controller
         Log::info("Processing webhook for Order #{$order->id}. Status in payload: " . json_encode($status));
 
         if ($this->isSuccessStatus($status)) {
-            if ($order->status !== 'completed') {
+            if ($order->status !== 'delivered') {
                 $order->complete($request->all());
                 Log::info("Order #{$order->id} completed via webhook.");
             }

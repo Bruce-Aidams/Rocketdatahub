@@ -4,7 +4,7 @@
 ?>
 
 <?php if($notifications->count() > 0): ?>
-    <div x-data="notificationManager()" x-init="init()" class="fixed top-24 right-6 z-50 space-y-4 max-w-sm pointer-events-none">
+    <div x-data="notificationManager()" x-init="init()" x-show="dismissed.length < <?php echo e($notifications->count()); ?>" x-transition:leave="transition ease-in duration-300 delay-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed top-24 right-6 z-50 space-y-4 max-w-sm pointer-events-none">
         <?php $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div x-show="!dismissed.includes(<?php echo e($notification->id); ?>)"
                 x-transition:enter="transform ease-out duration-500"
@@ -50,7 +50,7 @@
             </div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         
-        <a href="<?php echo e(route('notifications.index')); ?>" class="block text-center py-2 text-[10px] font-black text-slate-500 hover:text-primary uppercase tracking-widest bg-white/50 backdrop-blur-md rounded-xl hover:bg-white/80 transition-all">
+        <a href="<?php echo e(route('notifications.index')); ?>" class="block text-center py-2 text-[10px] font-black text-slate-500 hover:text-primary uppercase tracking-widest bg-white/50 backdrop-blur-md rounded-xl hover:bg-white/80 transition-all pointer-events-auto shadow-xl">
             See All Notifications
         </a>
     </div>

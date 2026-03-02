@@ -63,14 +63,14 @@ class NotificationController extends Controller
         return view('admin.notifications.index', compact('notifications', 'users'));
     }
 
-    // User: Toggle read/unread status
+    // User: Mark notification as read
     public function markAsRead(Request $request, $id)
     {
         $notification = $request->user()->notifications()->findOrFail($id);
-        $notification->update(['is_read' => !$notification->is_read]);
+        $notification->update(['is_read' => true]);
         return response()->json([
-            'message' => $notification->is_read ? 'Marked as read' : 'Marked as unread',
-            'is_read' => $notification->is_read
+            'message' => 'Marked as read',
+            'is_read' => true
         ]);
     }
 

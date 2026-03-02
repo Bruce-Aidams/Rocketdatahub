@@ -15,16 +15,21 @@ class CheckMaintenanceMode
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if maintenance mode is enabled (cache for request duration)
-        static $maintenanceMode = null;
-        if ($maintenanceMode === null) {
-            $maintenanceMode = \App\Models\Setting::where('key', 'maintenance_mode')->value('value');
+        $start = microtime(true);
+
+        // Use the new caching mechanism for settings
+        $maintenanceMode = \App\Models\Setting::getCached('maintenance_mode');
+        $m1 = microtime(true);
+
+        $message = \App\Models\Setting::getCached('site_alert_message', 'System is currently under maintenance. Please try again later.');
+        $m2 = microtime(true);
+
+        // LOG TIMING (only if still unusually slow)
+        if (($m2 - $start) > 0.05) {
+            \Illuminate\Support\Facades\Log::debug("CheckMaintenanceMode CACHED Time: " . ($m2 - $start) . "s (Q1: " . ($m1 - $start) . "s, Q2: " . ($m2 - $m1) . "s)");
         }
 
-        $message = \App\Models\Setting::where('key', 'site_alert_message')->value('value') ?? 'System is currently under maintenance. Please try again later.';
-
         // If maintenance mode is not enabled, continue normally
-        // Use loose comparison to handle both string '1' and integer 1
         if ($maintenanceMode != '1' && $maintenanceMode != 'true') {
             return $next($request);
         }

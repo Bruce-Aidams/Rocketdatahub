@@ -82,6 +82,27 @@
                                 class="text-emerald-500 font-black uppercase tracking-widest text-[9px] bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-lg">Active</span>
                         </div>
                         <div class="flex items-center justify-between text-xs">
+                            <span class="font-black uppercase tracking-widest text-slate-400">Verification</span>
+                            @if($user->is_verified)
+                                <div class="relative group/verify">
+                                    <div
+                                        class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg blur-[4px] opacity-30 group-hover/verify:opacity-60 transition duration-700">
+                                    </div>
+                                    <span
+                                        class="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] backdrop-blur-xl">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span class="text-[9px] font-black uppercase tracking-[0.15em]">Verified</span>
+                                    </span>
+                                </div>
+                            @else
+                                <span
+                                    class="text-slate-400 font-black uppercase tracking-widest text-[9px] bg-slate-100 dark:bg-slate-800/50 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-800">Unverified</span>
+                            @endif
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
                             <span class="font-black uppercase tracking-widest text-slate-400">Member since</span>
                             <span
                                 class="text-foreground font-black tracking-tight font-mono">{{ $user->created_at->format('d.m.Y') }}</span>

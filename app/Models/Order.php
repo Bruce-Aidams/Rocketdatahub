@@ -42,12 +42,12 @@ class Order extends Model
 
     public function complete($responseData = null)
     {
-        if ($this->status === 'completed') {
+        if ($this->status === 'delivered') {
             return;
         }
 
         $this->update([
-            'status' => 'completed',
+            'status' => 'delivered',
             'response_data' => $responseData
         ]);
 

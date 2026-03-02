@@ -5,7 +5,7 @@
 ?>
 
 <header
-    class="h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 sticky top-0 z-40 px-6 md:px-10 flex items-center justify-between transition-colors duration-300">
+    class="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between transition-colors duration-300">
     <div class="flex items-center gap-6 flex-1">
         
         <button @click="sidebarOpen = true"
@@ -84,17 +84,20 @@
                 'time_pretty' => $n->created_at->diffForHumans()
             ]))->toHtml() ?>,
             markNotificationAsRead(id, element) {
+                // Optimistic UI: Filter out the notification immediately
+                this.notifications = this.notifications.filter(n => n.id !== id);
+                this.unreadCount = Math.max(0, this.unreadCount - 1);
+
                 fetch(`/notifications/${id}/read`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=&quot;csrf-token&quot;]').content,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }
                 }).then(response => {
-                    if (response.ok) {
-                        this.notifications = this.notifications.filter(n => n.id !== id);
-                        this.unreadCount = Math.max(0, this.unreadCount - 1);
+                    if (!response.ok) {
+                        console.error('Failed to mark notification as read');
                     }
                 });
             },
@@ -129,9 +132,9 @@
             <div x-show="open" x-cloak x-transition:enter="duration-200 ease-out"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                class="absolute right-0 mt-4 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-2xl border border-slate-100 dark:border-slate-800 z-50">
+                class="absolute right-0 mt-4 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-3xl p-3 shadow-2xl border border-slate-100 dark:border-slate-800 z-50">
                 <div
-                    class="flex items-center justify-between px-4 pb-4 border-b border-slate-50 dark:border-slate-800 mb-2">
+                    class="flex items-center justify-between px-3 pb-3 border-b border-slate-50 dark:border-slate-800 mb-2">
                     <div>
                         <h4 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">
                             Notifications</h4>
@@ -142,7 +145,7 @@
 
                 <div class="space-y-1 max-h-[350px] overflow-y-auto custom-scrollbar">
                     <template x-for="notification in notifications" :key="notification.id">
-                        <div class="p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group/item cursor-pointer"
+                        <div class="p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group/item cursor-pointer"
                             @click="markNotificationAsRead(notification.id, $el)">
                             <div class="flex gap-4">
                                 <template x-if="notification.type === 'success'">
@@ -164,7 +167,7 @@
                     </template>
 
                     <template x-if="notifications.length === 0">
-                        <div class="py-12 flex flex-col items-center justify-center text-center">
+                        <div class="py-8 flex flex-col items-center justify-center text-center">
                             <svg class="w-12 h-12 text-slate-100 dark:text-slate-800 mb-4" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

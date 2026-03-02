@@ -33,7 +33,7 @@ class DepositController extends Controller
 
     public function store(Request $request)
     {
-        $settings = \App\Models\Setting::whereIn('key', ['min_payment', 'max_payment', 'enable_manual_transfer'])->get()->pluck('value', 'key');
+        $settings = \App\Models\Setting::getManyCached(['min_payment', 'max_payment', 'enable_manual_transfer']);
 
         if (($settings['enable_manual_transfer'] ?? '1') !== '1') {
             $msg = "Manual bank transfers are currently disabled.";

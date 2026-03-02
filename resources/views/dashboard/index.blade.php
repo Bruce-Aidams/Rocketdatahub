@@ -67,28 +67,77 @@
         {{-- Statistics & Actions --}}
         <div class="grid gap-3 md:gap-6 md:grid-cols-3">
             {{-- Account Status --}}
-            <div
-                class="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 p-3 md:p-6 rounded-2xl md:rounded-[2.5rem] shadow-xl relative overflow-hidden group text-white">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full pointer-events-none"></div>
-                <div class="flex items-center gap-4">
-                    <div class="relative items-center justify-center flex shrink-0">
-                        <div class="absolute inset-0 border-2 border-emerald-400/30 rounded-full animate-ping"></div>
-                        <div
-                            class="w-12 h-12 md:w-20 md:h-20 border-4 border-white/20 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-md">
-                            <span class="text-xs md:text-lg font-black text-white">100%</span>
+            @if(auth()->user()->is_verified)
+                <div
+                    class="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-3 md:p-6 rounded-2xl md:rounded-[2.5rem] shadow-xl relative overflow-hidden group text-white">
+                    <div
+                        class="absolute -right-4 -top-4 w-32 h-32 bg-white/10 rounded-full blur-3xl transition-all group-hover:bg-white/20">
+                    </div>
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div class="relative items-center justify-center flex shrink-0">
+                            <div class="absolute inset-0 border-2 border-white/20 rounded-full animate-ping duration-1000">
+                            </div>
+                            <div
+                                class="w-12 h-12 md:w-20 md:h-20 border-4 border-white/20 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-xl shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
+                                <svg class="w-6 h-6 md:w-10 md:h-10 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[8px] md:text-[10px] font-black tracking-[0.2em] text-white/60 uppercase">Identity
+                                Status</p>
+                            <h4
+                                class="text-[11px] md:text-sm font-black text-white uppercase tracking-wider mt-1 flex items-center gap-2">
+                                Verified Profile
+                                <span class="relative flex h-2 w-2">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                </span>
+                            </h4>
+                            <div
+                                class="mt-2 w-fit px-3 py-1 bg-white/10 backdrop-blur-md text-[7px] md:text-[9px] font-black uppercase tracking-[0.1em] rounded-lg border border-white/10">
+                                Trusted Account
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <p class="text-[8px] md:text-[10px] font-black tracking-widest text-white/50 uppercase">Account
-                            Status</p>
-                        <h4 class="text-[11px] md:text-sm font-black text-white uppercase tracking-wider mt-1">Verified
-                            Account</h4>
+                </div>
+            @else
+                <div
+                    class="bg-slate-100 dark:bg-slate-900/50 p-3 md:p-6 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                    <div
+                        class="absolute right-0 top-0 w-24 h-24 bg-slate-200/50 dark:bg-slate-800/50 rounded-bl-full pointer-events-none transition-all group-hover:scale-110">
+                    </div>
+                    <div class="flex items-center gap-4 relative z-10">
                         <div
-                            class="mt-2 w-fit px-2 py-0.5 bg-white/20 text-[7px] md:text-[9px] font-black uppercase tracking-widest rounded-full">
-                            Active</div>
+                            class="w-12 h-12 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-slate-200 dark:bg-slate-800 border-4 border-slate-100 dark:border-slate-700">
+                            <svg class="w-6 h-6 md:w-10 md:h-10 text-slate-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[8px] md:text-[10px] font-black tracking-[0.2em] text-slate-400 dark:text-slate-500 uppercase">
+                                Identity Status</p>
+                            <h4
+                                class="text-[11px] md:text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider mt-1">
+                                Pending Verification</h4>
+                            <a href="{{ route('profile.index') }}"
+                                class="mt-2 text-[7px] md:text-[9px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1 group/link">
+                                Complete Profile
+                                <svg class="w-2 h-2 transition-transform group-hover/link:translate-x-1" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
             {{-- Wallet Balance --}}
             <div

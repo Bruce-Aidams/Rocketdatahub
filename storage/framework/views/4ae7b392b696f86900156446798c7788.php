@@ -83,10 +83,8 @@
 <?php unset($__componentOriginald37f1b809d8dad08d9600a37cd72bf8e); ?>
 <?php endif; ?>
 
-            <main class="flex-1 p-4 md:p-8 lg:p-10 animate-fade-in-up">
-                <div class="max-w-7xl mx-auto">
-                    <?php echo $__env->yieldContent('content'); ?>
-                </div>
+            <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden animate-fade-in-up">
+                <?php echo $__env->yieldContent('content'); ?>
             </main>
         </div>
 
@@ -130,6 +128,26 @@
 <?php if (isset($__componentOriginalabfd08d099e5120d99fc78cfc4d6eb8e)): ?>
 <?php $component = $__componentOriginalabfd08d099e5120d99fc78cfc4d6eb8e; ?>
 <?php unset($__componentOriginalabfd08d099e5120d99fc78cfc4d6eb8e); ?>
+<?php endif; ?>
+        <?php if (isset($component)) { $__componentOriginalf1459c77884da77511455b4b12472e64 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf1459c77884da77511455b4b12472e64 = $attributes; } ?>
+<?php $component = App\View\Components\AnnouncementModal::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('announcement-modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AnnouncementModal::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf1459c77884da77511455b4b12472e64)): ?>
+<?php $attributes = $__attributesOriginalf1459c77884da77511455b4b12472e64; ?>
+<?php unset($__attributesOriginalf1459c77884da77511455b4b12472e64); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf1459c77884da77511455b4b12472e64)): ?>
+<?php $component = $__componentOriginalf1459c77884da77511455b4b12472e64; ?>
+<?php unset($__componentOriginalf1459c77884da77511455b4b12472e64); ?>
 <?php endif; ?>
 
         <!-- Overlay for mobile -->

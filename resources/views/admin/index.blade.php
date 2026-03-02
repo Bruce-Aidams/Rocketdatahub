@@ -29,9 +29,9 @@
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             @php
                 $stats = [
-                    ['label' => "Total Revenue", 'value' => "GHS " . number_format($todayRevenue ?? 0, 2), 'icon' => 'banknotes', 'color' => 'indigo', 'desc' => 'Daily revenue'],
-                    ['label' => "Total Orders", 'value' => $todayOrders ?? 0, 'icon' => 'shopping-cart', 'color' => 'blue', 'desc' => 'Processed today'],
-                    ['label' => "Data Usage", 'value' => ($todayDataGb ?? 0) . " GB", 'icon' => 'signal', 'color' => 'emerald', 'desc' => 'Total data delivered'],
+                    ['label' => "Total Revenue Today", 'value' => "GHS " . number_format($todayRevenue ?? 0, 2), 'icon' => 'banknotes', 'color' => 'indigo', 'desc' => 'Daily revenue'],
+                    ['label' => "Total Orders Today", 'value' => $todayOrders ?? 0, 'icon' => 'shopping-cart', 'color' => 'blue', 'desc' => 'Processed today'],
+                    ['label' => "Data Usage Today", 'value' => ($todayDataGb ?? 0) . " GB", 'icon' => 'signal', 'color' => 'emerald', 'desc' => 'Total data delivered'],
                     ['label' => "Total Agents", 'value' => $totalAgents ?? 0, 'icon' => 'users', 'color' => 'amber', 'desc' => 'Active sales partners'],
                 ];
 

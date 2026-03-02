@@ -167,12 +167,28 @@ class ApiController extends Controller
                 }
             }
 
+            // Automatically add API Key if provided and not already in headers
+            if (!empty($validated['api_key'])) {
+                $hasApiKeyToken = false;
+                foreach ($headers as $h) {
+                    if (stripos($h, 'Authorization') === 0 || stripos($h, 'X-API-KEY') === 0 || stripos($h, 'api-key') === 0) {
+                        $hasApiKeyToken = true;
+                        break;
+                    }
+                }
+                if (!$hasApiKeyToken) {
+                    $headers[] = "X-API-KEY: " . $validated['api_key'];
+                    $headers[] = "Authorization: Bearer " . $validated['api_key'];
+                }
+            }
+
             // Initialize cURL
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $validated['base_url']);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $validated['request_method']);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local/dev testing
 
             if (!empty($headers)) {
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -183,14 +199,19 @@ class ApiController extends Controller
                 $bodyString = $validated['request_body'] ?? $validated['request_body_template'] ?? null;
 
                 if (!empty($bodyString)) {
+                    // Inject placeholders if body is a template
+                    if (!empty($validated['api_key'])) {
+                        $bodyString = str_replace('{api_key}', $validated['api_key'], $bodyString);
+                    }
+                    if (!empty($validated['secret_key'])) {
+                        $bodyString = str_replace('{secret_key}', $validated['secret_key'], $bodyString);
+                    }
+
                     // Try to decode to ensure valid JSON, or send as string if not
                     $body = json_decode($bodyString, true);
                     if (is_array($body)) {
                         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
                     } else {
-                        // If it's a template string that's not valid JSON yet (e.g. contains placeholders), send as is? 
-                        // Or maybe we should just send it. 
-                        // For generic testing, let's assume valid JSON or send the raw string.
                         curl_setopt($ch, CURLOPT_POSTFIELDS, $bodyString);
                     }
                 }
@@ -211,12 +232,15 @@ class ApiController extends Controller
                 ], 500);
             }
 
+            $isSuccess = ($httpCode >= 200 && $httpCode < 300);
+            $decodedResponse = json_decode($response, true);
+
             return response()->json([
-                'success' => true,
-                'message' => 'Connection successful',
+                'success' => $isSuccess,
+                'message' => $isSuccess ? 'Connection successful' : 'Connection failed with status ' . $httpCode,
                 'http_code' => $httpCode,
                 'response_time' => $responseTime . 'ms',
-                'response' => json_decode($response, true) ?? $response
+                'response' => $decodedResponse ?? $response
             ]);
 
         } catch (\Exception $e) {

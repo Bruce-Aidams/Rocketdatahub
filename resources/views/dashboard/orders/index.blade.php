@@ -1,6 +1,7 @@
 @extends('layouts.dashboard')
-
 @section('title', 'Order History')
+
+@php /** @var \Illuminate\Pagination\LengthAwarePaginator $orders */ @endphp
 
 @section('content')
     <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ loading: true }"
@@ -98,9 +99,10 @@
                                 <select name="status"
                                     class="w-full h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none cursor-pointer">
                                     <option value="all">All Status</option>
-                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
+                                    <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>
                                         Delivered</option>
-                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Validating
+                                    <option value="validation" {{ request('status') == 'validation' ? 'selected' : '' }}>
+                                        Validating
                                     </option>
                                     <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>
                                         Processing</option>
@@ -215,10 +217,10 @@
                                     <td class="px-6 py-5 text-center">
                                         @php
                                             $statusConfig = [
-                                                'completed' => ['bg' => 'bg-emerald-500/10', 'text' => 'text-emerald-600', 'label' => 'Delivered'],
+                                                'delivered' => ['bg' => 'bg-emerald-500/10', 'text' => 'text-emerald-600', 'label' => 'Delivered'],
                                                 'failed' => ['bg' => 'bg-rose-500/10', 'text' => 'text-rose-600', 'label' => 'Failed'],
                                                 'processing' => ['bg' => 'bg-blue-500/10', 'text' => 'text-blue-600', 'label' => 'Processing'],
-                                                'pending' => ['bg' => 'bg-amber-500/10', 'text' => 'text-amber-600', 'label' => 'Validating'],
+                                                'validation' => ['bg' => 'bg-amber-500/10', 'text' => 'text-amber-600', 'label' => 'Validating'],
                                             ];
                                             $conf = $statusConfig[$order->status] ?? ['bg' => 'bg-slate-500/10', 'text' => 'text-slate-600', 'label' => $order->status];
                                         @endphp
@@ -245,7 +247,7 @@
                                                         d="M9 5l7 7-7 7" />
                                                 </svg>
                                             </a>
-                                            @if($order->status === 'completed')
+                                            @if($order->status === 'delivered')
                                                 <a href="{{ route('billing.invoice', $order->id) }}"
                                                     class="h-9 w-9 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-emerald-600 hover:text-white transition-all active:scale-90 border border-slate-100 dark:border-slate-800"
                                                     title="View Invoice">
@@ -333,7 +335,7 @@
                                                     d="M9 5l7 7-7 7" />
                                             </svg>
                                         </a>
-                                        @if($order->status === 'completed')
+                                        @if($order->status === 'delivered')
                                             <a href="{{ route('billing.invoice', $order->id) }}"
                                                 class="h-9 w-9 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-500 rounded-xl active:bg-emerald-600 active:text-white border border-slate-100 dark:border-slate-800">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

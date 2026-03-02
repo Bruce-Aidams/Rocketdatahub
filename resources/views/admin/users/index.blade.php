@@ -1,71 +1,72 @@
 @extends('layouts.admin')
-
 @section('title', 'User Management')
+
+@php /** @var \Illuminate\Pagination\LengthAwarePaginator $users */ @endphp
 
 @section('content')
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{
-                                                            modalOpen: false,
-                                                            editMode: false,
-                                                            walletModalOpen: false,
-                                                            walletUser: { id: '', name: '', balance: 0 },
-                                                            walletData: { type: 'credit', amount: '', note: '', isSubmitting: false },
-                                                            user: { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '', wallet_balance: 0 },
-                                                            resetForm() {
-                                                                this.user = { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '', wallet_balance: 0 };
-                                                                this.editMode = false;
-                                                            },
-                                                            openAdd() {
-                                                                this.resetForm();
-                                                                this.modalOpen = true;
-                                                            },
-                                                            openEdit(u) {
-                                                                this.user = JSON.parse(JSON.stringify(u));
-                                                                this.user.is_active = !!this.user.is_active;
-                                                                this.user.password = '';
-                                                                this.editMode = true;
-                                                                this.modalOpen = true;
-                                                            },
-                                                            openWallet(u) {
-                                                                this.walletUser = { id: u.id, name: u.name, balance: u.wallet_balance };
-                                                                this.walletData = { type: 'credit', amount: '', note: '', isSubmitting: false };
-                                                                this.walletModalOpen = true;
-                                                            },
-                                                            async submitWalletAdjustment() {
-                                                                if (this.walletData.isSubmitting) return;
-                                                                this.walletData.isSubmitting = true;
+                                                                modalOpen: false,
+                                                                editMode: false,
+                                                                walletModalOpen: false,
+                                                                walletUser: { id: '', name: '', balance: 0 },
+                                                                walletData: { type: 'credit', amount: '', note: '', isSubmitting: false },
+                                                                user: { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '', wallet_balance: 0 },
+                                                                resetForm() {
+                                                                    this.user = { id: '', name: '', email: '', phone: '', role: 'user', is_active: true, password: '', wallet_balance: 0 };
+                                                                    this.editMode = false;
+                                                                },
+                                                                openAdd() {
+                                                                    this.resetForm();
+                                                                    this.modalOpen = true;
+                                                                },
+                                                                openEdit(u) {
+                                                                    this.user = JSON.parse(JSON.stringify(u));
+                                                                    this.user.is_active = !!this.user.is_active;
+                                                                    this.user.password = '';
+                                                                    this.editMode = true;
+                                                                    this.modalOpen = true;
+                                                                },
+                                                                openWallet(u) {
+                                                                    this.walletUser = { id: u.id, name: u.name, balance: u.wallet_balance };
+                                                                    this.walletData = { type: 'credit', amount: '', note: '', isSubmitting: false };
+                                                                    this.walletModalOpen = true;
+                                                                },
+                                                                async submitWalletAdjustment() {
+                                                                    if (this.walletData.isSubmitting) return;
+                                                                    this.walletData.isSubmitting = true;
 
-                                                                try {
-                                                                    const response = await fetch(`/admin/users/${this.walletUser.id}/wallet`, {
-                                                                        method: 'POST',
-                                                                        headers: {
-                                                                            'Content-Type': 'application/json',
-                                                                            'Accept': 'application/json',
-                                                                            'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
-                                                                        },
-                                                                        body: JSON.stringify({
-                                                                            type: this.walletData.type,
-                                                                            amount: this.walletData.amount,
-                                                                            note: this.walletData.note
-                                                                        })
-                                                                    });
+                                                                    try {
+                                                                        const response = await fetch(`/admin/users/${this.walletUser.id}/wallet`, {
+                                                                            method: 'POST',
+                                                                            headers: {
+                                                                                'Content-Type': 'application/json',
+                                                                                'Accept': 'application/json',
+                                                                                'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content')
+                                                                            },
+                                                                            body: JSON.stringify({
+                                                                                type: this.walletData.type,
+                                                                                amount: this.walletData.amount,
+                                                                                note: this.walletData.note
+                                                                            })
+                                                                        });
 
-                                                                    const data = await response.json();
+                                                                        const data = await response.json();
 
-                                                                    if (response.ok) {
-                                                                        // Success handled by session flash after reload
-                                                                        this.walletModalOpen = false;
-                                                                        window.location.reload();
-                                                                    } else {
-                                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Failed to adjust wallet', type: 'error' } }));
+                                                                        if (response.ok) {
+                                                                            // Success handled by session flash after reload
+                                                                            this.walletModalOpen = false;
+                                                                            window.location.reload();
+                                                                        } else {
+                                                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Failed to adjust wallet', type: 'error' } }));
+                                                                        }
+                                                                    } catch (error) {
+                                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'An error occurred. Please try again.', type: 'error' } }));
+                                                                        console.error(error);
+                                                                    } finally {
+                                                                        this.walletData.isSubmitting = false;
                                                                     }
-                                                                } catch (error) {
-                                                                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'An error occurred. Please try again.', type: 'error' } }));
-                                                                    console.error(error);
-                                                                } finally {
-                                                                    this.walletData.isSubmitting = false;
                                                                 }
-                                                            }
-                                                        }">
+                                                            }">
         {{-- Header Section --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -152,6 +153,9 @@
                                 class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">
                                 Status</th>
                             <th
+                                class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">
+                                Verification</th>
+                            <th
                                 class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">
                                 Joined</th>
                             <th
@@ -200,11 +204,25 @@
                                 <td class="px-6 py-4 text-center">
                                     <span
                                         class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold
-                                                                                                                                                                                                                                             {{ $u->is_active ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' }}">
+                                                                                                                                                                                                                                                     {{ $u->is_active ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600' }}">
                                         <span
                                             class="w-1 h-1 rounded-full {{ $u->is_active ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
                                         {{ $u->is_active ? 'Active' : 'Suspended' }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    @if($u->is_verified)
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)] backdrop-blur-md">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <span class="text-[9px] font-black uppercase tracking-widest">Verified</span>
+                                        </div>
+                                    @else
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/10 text-slate-400 border border-slate-500/20 grayscale transition-all hover:grayscale-0">
+                                            <span class="text-[9px] font-black uppercase tracking-widest text-glow-none">Unverified</span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <span
@@ -228,6 +246,18 @@
                                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                 @endif
+                                            </button>
+                                        </form>
+
+                                        {{-- Toggle Verification --}}
+                                        <form action="{{ route('admin.users.toggle-verification', $u->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" title="{{ $u->is_verified ? 'Unverify User' : 'Verify User' }}"
+                                                class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-400 hover:text-blue-500 transition-all flex items-center justify-center">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                </svg>
                                             </button>
                                         </form>
 

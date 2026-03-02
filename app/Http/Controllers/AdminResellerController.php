@@ -32,7 +32,7 @@ class AdminResellerController extends Controller
             'storefront_profit' => \App\Models\Order::selectRaw('COALESCE(sum(profit), 0)')
                 ->whereColumn('user_id', 'users.id')
                 ->where('source', 'storefront')
-                ->where('status', 'completed'),
+                ->where('status', 'delivered'),
             'referral_earnings' => \App\Models\Commission::selectRaw('COALESCE(sum(amount), 0)')
                 ->whereColumn('user_id', 'users.id')
         ]);

@@ -45,16 +45,15 @@
 
             <x-dashboard-header />
 
-            <main class="flex-1 p-4 md:p-8 lg:p-10 animate-fade-in-up">
-                <div class="max-w-7xl mx-auto">
-                    @yield('content')
-                </div>
+            <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden animate-fade-in-up">
+                @yield('content')
             </main>
         </div>
 
         <!-- Notifications & Utils -->
         <x-notifications />
         <x-toaster />
+        <x-announcement-modal />
 
         <!-- Overlay for mobile -->
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"

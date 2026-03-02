@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -54,6 +55,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'role' => 'required|in:user,admin,agent,dealer,super_agent',
             'is_active' => 'boolean',
+            'is_verified' => 'boolean',
             'wallet_balance' => 'nullable|numeric|min:0',
         ]);
 
@@ -98,6 +100,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8',
             'role' => 'required|in:user,admin,agent,dealer,super_agent',
             'is_active' => 'boolean',
+            'is_verified' => 'boolean',
             'wallet_balance' => 'sometimes|numeric|min:0',
         ]);
 
@@ -202,5 +205,66 @@ class UserController extends Controller
             \Illuminate\Support\Facades\Log::error("Error toggling status for user {$user->id}: " . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to update user status.');
         }
+    }
+
+    /**
+     * Toggle user verification status (verify/unverify)
+     */
+    public function toggleVerification(User $user)
+    {
+        try {
+            \Illuminate\Support\Facades\Log::info("Admin toggling verification for user: {$user->id} ({$user->email}). Current status: {$user->is_verified}");
+
+            $user->is_verified = !$user->is_verified;
+            $user->save();
+
+            $status = $user->is_verified ? 'verified' : 'unverified';
+
+            \Illuminate\Support\Facades\Log::info("User {$user->id} verification updated to: {$user->is_verified}");
+
+            return redirect()->back()->with('success', "User {$status} successfully");
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error toggling verification for user {$user->id}: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update user verification.');
+        }
+    }
+
+    /**
+     * Display the verification notice for unverified users.
+     */
+    public function verificationNotice()
+    {
+        // If the user is already verified, send them to the dashboard
+        if (auth()->user()->is_verified || auth()->user()->role === 'admin') {
+            return redirect()->route('dashboard');
+        }
+
+        return view('auth.user-verify');
+    }
+
+    /**
+     * Handle verification request (placeholder for actual request logic)
+     */
+    public function requestVerification()
+    {
+        $user = auth()->user();
+        \Illuminate\Support\Facades\Log::info("Verification request initiated by user: {$user->id} ({$user->name})");
+
+        // Find all admins to notify
+        $admins = User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Log::info("Found " . $admins->count() . " admins to notify.");
+
+        foreach ($admins as $admin) {
+            Notification::create([
+                'user_id' => $admin->id,
+                'title' => 'New Verification Request',
+                'message' => "{$user->name} has requested account verification.",
+                'type' => 'info',
+                'is_read' => false
+            ]);
+            \Illuminate\Support\Facades\Log::info("Notification created for admin: {$admin->id}");
+        }
+
+        return redirect()->back()->with('success', 'Your verification request has been sent to the administrators.');
     }
 }

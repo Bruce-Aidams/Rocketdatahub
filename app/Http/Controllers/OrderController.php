@@ -161,11 +161,26 @@ class OrderController extends Controller
 
         $totalFilteredOrders = $summaryQuery->count();
 
+        $statusLabels = [
+            'pending_payment' => 'Pending Payment',
+            'awaiting_transfer' => 'Awaiting Transfer',
+            'validation' => 'Validating',
+            'processing' => 'Processing',
+            'delivered' => 'Delivered',
+            'failed' => 'Failed',
+        ];
+
         if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json(['orders' => $orders, 'networks' => $networks, 'networkCounts' => $networkCounts, 'totalFilteredOrders' => $totalFilteredOrders]);
+            return response()->json([
+                'orders' => $orders,
+                'networks' => $networks,
+                'networkCounts' => $networkCounts,
+                'totalFilteredOrders' => $totalFilteredOrders,
+                'statusLabels' => $statusLabels
+            ]);
         }
 
-        return view('admin.orders.index', compact('orders', 'networks', 'networkCounts', 'totalFilteredOrders'));
+        return view('admin.orders.index', compact('orders', 'networks', 'networkCounts', 'totalFilteredOrders', 'statusLabels'));
     }
 
     public function export(Request $request)
@@ -263,7 +278,7 @@ class OrderController extends Controller
                     'recipient_phone' => $request->recipient_phone,
                     'cost' => $price,
                     'cost_price' => $bundle->cost_price ?? 0,
-                    'status' => 'pending',
+                    'status' => 'validation',
                     'reference' => 'ORD-' . Str::uuid(),
                 ]);
 
@@ -277,7 +292,7 @@ class OrderController extends Controller
                     'description' => "Purchase: {$bundle->name} for {$request->recipient_phone}",
                 ]);
 
-                $order->complete(['method' => 'wallet', 'auto_completed' => true]);
+                // Transition to validation for background processing
                 return $order;
             });
 
@@ -289,7 +304,7 @@ class OrderController extends Controller
 
         // 2. GATEWAY FLOW (Paystack / MOMO)
         if (in_array($request->payment_method, ['paystack', 'momo'])) {
-            $settings = Setting::whereIn('key', ['charge_type', 'charge_value'])->get()->pluck('value', 'key');
+            $settings = Setting::getManyCached(['charge_type', 'charge_value']);
             $chargeType = $settings['charge_type'] ?? 'percentage';
             $chargeValue = (float) ($settings['charge_value'] ?? 0);
             $charge = $chargeType === 'percentage' ? ($price * ($chargeValue / 100)) : $chargeValue;
@@ -366,12 +381,12 @@ class OrderController extends Controller
     // Admin: Update Status manually
     public function update(Request $request, Order $order)
     {
-        $request->validate(['status' => 'required|in:pending,processing,completed,failed']);
+        $request->validate(['status' => 'required|in:pending_payment,awaiting_transfer,validation,processing,delivered,failed']);
 
-        if ($request->status === 'completed') {
+        if ($request->status === 'delivered') {
             $order->cost_price = $order->bundle->cost_price ?? 0;
             $order->profit = $order->cost - $order->cost_price;
-            $order->status = 'completed';
+            $order->status = 'delivered';
             $order->save();
             $order->complete(); // This handles commissions
         } else {
@@ -436,7 +451,7 @@ class OrderController extends Controller
             return back()->with('error', 'Invalid payment method selected.');
         }
 
-        $allSettings = Setting::whereIn('key', ['enable_paystack', 'enable_momo_deposits', 'enable_manual_transfer'])->get()->pluck('value', 'key');
+        $allSettings = Setting::getManyCached(['enable_paystack', 'enable_momo_deposits', 'enable_manual_transfer']);
 
         if ($request->payment_method === 'paystack' && ($allSettings['enable_paystack'] ?? '1') !== '1') {
             return back()->with('error', 'Paystack gateway is currently disabled.');
@@ -458,7 +473,7 @@ class OrderController extends Controller
         // Calculate Charge if Paystack/MOMO
         $charge = 0;
         if ($isPaystack) {
-            $settings = Setting::whereIn('key', ['charge_type', 'charge_value'])->get()->pluck('value', 'key');
+            $settings = Setting::getManyCached(['charge_type', 'charge_value']);
             $chargeType = $settings['charge_type'] ?? 'percentage';
             $chargeValue = (float) ($settings['charge_value'] ?? 0);
             $charge = $chargeType === 'percentage' ? ($totalCost * ($chargeValue / 100)) : $chargeValue;
@@ -495,7 +510,8 @@ class OrderController extends Controller
                 ]);
 
                 if ($request->payment_method === 'wallet') {
-                    $order->complete(['method' => 'wallet', 'auto_completed' => true]);
+                    // Start validation flow
+                    $order->update(['status' => 'validation']);
                 }
 
                 $createdOrders[] = $order;

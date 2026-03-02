@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'auth.apikey' => \App\Http\Middleware\ValidateApiKey::class,
+            'verified_only' => \App\Http\Middleware\VerifiedUserOnly::class,
         ]);
 
         $middleware->throttleApi('api', 60);

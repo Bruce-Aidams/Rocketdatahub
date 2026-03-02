@@ -30,13 +30,15 @@ class ProcessOrder implements ShouldQueue
      */
     public function handle(ApiService $apiService): void
     {
-        // Skip if order is already completed or failed to prevent state overwrite
-        if (in_array($this->order->status, ['completed', 'failed'])) {
+        // Skip if order is already delivered or failed to prevent state overwrite
+        if (in_array($this->order->status, ['delivered', 'failed'])) {
             Log::info("Order ID: " . $this->order->id . " is already " . $this->order->status . ". Skipping job.");
             return;
         }
 
-        Log::info("Processing Order ID: " . $this->order->id);
+        Log::info("Processing Order ID: " . $this->order->id . " (Current Status: " . $this->order->status . ")");
+
+        // Transition from validation/pending to processing
         $this->order->update(['status' => 'processing']);
 
         try {
@@ -44,13 +46,13 @@ class ProcessOrder implements ShouldQueue
 
             if ($result['success']) {
                 $this->order->complete($result);
-                Log::info("Order ID: " . $this->order->id . " completed successfully.");
+                Log::info("Order ID: " . $this->order->id . " delivered successfully via API.");
             } else {
                 $this->order->update([
                     'status' => 'failed',
                     'response_data' => $result
                 ]);
-                Log::warning("Order ID: " . $this->order->id . " failed. Message: " . ($result['message'] ?? 'Unknown error'));
+                Log::warning("Order ID: " . $this->order->id . " failed API processing. Message: " . ($result['message'] ?? 'Unknown error'));
             }
         } catch (\Exception $e) {
             Log::error("Order ID: " . $this->order->id . " exception: " . $e->getMessage());
