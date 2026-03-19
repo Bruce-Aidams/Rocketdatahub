@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="transition-colors duration-500">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" class="transition-colors duration-500">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Verification - {{ config('app.name') }}</title>
+    <title>Admin Verification - <?php echo e(config('app.name')); ?></title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Scripts & Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <script>
@@ -154,12 +154,12 @@
             <rect width="100%" height="100%" fill="url(#mesh-glow-dark)" class="hidden dark:block" />
 
             <!-- Dynamic Nodes -->
-            @for ($i = 0; $i < 15; $i++)
-                <circle cx="{{ rand(5, 95) }}%" cy="{{ rand(5, 95) }}%" r="1.5" fill="#3b82f6" opacity="0.6">
-                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="{{ rand(3, 7) }}s" repeatCount="indefinite" />
-                    <animate attributeName="r" values="1;2.5;1" dur="{{ rand(4, 9) }}s" repeatCount="indefinite" />
+            <?php for($i = 0; $i < 15; $i++): ?>
+                <circle cx="<?php echo e(rand(5, 95)); ?>%" cy="<?php echo e(rand(5, 95)); ?>%" r="1.5" fill="#3b82f6" opacity="0.6">
+                    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="<?php echo e(rand(3, 7)); ?>s" repeatCount="indefinite" />
+                    <animate attributeName="r" values="1;2.5;1" dur="<?php echo e(rand(4, 9)); ?>s" repeatCount="indefinite" />
                 </circle>
-            @endfor
+            <?php endfor; ?>
         </svg>
     </div>
 
@@ -208,7 +208,7 @@
                 });
 
                 setTimeout(() => {
-                    window.location.href = '{{ $redirect_to }}';
+                    window.location.href = '<?php echo e($redirect_to); ?>';
                 }, 4000);
             }
          }" x-init="init()">
@@ -359,9 +359,9 @@
             <p class="text-[7px] md:text-[8px] font-mono tracking-[0.3em] uppercase text-slate-600 dark:text-slate-400">Auth Level: Level-5 Clear</p>
         </div>
         <div class="fixed bottom-6 right-6 md:bottom-10 md:right-10 p-3 md:p-4 border-r border-b border-blue-500/30 dark:border-blue-500/20 rounded-br-3xl opacity-40 dark:opacity-30 select-none hidden sm:block text-right">
-            <p class="text-[7px] md:text-[8px] font-mono tracking-[0.3em] uppercase text-slate-600 dark:text-slate-400">Node: GH-0X{{ rand(100, 999) }}</p>
+            <p class="text-[7px] md:text-[8px] font-mono tracking-[0.3em] uppercase text-slate-600 dark:text-slate-400">Node: GH-0X<?php echo e(rand(100, 999)); ?></p>
         </div>
     </div>
 </body>
 
-</html>
+</html><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/admin/verify.blade.php ENDPATH**/ ?>

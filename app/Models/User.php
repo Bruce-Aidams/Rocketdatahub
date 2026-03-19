@@ -42,6 +42,7 @@ class User extends Authenticatable
         'two_factor_enabled',
         'two_factor_code',
         'store_name',
+        'google_id',
     ];
 
     public function isReseller()

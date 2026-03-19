@@ -4,74 +4,74 @@
 
 <?php $__env->startSection('content'); ?>
     <div class="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" x-data="{ 
-                                    tab: 'providers',
-                                    modalOpen: false, 
-                                    modalTab: 'general',
-                                    editMode: false,
-                                    loading: false,
-                                    provider: { 
-                                        id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
-                                        request_headers: '', request_body: '', request_body_template: '',
-                                        timeout_seconds: 30, retry_attempts: 3,
-                                        response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
-                                        webhook_url: '', api_key: '', secret_key: '', is_active: true 
-                                    },
-                                    resetForm() {
-                                        this.provider = { 
-                                            id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
-                                            request_headers: '', request_body: '', request_body_template: '',
-                                            timeout_seconds: 30, retry_attempts: 3,
-                                            response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
-                                            webhook_url: '', api_key: '', secret_key: '', is_active: true 
-                                        };
-                                        this.editMode = false;
-                                        this.modalTab = 'general';
-                                    },
-                                    openAdd() {
-                                        this.resetForm();
-                                        this.modalOpen = true;
-                                    },
-                                    openEdit(p) {
-                                        this.provider = JSON.parse(JSON.stringify(p));
-                                        this.provider.request_headers = p.request_headers ? (typeof p.request_headers === 'string' ? p.request_headers : JSON.stringify(p.request_headers, null, 2)) : '';
-                                        this.provider.request_body = p.request_body ? (typeof p.request_body === 'string' ? p.request_body : JSON.stringify(p.request_body, null, 2)) : '';
-                                        // Ensure defaults for new fields if they are missing
-                                        this.provider.timeout_seconds = p.timeout_seconds || 30;
-                                        this.provider.retry_attempts = p.retry_attempts || 3;
-                                        this.provider.response_success_field = p.response_success_field || 'success';
-                                        this.provider.response_data_field = p.response_data_field || 'data';
-                                        this.provider.response_error_field = p.response_error_field || 'error';
+                                            tab: 'providers',
+                                            modalOpen: false, 
+                                            modalTab: 'general',
+                                            editMode: false,
+                                            loading: false,
+                                            provider: { 
+                                                id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
+                                                request_headers: '', request_body: '', request_body_template: '',
+                                                timeout_seconds: 30, retry_attempts: 3,
+                                                response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
+                                                webhook_url: '', api_key: '', secret_key: '', is_active: true 
+                                            },
+                                            resetForm() {
+                                                this.provider = { 
+                                                    id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
+                                                    request_headers: '', request_body: '', request_body_template: '',
+                                                    timeout_seconds: 30, retry_attempts: 3,
+                                                    response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
+                                                    webhook_url: '', api_key: '', secret_key: '', is_active: true 
+                                                };
+                                                this.editMode = false;
+                                                this.modalTab = 'general';
+                                            },
+                                            openAdd() {
+                                                this.resetForm();
+                                                this.modalOpen = true;
+                                            },
+                                            openEdit(p) {
+                                                this.provider = JSON.parse(JSON.stringify(p));
+                                                this.provider.request_headers = p.request_headers ? (typeof p.request_headers === 'string' ? p.request_headers : JSON.stringify(p.request_headers, null, 2)) : '';
+                                                this.provider.request_body = p.request_body ? (typeof p.request_body === 'string' ? p.request_body : JSON.stringify(p.request_body, null, 2)) : '';
+                                                // Ensure defaults for new fields if they are missing
+                                                this.provider.timeout_seconds = p.timeout_seconds || 30;
+                                                this.provider.retry_attempts = p.retry_attempts || 3;
+                                                this.provider.response_success_field = p.response_success_field || 'success';
+                                                this.provider.response_data_field = p.response_data_field || 'data';
+                                                this.provider.response_error_field = p.response_error_field || 'error';
 
-                                        this.editMode = true;
-                                        this.modalTab = 'general';
-                                        this.modalOpen = true;
-                                    },
-                                    async testProviderConnection() {
-                                        this.loading = true;
-                                        try {
-                                            const response = await fetch('/admin/api-management/providers/test', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                                                    'Accept': 'application/json'
-                                                },
-                                                body: JSON.stringify(this.provider)
-                                            });
-                                            const data = await response.json();
+                                                this.editMode = true;
+                                                this.modalTab = 'general';
+                                                this.modalOpen = true;
+                                            },
+                                            async testProviderConnection() {
+                                                this.loading = true;
+                                                try {
+                                                    const response = await fetch('/admin/api-management/providers/test', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                                            'Accept': 'application/json'
+                                                        },
+                                                        body: JSON.stringify(this.provider)
+                                                    });
+                                                    const data = await response.json();
 
-                                            if (response.ok && data.success) {
-                                                window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Connection Successful! ' + (data.message || ''), type: 'success' } }));
-                                            } else {
-                                                throw new Error(data.message || 'Connection failed');
+                                                    if (response.ok && data.success) {
+                                                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Connection Successful! ' + (data.message || ''), type: 'success' } }));
+                                                    } else {
+                                                        throw new Error(data.message || 'Connection failed');
+                                                    }
+                                                } catch (error) {
+                                                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: error.message || 'Connection Test Failed', type: 'error' } }));
+                                                } finally {
+                                                    this.loading = false;
+                                                }
                                             }
-                                        } catch (error) {
-                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: error.message || 'Connection Test Failed', type: 'error' } }));
-                                        } finally {
-                                            this.loading = false;
-                                        }
-                                    }
-                                }">
+                                        }">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -134,79 +134,79 @@
 
         <!-- Data Integration View -->
         <div x-show="tab === 'data_integration'" class="space-y-6" x-data="{
-                                        config: {
-                                            base_url: '',
-                                            api_key: '',
-                                            webhook_url: '',
-                                            is_active: false,
-                                            last_tested_at: null,
-                                            test_status: null,
-                                            test_message: null
-                                        },
-                                        showApiKey: false,
-                                        testing: false,
-                                        saving: false,
-                                        showInstructions: false,
-                                        async loadConfig() {
-                                            try {
-                                                const response = await fetch('/admin/api-management/data-integration');
-                                                this.config = await response.json();
-                                            } catch (error) {
-                                                console.error('Failed to load data integration config:', error);
-                                            }
-                                        },
-                                        async saveConfig() {
-                                            this.saving = true;
-                                            try {
-                                                const response = await fetch('/admin/api-management/data-integration', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                                                    },
-                                                    body: JSON.stringify({
-                                                        base_url: this.config.base_url,
-                                                        api_key: this.config.api_key,
-                                                        is_active: this.config.is_active
-                                                    })
-                                                });
-                                                const data = await response.json();
-                                                window.showToast(data.message || 'Configuration saved successfully', 'success');
-                                                await this.loadConfig();
-                                            } catch (error) {
-                                                window.showToast('Failed to save configuration', 'error');
-                                            } finally {
-                                                this.saving = false;
-                                            }
-                                        },
-                                        async testConnection() {
-                                            this.testing = true;
-                                            try {
-                                                const response = await fetch('/admin/api-management/data-integration/test', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                config: {
+                                                    base_url: '',
+                                                    api_key: '',
+                                                    webhook_url: '',
+                                                    is_active: false,
+                                                    last_tested_at: null,
+                                                    test_status: null,
+                                                    test_message: null
+                                                },
+                                                showApiKey: false,
+                                                testing: false,
+                                                saving: false,
+                                                showInstructions: false,
+                                                async loadConfig() {
+                                                    try {
+                                                        const response = await fetch('/admin/api-management/data-integration');
+                                                        this.config = await response.json();
+                                                    } catch (error) {
+                                                        console.error('Failed to load data integration config:', error);
                                                     }
-                                                });
-                                                const data = await response.json();
-                                                if (data.success) {
-                                                    window.showToast(data.message, 'success');
-                                                } else {
-                                                    window.showToast(data.message, 'error');
+                                                },
+                                                async saveConfig() {
+                                                    this.saving = true;
+                                                    try {
+                                                        const response = await fetch('/admin/api-management/data-integration', {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                            },
+                                                            body: JSON.stringify({
+                                                                base_url: this.config.base_url,
+                                                                api_key: this.config.api_key,
+                                                                is_active: this.config.is_active
+                                                            })
+                                                        });
+                                                        const data = await response.json();
+                                                        window.showToast(data.message || 'Configuration saved successfully', 'success');
+                                                        await this.loadConfig();
+                                                    } catch (error) {
+                                                        window.showToast('Failed to save configuration', 'error');
+                                                    } finally {
+                                                        this.saving = false;
+                                                    }
+                                                },
+                                                async testConnection() {
+                                                    this.testing = true;
+                                                    try {
+                                                        const response = await fetch('/admin/api-management/data-integration/test', {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                            }
+                                                        });
+                                                        const data = await response.json();
+                                                        if (data.success) {
+                                                            window.showToast(data.message, 'success');
+                                                        } else {
+                                                            window.showToast(data.message, 'error');
+                                                        }
+                                                        await this.loadConfig();
+                                                    } catch (error) {
+                                                        window.showToast('Connection test failed', 'error');
+                                                    } finally {
+                                                        this.testing = false;
+                                                    }
+                                                },
+                                                copyWebhookUrl() {
+                                                    navigator.clipboard.writeText(this.config.webhook_url);
+                                                    window.showToast('Webhook URL copied to clipboard', 'success');
                                                 }
-                                                await this.loadConfig();
-                                            } catch (error) {
-                                                window.showToast('Connection test failed', 'error');
-                                            } finally {
-                                                this.testing = false;
-                                            }
-                                        },
-                                        copyWebhookUrl() {
-                                            navigator.clipboard.writeText(this.config.webhook_url);
-                                            window.showToast('Webhook URL copied to clipboard', 'success');
-                                        }
-                                    }" x-init="loadConfig()">
+                                            }" x-init="loadConfig()">
             <div
                 class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div class="flex items-center gap-4 mb-8">
@@ -518,16 +518,16 @@
                     <div class="pt-4">
                         <button type="button"
                             @click="async () => {
-                                                                                                                                                                                                                const url = document.getElementById('webhook_url').value;
-                                                                                                                                                                                                                const secret = document.getElementById('webhook_secret').value;
-                                                                                                                                                                                                                const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
-                                                                                                                                                                                                                    method: 'PUT',
-                                                                                                                                                                                                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                                                                                                                                                                                                                    body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
-                                                                                                                                                                                                                });
-                                                                                                                                                                                                                if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
-                                                                                                                                                                                                                else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
-                                                                                                                                                                                                            }"
+                                                                                                                                                                                                                        const url = document.getElementById('webhook_url').value;
+                                                                                                                                                                                                                        const secret = document.getElementById('webhook_secret').value;
+                                                                                                                                                                                                                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
+                                                                                                                                                                                                                            method: 'PUT',
+                                                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+                                                                                                                                                                                                                            body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
+                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                        if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
+                                                                                                                                                                                                                        else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
+                                                                                                                                                                                                                    }"
                             class="h-12 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-bold text-xs uppercase shadow-lg shadow-emerald-500/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-3 border-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -558,7 +558,7 @@
                                         </svg>
                                     </div>
                                     <div class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
-                                                                                                                                                                                                                                                                                                                                <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
+                                                                                                                                                                                                                                                                                                                                                        <?php echo e($p->network_type === 'MTN' ? 'bg-amber-100 text-amber-600' :
                     ($p->network_type === 'TELECEL' ? 'bg-rose-100 text-rose-600' :
                         ($p->network_type === 'AT' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'))); ?>">
                                         <?php echo e($p->network_type ?: 'Global'); ?>
@@ -568,19 +568,19 @@
 
                                 <button
                                     @click="async () => {
-                                                                                                                                                                const newState = !<?php echo e($p->is_active ? 'true' : 'false'); ?>;
-                                                                                                                                                                const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
-                                                                                                                                                                    method: 'PUT',
-                                                                                                                                                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
-                                                                                                                                                                    body: JSON.stringify({ is_active: newState })
-                                                                                                                                                                });
-                                                                                                                                                                if(response.ok) {
-                                                                                                                                                                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Provider status updated!', type: 'success' } }));
-                                                                                                                                                                    setTimeout(() => window.location.reload(), 500);
-                                                                                                                                                                } else {
-                                                                                                                                                                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Update failed.', type: 'error' } }));
-                                                                                                                                                                }
-                                                                                                                                                            }"
+                                                                                                                                                                                        const newState = !<?php echo e($p->is_active ? 'true' : 'false'); ?>;
+                                                                                                                                                                                        const response = await fetch('<?php echo e(route('admin.api.providers.update', $p->id)); ?>', {
+                                                                                                                                                                                            method: 'PUT',
+                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+                                                                                                                                                                                            body: JSON.stringify({ is_active: newState })
+                                                                                                                                                                                        });
+                                                                                                                                                                                        if(response.ok) {
+                                                                                                                                                                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Provider status updated!', type: 'success' } }));
+                                                                                                                                                                                            setTimeout(() => window.location.reload(), 500);
+                                                                                                                                                                                        } else {
+                                                                                                                                                                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Update failed.', type: 'error' } }));
+                                                                                                                                                                                        }
+                                                                                                                                                                                    }"
                                     class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none <?php echo e($p->is_active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'); ?>">
                                     <span class="sr-only">Toggle Status</span>
                                     <span
@@ -1175,21 +1175,20 @@
                         </svg>
                     </div>
                     <div>
-                        <h4 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">CloudTech
-                            API Documentation</h4>
+                        <h4 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Simple Help
+                            Guide</h4>
                         <p class="text-[10px] text-slate-500 dark:text-slate-500 mt-1 uppercase tracking-widest font-black">
-                            Technical Integration & Management Guide</p>
+                            How to connect your site to others</p>
                     </div>
                 </div>
 
                 <div class="space-y-16">
                     <!-- Getting Started -->
                     <div class="space-y-4">
-                        <h5 class="text-xs font-black uppercase tracking-[.2em] text-cyan-600">Getting Started</h5>
+                        <h5 class="text-xs font-black uppercase tracking-[.2em] text-cyan-600">Quick Start</h5>
                         <p class="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
-                            This guide provides comprehensive instructions for both Admin and Agents to connect their
-                            systems to the CloudTech platform. Utilize these endpoints to automate orders, manage users, and
-                            synchronize data across your infrastructure.
+                            Follow these simple steps to connect CloudTech to another platform. This allows you to buy data
+                            automatically.
                         </p>
                     </div>
 
@@ -1200,7 +1199,8 @@
                             <div class="flex items-center gap-3">
                                 <span
                                     class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black">01</span>
-                                <h4 class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">Endpoint Access
+                                <h4 class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">Step 1: Your
+                                    Site Link
                                 </h4>
                             </div>
                             <div
@@ -1222,7 +1222,8 @@
                             <div class="flex items-center gap-3">
                                 <span
                                     class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black">02</span>
-                                <h4 class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">Authentication
+                                <h4 class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">Step 2: Your
+                                    Secret Key
                                 </h4>
                             </div>
                             <div
@@ -1240,7 +1241,7 @@
                         <div class="flex items-center gap-4">
                             <span
                                 class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black">03</span>
-                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Core API Routes</h4>
+                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">What You Can Do</h4>
                         </div>
 
                         <div class="grid xl:grid-cols-2 gap-12">

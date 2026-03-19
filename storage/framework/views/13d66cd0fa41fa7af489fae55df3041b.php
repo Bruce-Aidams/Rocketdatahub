@@ -1,12 +1,12 @@
-@php
+<?php
     $hideNav = true;
     /** @var \Illuminate\Support\ViewErrorBag $errors */
-@endphp
-@extends('layouts.app')
+?>
 
-@section('title', 'Login')
 
-@section('content')
+<?php $__env->startSection('title', 'Login'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
         x-data="{ 
                                 loading: false,
@@ -17,14 +17,15 @@
                              }">
         <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
             <!-- Logo Header -->
-            <a href="{{ url('/') }}" class="flex flex-col items-center gap-3 mb-8 group">
+            <a href="<?php echo e(url('/')); ?>" class="flex flex-col items-center gap-3 mb-8 group">
                 <div
                     class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 transition-transform group-hover:scale-105 duration-300">
-                    <img src="{{ asset('favicon.ico') }}" alt="Logo"
+                    <img src="<?php echo e(asset('favicon.ico')); ?>" alt="Logo"
                         class="w-8 h-8 transition-transform group-hover:rotate-12">
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
-                    {{ config('app.name') }}
+                    <?php echo e(config('app.name')); ?>
+
                 </h1>
             </a>
 
@@ -34,27 +35,27 @@
                 <div class="p-8">
                     <div class="mb-8">
                         <h3 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-1">Welcome to
-                            {{ config('app.name') }}! 👋
+                            <?php echo e(config('app.name')); ?>! 👋
                         </h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Please sign-in to your account
                         </p>
                     </div>
 
-                    @if($errors->any())
+                    <?php if($errors->any()): ?>
                         <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">{{ $errors->first() }}</p>
+                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider"><?php echo e($errors->first()); ?></p>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    <form method="POST" action="{{ route('login') }}" x-ref="loginForm" @submit.prevent="submit"
+                    <form method="POST" action="<?php echo e(route('login')); ?>" x-ref="loginForm" @submit.prevent="submit"
                         class="space-y-5">
-                        @csrf
+                        <?php echo csrf_field(); ?>
 
                         <div class="space-y-2">
                             <label for="login"
                                 class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">Email
                                 or Username</label>
-                            <input id="login" type="text" name="login" value="{{ old('login') }}" required autofocus
+                            <input id="login" type="text" name="login" value="<?php echo e(old('login')); ?>" required autofocus
                                 class="w-full h-11 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/10 transition-all text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-300"
                                 placeholder="Enter your email or username">
                         </div>
@@ -63,11 +64,11 @@
                             <div class="flex items-center justify-between ml-1">
                                 <label for="password"
                                     class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Password</label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}"
+                                <?php if(Route::has('password.request')): ?>
+                                    <a href="<?php echo e(route('password.request')); ?>"
                                         class="text-[11px] font-bold text-primary hover:underline transition-all">Forgot
                                         Password?</a>
-                                @endif
+                                <?php endif; ?>
                             </div>
                             <div class="relative" x-data="{ show: false }">
                                 <input id="password" :type="show ? 'text' : 'password'" name="password" required
@@ -122,7 +123,7 @@
                             <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
                         </div>
 
-                        <a href="{{ route('google.login') }}"
+                        <a href="<?php echo e(route('google.login')); ?>"
                             class="w-full h-11 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:bg-slate-50 dark:hover:bg-slate-700/50 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3">
                             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -144,7 +145,7 @@
                         <div class="pt-2 text-center">
                             <p class="text-sm text-slate-500 dark:text-slate-400">
                                 New on our platform?
-                                <a href="{{ route('register') }}" class="text-primary font-bold hover:underline ml-1">Create
+                                <a href="<?php echo e(route('register')); ?>" class="text-primary font-bold hover:underline ml-1">Create
                                     an account</a>
                             </p>
                         </div>
@@ -153,12 +154,13 @@
             </div>
 
             <!-- Footer -->
-            @if(config('app.env') === 'demo')
+            <?php if(config('app.env') === 'demo'): ?>
                 <div class="mt-8 p-4 bg-primary/10 rounded-xl text-center border border-primary/20">
                     <p class="text-xs font-bold text-primary uppercase tracking-widest">Demo Credentials</p>
                     <p class="text-[11px] text-slate-600 mt-1 uppercase tracking-tight">Admin: admin@test.com / password</p>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Bruce\Desktop\Projects\cloudtech\resources\views/auth/login.blade.php ENDPATH**/ ?>

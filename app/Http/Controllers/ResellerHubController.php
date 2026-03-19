@@ -5,55 +5,75 @@ namespace App\Http\Controllers;
 use App\Models\Bundle;
 use App\Models\ResellerPrice;
 use App\Models\Order;
-use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Commission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ResellerHubController extends Controller
 {
-    public function index()
+    /**
+     * Get the authenticated reseller user or abort.
+     */
+    private function getResellerUser($redirect = false)
     {
         $user = Auth::user();
-
-        if (!$user->isReseller()) {
-            return redirect()->route('dashboard')->with('error', 'Access denied to Reseller Hub.');
+        
+        if (!$user || !$user->isReseller()) {
+            if ($redirect) {
+                // Return a redirect response to break execution
+                abort(redirect()->route('dashboard')->with('error', 'Access denied to Reseller Hub.'));
+            }
+            abort(403);
         }
 
         if (!$user->referral_code) {
-            $user->update(['referral_code' => strtoupper(\Illuminate\Support\Str::random(10))]);
+            $user->update(['referral_code' => strtoupper(Str::random(10))]);
         }
 
+        return $user;
+    }
+
+    /**
+     * Base query for orders belonging to a reseller's referrals or storefront.
+     */
+    private function getResellerOrdersQuery(User $user)
+    {
+        $referralIds = User::where('referred_by_id', $user->id)->pluck('id');
+
+        return Order::where(function ($q) use ($user, $referralIds) {
+            $q->whereIn('user_id', $referralIds)
+                ->orWhere(function ($sub) use ($user) {
+                    $sub->where('user_id', $user->id)
+                        ->where('source', 'storefront');
+                });
+        });
+    }
+    public function index()
+    {
+        $user = $this->getResellerUser(true);
         $referralIds = User::where('referred_by_id', $user->id)->pluck('id');
 
         // Stats Logic
         $stats = [
             'referral_count' => $referralIds->count(),
             'wallet_balance' => $user->wallet_balance,
-            'total_sales' => Order::where(function ($q) use ($user, $referralIds) {
-                $q->whereIn('user_id', $referralIds)
-                    ->orWhere(function ($sub) use ($user) {
-                        $sub->where('user_id', $user->id)->where('source', 'storefront');
-                    });
-            })->where('status', 'delivered')->count(),
-
+            'total_sales' => $this->getResellerOrdersQuery($user)->where('status', 'delivered')->count(),
             'storefront_profit' => Order::where('user_id', $user->id)
                 ->where('source', 'storefront')
                 ->where('status', 'delivered')
                 ->sum('profit'),
-
             'referral_earnings' => Commission::where('user_id', $user->id)->sum('amount'),
         ];
 
         $stats['total_earnings'] = $stats['storefront_profit'] + $stats['referral_earnings'];
 
-        $recentOrders = Order::where(function ($q) use ($user, $referralIds) {
-            $q->whereIn('user_id', $referralIds)
-                ->orWhere(function ($sub) use ($user) {
-                    $sub->where('user_id', $user->id)->where('source', 'storefront');
-                });
-        })->with(['user', 'bundle'])->latest()->limit(5)->get();
+        $recentOrders = $this->getResellerOrdersQuery($user)
+            ->with(['user', 'bundle'])
+            ->latest()
+            ->limit(5)
+            ->get();
 
         $recentReferrals = User::where('referred_by_id', $user->id)
             ->latest()
@@ -65,13 +85,7 @@ class ResellerHubController extends Controller
 
     public function manageStore()
     {
-        $user = Auth::user();
-        if (!$user->isReseller())
-            abort(403);
-
-        if (!$user->referral_code) {
-            $user->update(['referral_code' => strtoupper(\Illuminate\Support\Str::random(10))]);
-        }
+        $user = $this->getResellerUser();
 
         $bundles = Bundle::where('is_active', true)->get();
         $customPrices = ResellerPrice::where('user_id', $user->id)->pluck('price', 'bundle_id');
@@ -94,7 +108,7 @@ class ResellerHubController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
 
-        $user = Auth::user();
+        $user = $this->getResellerUser();
         $bundle = Bundle::findOrFail($request->bundle_id);
 
         // Reseller can't set price lower than their cost
@@ -116,9 +130,7 @@ class ResellerHubController extends Controller
     public function updateStoreName(Request $request)
     {
         $request->validate(['store_name' => 'required|string|max:50']);
-        $user = Auth::user();
-        if (!$user->isReseller())
-            abort(403);
+        $user = $this->getResellerUser();
 
         $user->update(['store_name' => $request->store_name]);
         return back()->with('success', 'Store name updated successfully.');
@@ -126,9 +138,7 @@ class ResellerHubController extends Controller
 
     public function toggleStoreStatus()
     {
-        $user = Auth::user();
-        if (!$user->isReseller())
-            abort(403);
+        $user = $this->getResellerUser();
 
         $user->store_active = !$user->store_active;
         $user->save();
@@ -139,15 +149,11 @@ class ResellerHubController extends Controller
 
     public function regenerateStoreLink()
     {
-        $user = Auth::user();
-        if (!$user->isReseller())
-            abort(403);
+        $user = $this->getResellerUser();
 
-        $newCode = strtoupper(\Illuminate\Support\Str::random(10));
-
-        while (\App\Models\User::where('referral_code', $newCode)->exists()) {
-            $newCode = strtoupper(\Illuminate\Support\Str::random(10));
-        }
+        do {
+            $newCode = strtoupper(Str::random(10));
+        } while (User::where('referral_code', $newCode)->exists());
 
         $user->referral_code = $newCode;
         $user->save();
@@ -157,23 +163,12 @@ class ResellerHubController extends Controller
 
     public function customerOrders(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->isReseller()) {
-            abort(403);
-        }
-
-        $referralIds = User::where('referred_by_id', $user->id)->pluck('id');
+        $user = $this->getResellerUser();
 
         // Capture both: 
         // 1. Orders from registered referred users
         // 2. Guest storefront purchases (where user_id is the reseller's ID and source is storefront)
-        $query = Order::where(function ($q) use ($user, $referralIds) {
-            $q->whereIn('user_id', $referralIds)
-                ->orWhere(function ($sub) use ($user) {
-                    $sub->where('user_id', $user->id)
-                        ->where('source', 'storefront');
-                });
-        });
+        $query = $this->getResellerOrdersQuery($user);
 
         // Search Filter (Reference or Phone)
         if ($request->filled('search')) {

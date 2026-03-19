@@ -13,6 +13,10 @@ Route::get('/verification-required', [\App\Http\Controllers\UserController::clas
 Route::post('/request-verification', [\App\Http\Controllers\UserController::class, 'requestVerification'])->middleware('auth')->name('verification.request');
 
 Route::middleware(['guest', 'auth_throttle'])->group(function () {
+    // Google OAuth Routes
+    Route::get('auth/google', [\App\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('google.login');
+    Route::get('auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback']);
+
     Route::get('login', function (Request $request) {
         if ($request->has('ref')) {
             session(['referred_by_code' => $request->ref]);

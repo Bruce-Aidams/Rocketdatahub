@@ -1,0 +1,72 @@
+# CloudTech Connection Guide: Integrating with External Sites
+
+This guide explains how to connect your CloudTech platform to external sites (Outbound) and how to allow external apps to connect to your platform (Inbound).
+
+---
+
+## 1. Admin Guide: Connecting CloudTech to External Providers (Outbound)
+
+If you want the platform to automatically fulfill orders by calling another site's API, follow these steps.
+
+### Method A: API Providers (Recommended for Data Fulfillment)
+This is used to connect to VTU or Data providers to automate the delivery of data bundles.
+
+1.  **Navigate**: Log in as Admin and go to **Admin > API Management > API Providers**.
+2.  **Add Provider**: Click **Add New Provider** and fill in the following:
+    - **Name**: A descriptive name (e.g., "MTN Data Pro").
+    - **Base URL**: The API endpoint provided by your partner.
+    - **Request Method**: Usually `POST`.
+    - **Headers**: Add authentication headers (e.g., `{"Authorization": "Bearer YOUR_SECRET_KEY"}`).
+3.  **Configure Template**: In the **Request Body Template**, use placeholders to tell CloudTech where to put order data:
+    - `{{phone}}` -> The recipient's phone number.
+    - `{{amount}}` -> The data amount (e.g., "1GB").
+    - `{{network}}` -> The network name.
+    - Example JSON: `{"number": "{{phone}}", "plan": "{{amount}}", "ref": "{{request_id}}"}`.
+4.  **Response Settings**: Tell the system which fields in the response indicate success:
+    - **Success Field**: The JSON key (e.g., `status` or `success`).
+    - **Success Value**: What the key should be (e.g., `true` or `00`).
+5.  **Test & Activate**: Click **Test Connection** to verify with a sample request. Once successful, toggle the status to **Active**.
+
+---
+
+### Method B: Global Data Integration (Platform-to-Platform Sync)
+Used for a single global "master" connection to a partner site.
+
+1.  **Navigate**: Go to **Admin > API Management > External Data Provider Integration**.
+2.  **Setup**: Enter the **Base URL** and your **API Key**.
+3.  **Webhook**: (Optional) Provide your site's webhook URL to the partner so they can push status updates back to you.
+4.  **Save & Test**: Click **Save Configuration** and then **Test Connection**.
+
+---
+
+## 2. Agent/User Guide: Connecting External Apps to CloudTech (Inbound)
+
+If you want your own site or app to call CloudTech's API to buy data for your users, follow these steps.
+
+### Step 1: Generate your API Key
+1.  Log in to your **Agent Dashboard**.
+2.  Navigate to **API Access / API Keys**.
+3.  Click **Generate New Key**. Give it a descriptive name.
+4.  **CRITICAL**: Copy the key immediately and store it safely. It will not be shown again.
+
+### Step 2: Authenticate Requests
+Include your key in every API request header:
+```http
+Authorization: Bearer YOUR_STORED_KEY
+Accept: application/json
+```
+
+### Step 3: Utilize Core Endpoints
+Refer to the **Developer Documentation** tab at the bottom of the API Access page for full details:
+- **`GET /api/networks`**: List all available networks.
+- **`GET /api/products`**: List all available data bundles and prices.
+- **`POST /api/orders`**: Place a single order for a customer.
+- **`GET /api/orders/{id}`**: Check the status of a specific order.
+
+---
+
+> [!TIP]
+> **Security First**: Never share your Admin API Keys or Provider Secret Keys. If a key is compromised, revoke it immediately and generate a new one.
+
+> [!NOTE]
+> **Webhook Support**: Both Incoming and Outgoing webhooks are supported for real-time order status synchronization between platforms.

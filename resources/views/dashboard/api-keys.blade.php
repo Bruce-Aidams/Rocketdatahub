@@ -188,8 +188,8 @@
                                         <td class="px-8 py-6">
                                             <code
                                                 class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 border border-border/10 text-[10px] font-black text-slate-500 font-mono tracking-tighter">
-                                                                                                                                                {{ $key->key_preview }}
-                                                                                                                                            </code>
+                                                                                                                                                            {{ $key->key_preview }}
+                                                                                                                                                        </code>
                                         </td>
                                         <td class="px-8 py-6">
                                             <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 space-y-1">
@@ -263,21 +263,19 @@
                     </div>
                     <div>
                         <h4 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                            CloudTech API Documentation</h4>
+                            Simple Connection Help</h4>
                         <p class="text-[10px] text-slate-500 dark:text-slate-500 mt-1 uppercase tracking-widest font-black">
-                            Technical Integration & Developer Guide</p>
+                            Connect your application in 3 steps</p>
                     </div>
                 </div>
 
                 <div class="space-y-16">
                     <!-- Getting Started -->
                     <div class="space-y-4">
-                        <h5 class="text-xs font-black uppercase tracking-[.2em] text-cyan-600">Developer
-                            Quickstart</h5>
+                        <h5 class="text-xs font-black uppercase tracking-[.2em] text-cyan-600">Quick Start Guide</h5>
                         <p class="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
-                            Integrate CloudTech into your platform to automate data bundle purchases, check
-                            order statuses, and synchronize network availability. Use your private API keys
-                            for authenticated requests.
+                            Want to buy data automatically from your own app? Use your private <b>Secret Keys</b> and the
+                            <b>Connection Link</b> below to get started.
                         </p>
                     </div>
 
@@ -289,7 +287,7 @@
                                 <span
                                     class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black">01</span>
                                 <h4 class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">
-                                    Endpoint Access</h4>
+                                    Step 1: The Link</h4>
                             </div>
                             <div
                                 class="bg-slate-950 rounded-2xl p-6 font-mono text-xs text-emerald-400 border border-slate-800 flex items-center justify-between group">
@@ -311,7 +309,7 @@
                                 <span
                                     class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black">02</span>
                                 <h4 class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">
-                                    Authentication</h4>
+                                    Step 2: The Secret Key</h4>
                             </div>
                             <div
                                 class="bg-slate-950 rounded-2xl p-6 font-mono text-xs text-slate-300 border border-slate-800">
@@ -329,8 +327,8 @@
                         <div class="flex items-center gap-4">
                             <span
                                 class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black">03</span>
-                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Core API
-                                Routes</h4>
+                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Step 3: What to Request
+                            </h4>
                         </div>
 
                         <div class="space-y-6">
@@ -395,12 +393,47 @@
                         </div>
                     </div>
 
-                    <!-- Webhooks -->
+                    <!-- Placing an Order -->
                     <div class="space-y-8">
                         <div class="flex items-center gap-4">
                             <span
                                 class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black">04</span>
-                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Webhook
+                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Step 4: Placing an Order
+                            </h4>
+                        </div>
+                        <div class="grid lg:grid-cols-2 gap-8 lg:items-center">
+                            <div class="space-y-4 text-slate-500 dark:text-slate-400">
+                                <p class="text-sm font-medium leading-relaxed">
+                                    To purchase data, send a <code class="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded">POST</code> request to the <code class="text-xs font-bold text-slate-900 dark:text-white">/orders</code> endpoint.
+                                </p>
+                                <ul class="text-xs space-y-2 font-medium leading-relaxed mt-4">
+                                    <li class="flex items-start gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 flex-shrink-0"></div>
+                                        <span>Use <code class="text-slate-800 dark:text-slate-300">payment_method: "wallet"</code> to automatically deduct from your account balance.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 flex-shrink-0"></div>
+                                        <span>You will receive an immediate response containing the status of the order.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-950 rounded-2xl p-6 font-mono text-[11px] leading-relaxed text-slate-300 border border-slate-800 shadow-2xl">
+                                <span class="text-purple-400">POST</span> <span class="text-emerald-400">/api/orders</span><br><br>
+                                <span class="text-white">{</span><br>
+                                <span class="pl-4"><span class="text-sky-400">"bundle_id"</span>: <span class="text-amber-400">15</span>,</span><br>
+                                <span class="pl-4"><span class="text-sky-400">"recipient_phone"</span>: <span class="text-emerald-400">"0241234567"</span>,</span><br>
+                                <span class="pl-4"><span class="text-sky-400">"payment_method"</span>: <span class="text-emerald-400">"wallet"</span></span><br>
+                                <span class="text-white">}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Webhooks -->
+                    <div class="space-y-8">
+                        <div class="flex items-center gap-4">
+                            <span
+                                class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black">05</span>
+                            <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Step 5: Webhook
                                 Integration</h4>
                         </div>
                         <div class="grid lg:grid-cols-2 gap-8">
@@ -441,7 +474,7 @@
                     <div class="space-y-8">
                         <div class="flex items-center gap-4">
                             <span
-                                class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black">05</span>
+                                class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-black">06</span>
                             <h4 class="text-sm font-black uppercase tracking-[.2em] text-slate-400">Response
                                 Status Codes</h4>
                         </div>
