@@ -360,6 +360,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'adminIndex'])->name('admin.notifications');
         Route::post('/notifications', [\App\Http\Controllers\NotificationController::class, 'store'])->name('admin.notifications.store');
         Route::patch('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
+        Route::patch('/admin-notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAdminNotificationAsRead'])->name('admin.admin_notifications.read');
         Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('admin.notifications.destroy');
 
         // Announcements

@@ -250,20 +250,14 @@ class UserController extends Controller
         $user = auth()->user();
         \Illuminate\Support\Facades\Log::info("Verification request initiated by user: {$user->id} ({$user->name})");
 
-        // Find all admins to notify
-        $admins = User::where('role', 'admin')->get();
-        \Illuminate\Support\Facades\Log::info("Found " . $admins->count() . " admins to notify.");
-
-        foreach ($admins as $admin) {
-            Notification::create([
-                'user_id' => $admin->id,
-                'title' => 'New Verification Request',
-                'message' => "{$user->name} has requested account verification.",
-                'type' => 'info',
-                'is_read' => false
-            ]);
-            \Illuminate\Support\Facades\Log::info("Notification created for admin: {$admin->id}");
-        }
+        \App\Models\AdminNotification::create([
+            'user_id' => $user->id,
+            'title' => 'New Verification Request',
+            'message' => "{$user->name} has requested account verification.",
+            'type' => 'info',
+            'is_read' => false
+        ]);
+        \Illuminate\Support\Facades\Log::info("Admin Notification created for verification request by user {$user->id}");
 
         return redirect()->back()->with('success', 'Your verification request has been sent to the administrators.');
     }

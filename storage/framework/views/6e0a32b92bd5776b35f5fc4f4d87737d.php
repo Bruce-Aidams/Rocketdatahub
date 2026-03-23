@@ -65,8 +65,8 @@
 <?php endif; ?>
 
         <?php
-            $unreadNotifications = auth()->user()->notifications()->where('is_read', 0)->latest()->take(5)->get();
-            $unreadCount = auth()->user()->notifications()->where('is_read', 0)->count();
+            $unreadNotifications = \App\Models\AdminNotification::with('user')->where('is_read', 0)->latest()->take(5)->get();
+            $unreadCount = \App\Models\AdminNotification::where('is_read', 0)->count();
         ?>
 
         <!-- Notifications -->

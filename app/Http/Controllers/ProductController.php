@@ -43,6 +43,37 @@ class ProductController extends Controller
     // Admin: Create
     public function store(Request $request)
     {
+        if ($request->has('bundles') && is_array($request->bundles)) {
+            $request->validate([
+                'network' => 'required',
+                'is_active' => 'required|boolean',
+                'bundles' => 'required|array|min:1',
+                'bundles.*.name' => 'required',
+                'bundles.*.price' => 'required|numeric',
+                'bundles.*.cost_price' => 'required|numeric',
+                'bundles.*.data_amount' => 'required',
+                'bundles.*.role_prices' => 'nullable'
+            ]);
+
+            foreach ($request->bundles as $bundleData) {
+                if (isset($bundleData['role_prices']) && is_string($bundleData['role_prices'])) {
+                    $bundleData['role_prices'] = json_decode($bundleData['role_prices'], true);
+                }
+
+                Bundle::create([
+                    'network' => $request->network,
+                    'is_active' => $request->is_active,
+                    'name' => strtoupper($bundleData['name']),
+                    'data_amount' => strtoupper($bundleData['data_amount']),
+                    'cost_price' => $bundleData['cost_price'],
+                    'price' => $bundleData['price'],
+                    'role_prices' => $bundleData['role_prices'] ?? null,
+                ]);
+            }
+
+            return redirect()->route('admin.bundles')->with('success', count($request->bundles) . ' Products created successfully');
+        }
+
         $request->validate([
             'network' => 'required',
             'name' => 'required',

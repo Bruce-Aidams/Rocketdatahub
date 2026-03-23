@@ -162,11 +162,13 @@
                                                             method: 'POST',
                                                             headers: {
                                                                 'Content-Type': 'application/json',
-                                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                                                'Accept': 'application/json'
                                                             },
                                                             body: JSON.stringify({
                                                                 base_url: this.config.base_url,
                                                                 api_key: this.config.api_key,
+                                                                webhook_url: this.config.webhook_url,
                                                                 is_active: this.config.is_active
                                                             })
                                                         });
@@ -279,14 +281,14 @@
                             panel</p>
                     </div>
 
-                    <!-- Webhook URL (Read-only) -->
+                    <!-- Webhook URL -->
                     <div class="space-y-1.5">
                         <label
                             class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[.2em]">Webhook
-                            URL (Configure this in provider's panel)</label>
+                            URL</label>
                         <div class="relative">
-                            <input type="text" :value="config.webhook_url" readonly
-                                class="w-full h-11 px-4 pr-12 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm font-mono text-slate-600 dark:text-slate-400 cursor-not-allowed">
+                            <input type="text" x-model="config.webhook_url" placeholder="https://external-provider.com/webhook"
+                                class="w-full h-11 px-4 pr-12 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm font-mono focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white">
                             <button @click="copyWebhookUrl()" type="button"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

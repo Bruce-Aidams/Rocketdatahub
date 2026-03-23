@@ -26,6 +26,10 @@ class ApiController extends Controller
     // Create a new provider
     public function store(Request $request)
     {
+        $request->merge([
+            'is_active' => $request->has('is_active')
+        ]);
+
         $validated = $request->validate([
             'name' => 'required|string',
             'network_type' => 'nullable|string',
@@ -69,6 +73,10 @@ class ApiController extends Controller
     public function update(Request $request, $id)
     {
         $provider = ApiProvider::findOrFail($id);
+
+        $request->merge([
+            'is_active' => $request->has('is_active')
+        ]);
 
         $validated = $request->validate([
             'name' => 'sometimes|string',

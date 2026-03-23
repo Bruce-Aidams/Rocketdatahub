@@ -11,8 +11,10 @@
                                                     productsUrl: '{{ route('admin.bundles.store') }}',
                                                     baseUrl: '{{ url('admin/bundles') }}',
                                                     bundle: { id: '', network: '', name: '', price: '', cost_price: '', data_amount: '', is_active: 1, role_prices: { dealer: '', super_agent: '' } },
+                                                    bulkBundles: [{ name: '', cost_price: '', price: '', data_amount: '', role_prices: { dealer: '', super_agent: '' } }],
                                                     resetForm() {
                                                         this.bundle = { id: '', network: '', name: '', price: '', cost_price: '', data_amount: '', is_active: 1, role_prices: { dealer: '', super_agent: '' } };
+                                                        this.bulkBundles = [{ name: '', cost_price: '', price: '', data_amount: '', role_prices: { dealer: '', super_agent: '' } }];
                                                         this.editMode = false;
                                                         this.previewUrl = null;
                                                     },
@@ -249,94 +251,135 @@
                         </div>
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Bundle
-                            Name</label>
-                        <input type="text" name="name" x-model="bundle.name" required placeholder="e.g. 1GB Super Saver"
-                            class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
-                    </div>
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="space-y-1.5">
-                            <label
-                                class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Amount</label>
-                            <input type="text" name="data_amount" x-model="bundle.data_amount" required placeholder="1 GB"
-                                class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label
-                                class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Cost
-                                (GHS)</label>
-                            <input type="number" step="0.01" name="cost_price" x-model="bundle.cost_price" required
-                                class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
-                        </div>
-                    </div>
-
-                    <div class="grid gap-4 sm:grid-cols-3">
-                        <div class="space-y-1.5">
-                            <label
-                                class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">User
-                                Price</label>
-                            <input type="number" step="0.01" name="price" x-model="bundle.price" required
-                                class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label
-                                class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Dealer</label>
-                            <input type="number" step="0.01" name="role_prices[dealer]" x-model="bundle.role_prices.dealer"
-                                class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label
-                                class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Super
-                                Agent</label>
-                            <input type="number" step="0.01" name="role_prices[super_agent]"
-                                x-model="bundle.role_prices.super_agent"
-                                class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Product
-                            Visual Identity</label>
-
-                        <div
-                            class="flex items-center gap-6 p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary/30 transition-all group relative overflow-hidden">
-                            {{-- Preview Area --}}
-                            <div
-                                class="w-24 h-24 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800 shadow-sm relative z-10">
-                                <template x-if="previewUrl">
-                                    <img :src="previewUrl" class="w-full h-full object-cover">
-                                </template>
-                                <template x-if="!previewUrl">
-                                    <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </template>
+                    <template x-if="editMode">
+                        <div class="space-y-6">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Bundle Name</label>
+                                <input type="text" name="name" x-model="bundle.name" required placeholder="e.g. 1GB Super Saver"
+                                    class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
                             </div>
 
-                            <div class="space-y-2 relative z-10">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase">Recommended: 800x600px</p>
-                                <div class="relative">
-                                    <button type="button"
-                                        class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-xs font-black uppercase tracking-tight hover:bg-primary hover:text-white transition-all">Select
-                                        Image</button>
-                                    <input type="file" name="image" @change="updatePreview"
-                                        class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Amount</label>
+                                    <input type="text" name="data_amount" x-model="bundle.data_amount" required placeholder="1 GB"
+                                        class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Cost (GHS)</label>
+                                    <input type="number" step="0.01" name="cost_price" x-model="bundle.cost_price" required
+                                        class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
                                 </div>
                             </div>
 
-                            {{-- Decorative Background --}}
-                            <div class="absolute right-0 bottom-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
-                                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                            <div class="grid gap-4 sm:grid-cols-3">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">User Price</label>
+                                    <input type="number" step="0.01" name="price" x-model="bundle.price" required
+                                        class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Dealer</label>
+                                    <input type="number" step="0.01" name="role_prices[dealer]" x-model="bundle.role_prices.dealer"
+                                        class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Super Agent</label>
+                                    <input type="number" step="0.01" name="role_prices[super_agent]" x-model="bundle.role_prices.super_agent"
+                                        class="w-full h-11 px-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Product Visual Identity</label>
+
+                                <div class="flex items-center gap-6 p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary/30 transition-all group relative overflow-hidden">
+                                    <div class="w-24 h-24 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800 shadow-sm relative z-10">
+                                        <template x-if="previewUrl">
+                                            <img :src="previewUrl" class="w-full h-full object-cover">
+                                        </template>
+                                        <template x-if="!previewUrl">
+                                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </template>
+                                    </div>
+
+                                    <div class="space-y-2 relative z-10">
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase">Recommended: 800x600px</p>
+                                        <div class="relative">
+                                            <button type="button" class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-xs font-black uppercase tracking-tight hover:bg-primary hover:text-white transition-all">Select Image</button>
+                                            <input type="file" name="image" @change="updatePreview" class="absolute inset-0 opacity-0 cursor-pointer">
+                                        </div>
+                                    </div>
+
+                                    <div class="absolute right-0 bottom-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
+                                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
+
+                    <template x-if="!editMode">
+                        <div class="space-y-6">
+                            <template x-for="(bk, index) in bulkBundles" :key="index">
+                                <div class="relative p-5 bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
+                                    <button type="button" @click="bulkBundles.splice(index, 1)" x-show="bulkBundles.length > 1"
+                                        class="absolute top-3 right-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 p-1.5 rounded-lg transition-colors z-10">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                    
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Bundle Name</label>
+                                        <input type="text" :name="'bundles['+index+'][name]'" x-model="bk.name" required placeholder="e.g. 1GB Super Saver"
+                                            class="w-full h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                    </div>
+
+                                    <div class="grid gap-4 sm:grid-cols-2">
+                                        <div class="space-y-1.5">
+                                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Amount</label>
+                                            <input type="text" :name="'bundles['+index+'][data_amount]'" x-model="bk.data_amount" required placeholder="1 GB"
+                                                class="w-full h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Cost (GHS)</label>
+                                            <input type="number" step="0.01" :name="'bundles['+index+'][cost_price]'" x-model="bk.cost_price" required
+                                                class="w-full h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid gap-4 sm:grid-cols-3">
+                                        <div class="space-y-1.5">
+                                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">User Price</label>
+                                            <input type="number" step="0.01" :name="'bundles['+index+'][price]'" x-model="bk.price" required
+                                                class="w-full h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Dealer</label>
+                                            <input type="number" step="0.01" :name="'bundles['+index+'][role_prices][dealer]'" x-model="bk.role_prices.dealer"
+                                                class="w-full h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <label class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Super Agent</label>
+                                            <input type="number" step="0.01" :name="'bundles['+index+'][role_prices][super_agent]'" x-model="bk.role_prices.super_agent"
+                                                class="w-full h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 dark:text-white">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <button type="button" @click="bulkBundles.push({ name: '', cost_price: '', price: '', data_amount: '', role_prices: { dealer: '', super_agent: '' } })"
+                                class="w-full h-12 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                Add Another Bundle
+                            </button>
+                        </div>
+                    </template>
 
                     <button type="submit"
                         class="w-full h-12 bg-primary text-white rounded-2xl font-bold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20"

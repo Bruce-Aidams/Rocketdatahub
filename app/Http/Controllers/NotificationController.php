@@ -74,6 +74,17 @@ class NotificationController extends Controller
         ]);
     }
 
+    // Admin: Mark Admin Notification as read
+    public function markAdminNotificationAsRead(Request $request, $id)
+    {
+        $notification = \App\Models\AdminNotification::findOrFail($id);
+        $notification->update(['is_read' => true]);
+        return response()->json([
+            'message' => 'Marked as read',
+            'is_read' => true
+        ]);
+    }
+
     // Admin: Send Notification
     public function store(Request $request)
     {
