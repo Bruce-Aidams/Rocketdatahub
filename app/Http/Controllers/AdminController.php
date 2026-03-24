@@ -425,12 +425,17 @@ class AdminController extends Controller
 
             $success = $response->successful();
             $status = $response->status();
-            if ($status === 401) {
-                $message = 'Authentication failed (401). Please check your API key.';
+
+            if ($success) {
+                $message = 'Connection successful! Status: ' . $status;
+            } elseif ($status === 401 || $status === 403) {
+                $message = 'Authentication failed (' . $status . '). Please check your API key.';
+            } elseif ($status === 400 || $status === 422) {
+                $message = 'Connection failed (Bad Request - ' . $status . '). Check your endpoint and parameters.';
             } elseif ($status === 404) {
-                $message = 'Endpoint not found (404). Check the base URL.';
+                $message = 'Connection failed (404 Not Found). Check if the base URL path is fully correct.';
             } else {
-                $message = $success ? 'Connection successful! Status: ' . $status : 'Connection failed. Status: ' . $status;
+                $message = 'Connection failed. Status: ' . $status;
             }
 
             DB::table('data_integration_settings')->where('id', $settings->id)->update([
