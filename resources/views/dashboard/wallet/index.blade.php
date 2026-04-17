@@ -14,8 +14,8 @@
 
         <div class="relative z-10 space-y-8 md:space-y-12">
             {{-- Header --}}
-            {{-- Header --}}
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
                 <div class="flex items-center gap-4">
                     <div
                         class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 ring-1 ring-emerald-500/20">
@@ -339,8 +339,6 @@
                         </form>
                     </div>
                 </div>
-            </div>
-
             {{-- Recent Activity --}}
             <div
                 class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
@@ -453,6 +451,7 @@
             </div>
         </div>
     </div>
+
 
     {{-- Universal Toast --}}
     <div id="wallet-toast"

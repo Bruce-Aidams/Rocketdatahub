@@ -45,7 +45,7 @@
 
             <x-dashboard-header />
 
-            <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden animate-fade-in-up">
+            <main class="flex-1 p-4 md:p-6 lg:p-8 animate-fade-in-up">
                 @yield('content')
             </main>
         </div>

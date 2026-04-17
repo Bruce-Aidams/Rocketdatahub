@@ -313,6 +313,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'destroy'])->name('admin.orders.destroy');
         Route::get('/orders/export', [\App\Http\Controllers\OrderController::class, 'export'])->name('admin.orders.export');
         Route::put('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'update'])->name('admin.orders.update');
+        Route::post('/orders/{order}/retry', [\App\Http\Controllers\OrderController::class, 'retry'])->name('admin.orders.retry');
         Route::post('/orders/cleanup', [\App\Http\Controllers\AdminController::class, 'deleteOldOrders'])->name('admin.orders.cleanup');
 
         // Inventory/Bundles Management

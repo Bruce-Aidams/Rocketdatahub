@@ -30,6 +30,34 @@ class Order extends Model
         'cost' => 'decimal:2',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($order) {
+            $savedEventsJson = \App\Models\Setting::where('key', 'webhook_events')->first()?->value ?? '[]';
+            $savedEvents = json_decode($savedEventsJson, true);
+            
+            if (is_array($savedEvents) && in_array('Order Created', $savedEvents)) {
+                \App\Jobs\SendWebhookJob::dispatch('Order Created', $order->toArray());
+            }
+        });
+
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                $savedEventsJson = \App\Models\Setting::where('key', 'webhook_events')->first()?->value ?? '[]';
+                $savedEvents = json_decode($savedEventsJson, true);
+                if (!is_array($savedEvents)) {
+                    $savedEvents = [];
+                }
+
+                if ($order->status === 'completed' && in_array('Order Completed', $savedEvents)) {
+                    \App\Jobs\SendWebhookJob::dispatch('Order Completed', $order->toArray());
+                } elseif ($order->status === 'failed' && in_array('Order Failed', $savedEvents)) {
+                    \App\Jobs\SendWebhookJob::dispatch('Order Failed', $order->toArray());
+                }
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

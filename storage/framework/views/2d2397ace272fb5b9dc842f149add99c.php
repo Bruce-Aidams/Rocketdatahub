@@ -343,8 +343,6 @@
                         </form>
                     </div>
                 </div>
-            </div>
-
             
             <div
                 class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
@@ -459,6 +457,7 @@
 
                     </div>
                 <?php endif; ?>
+            </div>
             </div>
         </div>
     </div>

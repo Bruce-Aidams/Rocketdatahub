@@ -38,7 +38,7 @@
           $watch('isCollapsed', val => localStorage.setItem('admin_compact_sidebar', val));
       ">
 
-    <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 overflow-x-hidden">
+    <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
 
         <x-admin-sidebar />
 
@@ -47,7 +47,7 @@
 
             <x-admin-navbar />
 
-            <main class="flex-1 p-4 md:p-8 lg:p-10 overflow-x-hidden animate-fade-in-up">
+            <main class="flex-1 p-4 md:p-8 lg:p-10 animate-fade-in-up">
                 <div class="max-w-7xl mx-auto">
                     @yield('content')
                 </div>

@@ -21,18 +21,7 @@ class ApiService
         Log::info("Processing Order #{$order->id} for Bundle: {$order->bundle->name} ({$order->bundle->network})");
 
         // 1. Find active provider for the network
-        // We prioritize a provider that specifically matches the network type.
-        $provider = ApiProvider::where('network_type', $order->bundle->network)
-            ->where('is_active', true)
-            ->first();
-
-        // 2. Fallback to a universal provider (provider with null network_type) if no specific one found
-        if (!$provider) {
-            Log::info("No specific provider found for {$order->bundle->network}. Looking for universal provider.");
-            $provider = ApiProvider::whereNull('network_type')
-                ->where('is_active', true)
-                ->first();
-        }
+        $provider = $this->getProviderForOrder($order);
 
         if (!$provider) {
             Log::error("No active API provider found for network: {$order->bundle->network}");
@@ -43,9 +32,11 @@ class ApiService
 
         // 3. Construct the Request Body
         $requestBody = $this->buildRequestBody($provider, $order);
-        $headers = $provider->request_headers ?? [];
 
-        // 4. Send Request with Retries
+        // 4. Parse Headers (Important for Bearer tokens with placeholders)
+        $headers = $this->parseHeaders($provider, $order);
+
+        // 5. Send Request with Retries
         $response = Http::withHeaders($headers)
                     ->timeout($provider->timeout_seconds ?? 30)
                     ->retry($provider->retry_attempts ?? 3, 100)
@@ -81,32 +72,60 @@ class ApiService
      */
     private function buildRequestBody(ApiProvider $provider, Order $order)
     {
-        // If no template, return empty array or default structure (legacy support)
         if (empty($provider->request_body_template)) {
-            // Fallback for legacy simple providers if needed, or just return empty
             return [];
         }
 
-        $template = $provider->request_body_template;
-
-        // Define Placeholders
-        $replacements = [
-            '{{phone}}' => $order->recipient_phone,
-            '{{amount}}' => $order->bundle->data_amount, // e.g., "1GB" or raw value depending on provider needs
-            '{{network}}' => $order->bundle->network,
-            '{{request_id}}' => $order->id . '-' . time(), // Unique ID
-            '{{callback_url}}' => url('/api/webhooks/incoming'),
-            // Add other necessary placeholders here
-        ];
-
-        // Perform Replacement
-        foreach ($replacements as $key => $value) {
-            $template = str_replace($key, $value, $template);
-        }
-
-        // Decode back to array for Http client
+        $template = $this->replacePlaceholders($provider->request_body_template, $provider, $order);
         return json_decode($template, true);
     }
+
+    /**
+     * Parse headers and replace placeholders.
+     */
+    private function parseHeaders(ApiProvider $provider, Order $order)
+    {
+        $headers = $provider->request_headers ?? [];
+        if (!is_array($headers)) return [];
+
+        foreach ($headers as $key => $value) {
+            $headers[$key] = $this->replacePlaceholders($value, $provider, $order);
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Centralized placeholder replacement logic.
+     * Supports both {key} and {{key}} formats.
+     */
+    private function replacePlaceholders(string $string, ApiProvider $provider, Order $order): string
+    {
+        $dataAmount = $order->bundle->data_amount ?? '0';
+        $numericAmount = preg_replace('/[^0-9.]/', '', $dataAmount);
+
+        $replacements = [
+            'phone' => $order->recipient_phone,
+            'amount' => $numericAmount ?: $dataAmount,
+            'capacity' => $numericAmount ?: $dataAmount,
+            'network' => $order->bundle->network,
+            'request_id' => $order->id . '-' . time(),
+            'callback_url' => url('/api/webhooks/incoming'),
+            'api_key' => $provider->api_key,
+            'secret_key' => $provider->secret_key,
+        ];
+
+
+        foreach ($replacements as $key => $value) {
+            // Replace {{key}}
+            $string = str_replace('{{' . $key . '}}', $value, $string);
+            // Replace {key}
+            $string = str_replace('{' . $key . '}', $value, $string);
+        }
+
+        return $string;
+    }
+
 
     /**
      * Check if the response indicates success based on provider config.
@@ -138,5 +157,25 @@ class ApiService
     {
         $errorField = $provider->response_error_field ?? 'message';
         return data_get($response, $errorField, 'API Request Failed');
+    }
+
+    /**
+     * Find the best active provider for a given order.
+     */
+    public function getProviderForOrder(Order $order): ?ApiProvider
+    {
+        // 1. Try specific network match
+        $provider = ApiProvider::where('network_type', $order->bundle->network)
+            ->where('is_active', true)
+            ->first();
+
+        // 2. Fallback to universal provider
+        if (!$provider) {
+            $provider = ApiProvider::whereNull('network_type')
+                ->where('is_active', true)
+                ->first();
+        }
+
+        return $provider;
     }
 }

@@ -188,33 +188,47 @@ class OrderController extends Controller
         $query = Order::with(['user', 'bundle']);
 
         // Apply filters (Same as adminIndex)
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('reference', 'like', "%$search%")
-                    ->orWhere('recipient_phone', 'like', "%$search%")
-                    ->orWhereHas('user', function ($qu) use ($search) {
-                        $qu->where('name', 'like', "%$search%")
-                            ->orWhere('email', 'like', "%$search%");
-                    });
-            });
-        }
-        if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-        if ($request->filled('network') && $request->network !== 'all') {
-            $query->whereHas('bundle', function ($q) use ($request) {
-                $q->where('network', $request->network);
-            });
-        }
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        if ($request->filled('order_ids')) {
+            $ids = is_array($request->order_ids) ? $request->order_ids : explode(',', $request->order_ids);
+            $query->whereIn('id', $ids);
+        } else {
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('reference', 'like', "%$search%")
+                        ->orWhere('recipient_phone', 'like', "%$search%")
+                        ->orWhereHas('user', function ($qu) use ($search) {
+                            $qu->where('name', 'like', "%$search%")
+                                ->orWhere('email', 'like', "%$search%");
+                        });
+                });
+            }
+            if ($request->filled('status') && $request->status !== 'all') {
+                $query->where('status', $request->status);
+            }
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
+            }
+            if ($request->filled('network') && $request->network !== 'all') {
+                $query->whereHas('bundle', function ($q) use ($request) {
+                    $q->where('network', $request->network);
+                });
+            }
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+            }
         }
 
         $orders = $query->latest()->get();
+
+        // Auto-transition 'validation' to 'processing' for exported orders
+        $validationIds = $orders->where('status', 'validation')->pluck('id');
+        if ($validationIds->isNotEmpty()) {
+            Order::whereIn('id', $validationIds)->update(['status' => 'processing']);
+            // Refresh orders if we want the CSV to reflect the NEW status (processing)
+            $orders = $query->latest()->get();
+        }
+
         $filename = "orders_" . now()->format('Y-m-d_His') . ".csv";
 
         $headers = [
@@ -225,24 +239,24 @@ class OrderController extends Controller
             "Expires" => "0"
         ];
 
-        $columns = ['Date', 'Reference', 'Customer', 'Phone', 'Network', 'Bundle', 'Cost', 'Status'];
+        $columns = ['Network', 'Bundle(GB)', 'Phone'];
 
         $callback = function () use ($orders, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
             foreach ($orders as $order) {
+                // Extract numeric value from bundle name (e.g. "1GB" -> "1", "1.5GB" -> "1.5")
+                $bundleName = $order->bundle->name ?? '';
+                $gbValue = preg_replace('/[^0-9.]/', '', $bundleName);
+
                 fputcsv($file, [
-                    $order->created_at->format('Y-m-d H:i:s'),
-                    $order->reference,
-                    $order->user->name ?? 'N/A',
+                    strtoupper($order->bundle->network ?? 'N/A'),
+                    $gbValue ?: $bundleName,
                     "'" . $order->recipient_phone, // Force string in Excel
-                    $order->bundle->network ?? 'N/A',
-                    $order->bundle->name ?? 'N/A',
-                    $order->cost,
-                    strtoupper($order->status),
                 ]);
             }
+
 
             fclose($file);
         };
@@ -480,7 +494,7 @@ class OrderController extends Controller
         }
 
         $orders = DB::transaction(function () use ($user, $totalCost, $orderData, $request, $isPaystack) {
-            $status = 'pending';
+            $status = 'validation';
             if ($isPaystack)
                 $status = 'pending_payment';
             if ($request->payment_method === 'transfer')
@@ -510,8 +524,7 @@ class OrderController extends Controller
                 ]);
 
                 if ($request->payment_method === 'wallet') {
-                    // Start validation flow
-                    $order->update(['status' => 'validation']);
+                    // Already set to validation above
                 }
 
                 $createdOrders[] = $order;
@@ -589,7 +602,7 @@ class OrderController extends Controller
             'user_id' => 'required|exists:users,id',
             'bundle_id' => 'required|exists:bundles,id',
             'recipient_phone' => ['required', 'string', new GhanaPhoneValidation()],
-            'status' => 'required|in:pending,processing,completed,failed',
+            'status' => 'required|in:validation,processing,delivered,failed',
         ]);
 
         $user = User::findOrFail($request->user_id);
@@ -607,14 +620,14 @@ class OrderController extends Controller
                 'reference' => 'ORD-ADM-' . strtoupper(Str::random(12)),
             ]);
 
-            if ($request->status === 'completed') {
+            if ($request->status === 'delivered') {
                 $order->complete(['method' => 'admin_manual']);
             }
 
             return $order;
         });
 
-        if ($order->status === 'pending' || $order->status === 'processing') {
+        if ($order->status === 'validation' || $order->status === 'processing') {
             ProcessOrder::dispatch($order);
         }
 
@@ -670,4 +683,19 @@ class OrderController extends Controller
 
         return response()->json(['message' => 'Order deleted successfully.']);
     }
+
+    /**
+     * Admin: Retry Order
+     */
+    public function retry(Order $order)
+    {
+        // Force status back to processing
+        $order->update(['status' => 'processing']);
+        
+        // Re-dispatch the job
+        ProcessOrder::dispatch($order);
+
+        return response()->json(['message' => 'Order re-queued for processing.']);
+    }
 }
+

@@ -83,7 +83,7 @@
 <?php unset($__componentOriginald37f1b809d8dad08d9600a37cd72bf8e); ?>
 <?php endif; ?>
 
-            <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden animate-fade-in-up">
+            <main class="flex-1 p-4 md:p-6 lg:p-8 animate-fade-in-up">
                 <?php echo $__env->yieldContent('content'); ?>
             </main>
         </div>

@@ -38,7 +38,7 @@
           $watch('isCollapsed', val => localStorage.setItem('admin_compact_sidebar', val));
       ">
 
-    <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 overflow-x-hidden">
+    <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
 
         <?php if (isset($component)) { $__componentOriginal6fc2d165f80d597f34aa0f8014c366d2 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal6fc2d165f80d597f34aa0f8014c366d2 = $attributes; } ?>
@@ -85,7 +85,7 @@
 <?php unset($__componentOriginal06600c18cadf0581659ec97dd74972b4); ?>
 <?php endif; ?>
 
-            <main class="flex-1 p-4 md:p-8 lg:p-10 overflow-x-hidden animate-fade-in-up">
+            <main class="flex-1 p-4 md:p-8 lg:p-10 animate-fade-in-up">
                 <div class="max-w-7xl mx-auto">
                     <?php echo $__env->yieldContent('content'); ?>
                 </div>

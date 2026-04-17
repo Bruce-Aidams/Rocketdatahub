@@ -68,9 +68,9 @@
                             <div class="relative group">
                                 <select name="status" required 
                                         class="w-full h-14 px-5 bg-white dark:bg-slate-950 border-none rounded-2xl text-sm font-bold text-slate-900 dark:text-white shadow-sm focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer">
-                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Validating (Pending)</option>
+                                    <option value="validation" {{ $order->status == 'validation' ? 'selected' : '' }}>Validating</option>
                                     <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
-                                    <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Completed (Delivered)</option>
+                                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
                                     <option value="failed" {{ $order->status == 'failed' ? 'selected' : '' }}>Failed</option>
                                 </select>
                                 <svg class="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">

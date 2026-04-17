@@ -500,36 +500,81 @@
                         </div>
                     </div>
 
-                    <div
-                        class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                        <h5 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-5">
-                            Events to Monitor</h5>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <?php $__currentLoopData = ['Order Created', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $event): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <label
-                                    class="flex items-center p-3.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer hover:border-primary/50 transition-all group">
-                                    <input type="checkbox"
-                                        class="w-4 h-4 text-primary rounded-md border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-primary/20">
-                                    <span
-                                        class="ml-3 text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors"><?php echo e($event); ?></span>
-                                </label>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <div
+                            class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <h5 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-5">
+                                Events to Monitor</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <?php
+                                    $savedEventsJson = \App\Models\Setting::where('key', 'webhook_events')->first()?->value ?? '[]';
+                                    $savedEvents = json_decode($savedEventsJson, true) ?? [];
+                                    if (!is_array($savedEvents)) $savedEvents = [];
+
+                                    $availableEventsJson = \App\Models\Setting::where('key', 'available_webhook_events')->first()?->value;
+                                    if (!$availableEventsJson) {
+                                        $availableEvents = ['Order Created', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment'];
+                                    } else {
+                                        $availableEvents = json_decode($availableEventsJson, true) ?? [];
+                                    }
+                                ?>
+                                <div id="events-data" data-available="<?php echo e(json_encode($availableEvents)); ?>" class="hidden"></div>
+                                <?php $__currentLoopData = $availableEvents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $event): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <label
+                                        class="flex items-center p-3.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer hover:border-primary/50 transition-all group">
+                                        <input type="checkbox" name="webhook_events[]" value="<?php echo e($event); ?>" <?php echo e(in_array($event, $savedEvents) ? 'checked' : ''); ?>
+
+                                            class="w-4 h-4 text-primary rounded-md border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-primary/20">
+                                        <span
+                                            class="ml-3 text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors"><?php echo e($event); ?></span>
+                                    </label>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+
+                            <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/50 flex flex-col sm:flex-row items-center gap-3">
+                                <input type="text" id="new_custom_event_name" placeholder="Define Custom Event Name..."
+                                    class="w-full sm:w-64 h-11 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20 dark:text-white transition-all">
+                                <button type="button"
+                                    @click="async () => {
+                                        const newEvName = document.getElementById('new_custom_event_name').value.trim();
+                                        if (!newEvName) return;
+                                        let evs = JSON.parse(document.getElementById('events-data').dataset.available);
+                                        if (evs.includes(newEvName)) {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Event already exists', type: 'error' } }));
+                                            return;
+                                        }
+                                        evs.push(newEvName);
+                                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+                                            body: JSON.stringify({ settings: { available_webhook_events: JSON.stringify(evs) } })
+                                        });
+                                        if(response.ok) {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Custom event successfully added!', type: 'success' } }));
+                                            setTimeout(() => window.location.reload(), 600);
+                                        } else {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to add custom event.', type: 'error' } }));
+                                        }
+                                    }"
+                                    class="w-full sm:w-auto h-11 px-6 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-700 dark:hover:bg-white transition-all whitespace-nowrap">
+                                    Add Event
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
                     <div class="pt-4">
                         <button type="button"
                             @click="async () => {
-                                                                                                                                                                                                                        const url = document.getElementById('webhook_url').value;
-                                                                                                                                                                                                                        const secret = document.getElementById('webhook_secret').value;
-                                                                                                                                                                                                                        const response = await fetch('<?php echo e(route('admin.settings.update')); ?>', {
-                                                                                                                                                                                                                            method: 'PUT',
-                                                                                                                                                                                                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                                                                                                                                                                                                                            body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret } })
-                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                        if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
-                                                                                                                                                                                                                        else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
-                                                                                                                                                                                                                    }"
+    const url = document.getElementById('webhook_url').value;
+    const secret = document.getElementById('webhook_secret').value;
+    const selectedEvents = Array.from(document.querySelectorAll(`input[name='webhook_events[]']:checked`)).map(cb => cb.value);
+    const response = await fetch('<?php echo e(route("admin.settings.update")); ?>', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+        body: JSON.stringify({ settings: { webhook_url: url, webhook_secret: secret, webhook_events: JSON.stringify(selectedEvents) } })
+    });
+    if(response.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Webhook configuration synchronized!', type: 'success' } }));
+    else window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Failed to save webhook settings.', type: 'error' } }));
+}"
                             class="h-12 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-bold text-xs uppercase shadow-lg shadow-emerald-500/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-3 border-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"

@@ -9,6 +9,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Models\AdminNotification;
 use App\Services\ApiService;
 
 class ProcessOrder implements ShouldQueue
@@ -38,21 +40,32 @@ class ProcessOrder implements ShouldQueue
 
         Log::info("Processing Order ID: " . $this->order->id . " (Current Status: " . $this->order->status . ")");
 
-        // Transition from validation/pending to processing
-        $this->order->update(['status' => 'processing']);
-
         try {
+            // Check for provider availability first
+            $provider = $apiService->getProviderForOrder($this->order);
+            
+            if (!$provider) {
+                Log::info("No active API provider found for Order ID: " . $this->order->id . ". This may be a manual order. Keeping status as: " . $this->order->status);
+                return;
+            }
+
+            // Transition from validation to processing only when provider exists
+            $this->order->update(['status' => 'processing']);
+
             $result = $apiService->processOrder($this->order);
 
             if ($result['success']) {
                 $this->order->complete($result);
                 Log::info("Order ID: " . $this->order->id . " delivered successfully via API.");
             } else {
+                $errorMessage = $result['message'] ?? 'Unknown API error';
                 $this->order->update([
                     'status' => 'failed',
                     'response_data' => $result
                 ]);
-                Log::warning("Order ID: " . $this->order->id . " failed API processing. Message: " . ($result['message'] ?? 'Unknown error'));
+                
+                $this->notifyAdmins("Order #{$this->order->reference} Failed", "Customer: {$this->order->recipient_phone}. Error: {$errorMessage}");
+                Log::warning("Order ID: " . $this->order->id . " failed API processing. Message: " . $errorMessage);
             }
         } catch (\Exception $e) {
             Log::error("Order ID: " . $this->order->id . " exception: " . $e->getMessage());
@@ -60,6 +73,25 @@ class ProcessOrder implements ShouldQueue
                 'status' => 'failed',
                 'response_data' => ['error' => $e->getMessage()]
             ]);
+            $this->notifyAdmins("Order #{$this->order->reference} Exception", $e->getMessage());
+        }
+    }
+
+    /**
+     * Notify all administrators
+     */
+    private function notifyAdmins(string $title, string $message): void
+    {
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            AdminNotification::create([
+                'user_id' => $admin->id,
+                'title' => $title,
+                'message' => $message,
+                'type' => 'error',
+                'is_read' => false
+            ]);
         }
     }
 }
+

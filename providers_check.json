@@ -1,0 +1,26 @@
+[
+    {
+        "id": 2,
+        "name": "MTN Data",
+        "base_url": "https:\/\/megabytehub.store\/api\/create_order.php",
+        "api_key": "UL3flzBLSUfA0lkUvbtr1Jja3b4x0mVz",
+        "secret_key": "UL3flzBLSUfA0lkUvbtr1Jja3b4x0mVz",
+        "is_active": true,
+        "created_at": "2026-02-05T22:58:49.000000Z",
+        "updated_at": "2026-03-23T22:58:08.000000Z",
+        "webhook_url": null,
+        "network_type": "MTN",
+        "request_method": "POST",
+        "request_headers": {
+            "Content-Type": "application\/json",
+            "Authorization": "Bearer {UL3flzBLSUfA0lkUvbtr1Jja3b4x0mVz}"
+        },
+        "request_body": null,
+        "timeout_seconds": 30,
+        "retry_attempts": 3,
+        "request_body_template": "{\"phoneNumber\": \"{phone}\", \"capacity\": \"{capacity}\"}",
+        "response_success_field": "success",
+        "response_data_field": "data",
+        "response_error_field": "error"
+    }
+]

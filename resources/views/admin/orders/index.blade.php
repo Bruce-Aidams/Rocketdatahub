@@ -45,15 +45,25 @@
                     New Order
                 </a>
 
+                {{-- Download Selected --}}
+                <button type="button" id="downloadSelectedBtn" onclick="downloadSelected()" disabled
+                    class="h-10 px-5 bg-indigo-600 text-white rounded-xl font-bold text-xs opacity-50 cursor-not-allowed hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Download Selected
+                </button>
+
                 {{-- Export --}}
-                <a href="{{ route('admin.orders.export', request()->all()) }}"
+                <button type="button" onclick="exportAll()"
                     class="h-10 px-5 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Export
-                </a>
+                    Export All
+                </button>
             </div>
         </div>
 
@@ -193,6 +203,10 @@
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                         <tr>
+                            <th class="w-10 px-5 py-3.5">
+                                <input type="checkbox" id="selectAll"
+                                    class="w-4 h-4 text-primary rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-primary/20 transition-all">
+                            </th>
                             <th class="px-5 py-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Order
                             </th>
                             <th class="px-5 py-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer
@@ -214,6 +228,12 @@
                         @forelse($orders as $order)
                             <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors group"
                                 id="order-row-{{ $order->id }}">
+
+                                {{-- Select --}}
+                                <td class="px-5 py-3.5">
+                                    <input type="checkbox" name="order_ids[]" value="{{ $order->id }}"
+                                        class="order-checkbox w-4 h-4 text-primary rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-primary/20 transition-all">
+                                </td>
 
                                 {{-- Order ID + Date --}}
                                 <td class="px-5 py-3.5">
@@ -278,13 +298,23 @@
                                     </select>
                                 </td>
 
-                                {{-- Actions --}}
                                 <td class="px-5 py-3.5">
-                                    <div class="flex items-center justify-center gap-1.5">
+                                    <div class="flex items-center justify-center gap-2">
+                                        {{-- Retry (only for failed) --}}
+                                        @if($order->status === 'failed')
+                                            <button onclick="retryOrder({{ $order->id }})" title="Retry Processing"
+                                                class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-slate-400 hover:text-emerald-600 transition-all flex items-center justify-center">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                            </button>
+                                        @endif
+
                                         {{-- Edit --}}
                                         <a href="{{ route('admin.orders.edit', $order->id) }}" title="Edit Order"
                                             class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-primary/10 text-slate-400 hover:text-primary transition-all flex items-center justify-center">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
@@ -293,7 +323,7 @@
                                         {{-- Delete --}}
                                         <button onclick="deleteOrder({{ $order->id }})" title="Delete Order"
                                             class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-400 hover:text-rose-600 transition-all flex items-center justify-center">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -303,7 +333,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-20 text-center">
+                                <td colspan="7" class="px-6 py-20 text-center">
                                     <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-600">
                                         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -338,7 +368,7 @@
 
     @push('scripts')
         <script>
-            // Filter helper — updates the URL and reload          s
+            // Filter helper — updates the URL and reload
             function filterBy(key, value) {
                 const url = new URL(window.location.href);
                 if (value === 'all' || value === '') {
@@ -349,6 +379,55 @@
                 url.searchParams.delete('page');
                 window.location.href = url.href;
             }
+
+            // Bulk Selection Logic
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.order-checkbox');
+            const downloadBtn = document.getElementById('downloadSelectedBtn');
+
+            function toggleDownloadBtn() {
+                const selectedCount = document.querySelectorAll('.order-checkbox:checked').length;
+                if (selectedCount > 0) {
+                    downloadBtn.disabled = false;
+                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    downloadBtn.disabled = true;
+                    downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => {
+                        cb.checked = this.checked;
+                    });
+                    toggleDownloadBtn();
+                });
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', toggleDownloadBtn);
+            });
+
+            function downloadSelected() {
+                const selectedIds = Array.from(document.querySelectorAll('.order-checkbox:checked'))
+                    .map(cb => cb.value);
+
+                if (selectedIds.length === 0) return;
+
+                const url = new URL('{{ route("admin.orders.export") }}');
+                url.searchParams.set('order_ids', selectedIds.join(','));
+
+                // Open in new tab or direct download
+                window.location.href = url.href;
+
+                // Optional: Refresh after a delay to show updated status
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Download initiated. Statuses updated to processing.', type: 'success' } }));
+                    setTimeout(() => window.location.reload(), 2000);
+                }, 1000);
+            }
+
 
             // Search on Enter
             document.getElementById('searchInput').addEventListener('keypress', function (e) {
@@ -379,6 +458,7 @@
                     });
                     if (response.ok) {
                         window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Order status updated.', type: 'success' } }));
+                        setTimeout(() => window.location.reload(), 1000);
                     } else {
                         const data = await response.json();
                         window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Update failed', type: 'error' } }));
@@ -388,7 +468,30 @@
                 }
             }
 
+            // Retry order
+            async function retryOrder(orderId) {
+                try {
+                    const response = await fetch(`{{ url('admin/orders') }}/${orderId}/retry`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Order re-queued for processing.', type: 'success' } }));
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        const data = await response.json();
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Retry failed', type: 'error' } }));
+                    }
+                } catch (e) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Network error', type: 'error' } }));
+                }
+            }
+
             // Delete order
+
             async function deleteOrder(orderId) {
                 if (!confirm('Delete this order? This will also remove associated transactions and cannot be undone.')) return;
                 try {
@@ -410,6 +513,17 @@
                 } catch (e) {
                     window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Network error', type: 'error' } }));
                 }
+            }
+
+            function exportAll() {
+                const url = new URL('{{ route("admin.orders.export", request()->all()) }}');
+                window.location.href = url.href;
+                
+                // Refresh after a delay to show updated status (since export transitions validation to processing)
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Export initiated. Refreshing list...', type: 'success' } }));
+                    setTimeout(() => window.location.reload(), 2000);
+                }, 1000);
             }
         </script>
     @endpush
