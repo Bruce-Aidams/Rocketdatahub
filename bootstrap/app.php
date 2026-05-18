@@ -32,7 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified_only' => \App\Http\Middleware\VerifiedUserOnly::class,
         ]);
 
-        $middleware->throttleApi('api', 60);
+        // $middleware->throttleApi('api', 60);
 
         $middleware->group('auth_throttle', [
             // Throttling disabled for local development to prevent timeout issues

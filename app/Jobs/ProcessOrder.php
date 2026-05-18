@@ -55,8 +55,20 @@ class ProcessOrder implements ShouldQueue
             $result = $apiService->processOrder($this->order);
 
             if ($result['success']) {
-                $this->order->complete($result);
-                Log::info("Order ID: " . $this->order->id . " delivered successfully via API.");
+                $rawResponse = $result['raw_response'] ?? [];
+                $vendorStatus = strtolower($rawResponse['status'] ?? $rawResponse['data']['status'] ?? 'completed');
+
+                if (in_array($vendorStatus, ['pending', 'processing', 'queued'])) {
+                    // Update response data but keep status as processing (do not call complete() yet)
+                    $this->order->update([
+                        'status' => 'processing',
+                        'response_data' => $result
+                    ]);
+                    Log::info("Order ID: " . $this->order->id . " is pending/processing on vendor site. Kept in processing state for sync worker.");
+                } else {
+                    $this->order->complete($result);
+                    Log::info("Order ID: " . $this->order->id . " delivered successfully via API.");
+                }
             } else {
                 $errorMessage = $result['message'] ?? 'Unknown API error';
                 $this->order->update([

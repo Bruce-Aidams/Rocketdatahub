@@ -123,4 +123,13 @@ class Order extends Model
             }
         }
     }
+
+    public static function generateReference($prefix = 'ORD-')
+    {
+        $dateStr = date('Ymd');
+        do {
+            $ref = $prefix . $dateStr . '-' . rand(100000, 999999);
+        } while (static::where('reference', $ref)->exists());
+        return $ref;
+    }
 }

@@ -84,7 +84,7 @@ class StorefrontPaymentController extends Controller
             'cost_price' => $costToReseller,
             'profit' => $profit,
             'status' => 'pending_payment',
-            'reference' => 'STR-' . Str::uuid(),
+            'reference' => Order::generateReference('STR-'),
             'payment_method' => 'paystack',
             'source' => 'storefront',
         ]);
@@ -195,7 +195,7 @@ class StorefrontPaymentController extends Controller
 
             // 1. Finalize Order
             $order->update([
-                'status' => 'pending',
+                'status' => 'validation',
                 'payment_reference' => $data['reference'],
                 'response_data' => $data
             ]);

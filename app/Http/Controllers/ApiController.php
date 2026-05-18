@@ -165,18 +165,84 @@ class ApiController extends Controller
             $timeout = $validated['timeout_seconds'] ?? 30;
             $headers = [];
 
+            $apiKey = $validated['api_key'] ?? '';
+            $secretKey = $validated['secret_key'] ?? '';
+
+            // Resolve from env if it matches an env variable name
+            if (!empty($apiKey) && env($apiKey) !== null) {
+                $apiKey = env($apiKey);
+            }
+            if (!empty($secretKey) && env($secretKey) !== null) {
+                $secretKey = env($secretKey);
+            }
+
+            // 1. Look for a validating order first
+            $order = \App\Models\Order::where('status', 'validation')->latest()->first();
+
+            // 2. If none, check if there's any active job in the queue table and find its corresponding order
+            if (!$order && \Schema::hasTable('jobs')) {
+                $job = \DB::table('jobs')->latest()->first();
+                if ($job && !empty($job->payload)) {
+                    try {
+                        $payload = json_decode($job->payload, true);
+                        $command = $payload['data']['command'] ?? null;
+                        if ($command) {
+                            $unserialized = unserialize($command);
+                            if ($unserialized && isset($unserialized->order)) {
+                                $order = $unserialized->order;
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Safe fallback if decoding/unserializing fails
+                    }
+                }
+            }
+
+            // 3. Fallback to processing, pending, failed, or just the absolute latest order
+            if (!$order) {
+                $order = \App\Models\Order::whereIn('status', ['processing', 'pending', 'failed'])->latest()->first()
+                    ?? \App\Models\Order::latest()->first();
+            }
+
+            $dataAmount = $order?->bundle?->data_amount ?? '1GB';
+            $numericAmount = preg_replace('/[^0-9.]/', '', $dataAmount) ?: $dataAmount;
+            $phone = $order?->recipient_phone ?? '0551518931';
+            $network = $order?->bundle?->network ?? 'MTN';
+            $requestId = ($order?->id ?? 'TEST') . '-' . time();
+
+            $replacements = [
+                'phone' => $phone,
+                'amount' => $numericAmount,
+                'capacity' => $numericAmount,
+                'network' => $network,
+                'request_id' => $requestId,
+                'callback_url' => url('/api/webhooks/incoming'),
+                'api_key' => $apiKey,
+                'secret_key' => $secretKey,
+            ];
+
+            $replaceFn = function($str) use ($replacements) {
+                if (empty($str)) return $str;
+                foreach ($replacements as $key => $value) {
+                    $str = str_replace('{{' . $key . '}}', $value, $str);
+                    $str = str_replace('{' . $key . '}', $value, $str);
+                }
+                return $str;
+            };
+
             // Parse headers if provided
             if (!empty($validated['request_headers'])) {
                 $parsedHeaders = json_decode($validated['request_headers'], true);
                 if (is_array($parsedHeaders)) {
                     foreach ($parsedHeaders as $key => $value) {
+                        $value = $replaceFn($value);
                         $headers[] = "$key: $value";
                     }
                 }
             }
 
             // Automatically add API Key if provided and not already in headers
-            if (!empty($validated['api_key'])) {
+            if (!empty($apiKey)) {
                 $hasApiKeyToken = false;
                 foreach ($headers as $h) {
                     if (stripos($h, 'Authorization') === 0 || stripos($h, 'X-API-KEY') === 0 || stripos($h, 'api-key') === 0) {
@@ -185,14 +251,17 @@ class ApiController extends Controller
                     }
                 }
                 if (!$hasApiKeyToken) {
-                    $headers[] = "X-API-KEY: " . $validated['api_key'];
-                    $headers[] = "Authorization: Bearer " . $validated['api_key'];
+                    $headers[] = "X-API-KEY: " . $apiKey;
+                    $headers[] = "Authorization: Bearer " . $apiKey;
                 }
             }
 
+            // Resolve placeholders in the Base URL
+            $url = $replaceFn($validated['base_url']);
+
             // Initialize cURL
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $validated['base_url']);
+            curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $validated['request_method']);
@@ -207,13 +276,7 @@ class ApiController extends Controller
                 $bodyString = $validated['request_body'] ?? $validated['request_body_template'] ?? null;
 
                 if (!empty($bodyString)) {
-                    // Inject placeholders if body is a template
-                    if (!empty($validated['api_key'])) {
-                        $bodyString = str_replace('{api_key}', $validated['api_key'], $bodyString);
-                    }
-                    if (!empty($validated['secret_key'])) {
-                        $bodyString = str_replace('{secret_key}', $validated['secret_key'], $bodyString);
-                    }
+                    $bodyString = $replaceFn($bodyString);
 
                     // Try to decode to ensure valid JSON, or send as string if not
                     $body = json_decode($bodyString, true);

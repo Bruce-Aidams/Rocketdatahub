@@ -144,3 +144,29 @@ Route::get('/system/status', function () {
         'message' => \App\Models\Setting::where('key', 'site_alert_message')->value('value')
     ]);
 });
+
+// Mock Vending Partner API for Local Connection and Flow Testing
+Route::post('/mock-vendor', function (Illuminate\Http\Request $request) {
+    $apiKey = $request->header('X-API-Key') ?? str_replace('Bearer ', '', $request->header('Authorization'));
+    
+    if (!$apiKey) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized: Missing API Key in headers (X-API-Key or Authorization)'
+        ], 401);
+    }
+
+    $body = $request->all();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Mock order processed successfully!',
+        'data' => [
+            'status' => 'delivered',
+            'transaction_id' => 'MOCK-' . strtoupper(Illuminate\Support\Str::random(12)),
+            'phone' => $body['phone'] ?? $body['recipient_phone'] ?? $body['phoneNumber'] ?? '0551518932',
+            'amount' => $body['amount'] ?? '100',
+            'reference' => 'REF-' . strtoupper(Illuminate\Support\Str::random(8))
+        ]
+    ]);
+});

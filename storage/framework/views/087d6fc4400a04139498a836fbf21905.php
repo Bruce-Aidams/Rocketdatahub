@@ -94,8 +94,8 @@
                 <?php
                     $statusMap = [
                         'all' => 'All',
-                        'pending_payment' => 'Pending Payment',
-                        'awaiting_transfer' => 'Awaiting Transfer',
+                        #'pending_payment' => 'Pending Payment',
+                        # 'awaiting_transfer' => 'Awaiting Transfer',
                         'validation' => 'Validating',
                         'processing' => 'Processing',
                         'delivered' => 'Delivered',
@@ -106,7 +106,7 @@
                 <?php $__currentLoopData = $statusMap; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <button onclick="filterBy('status', '<?php echo e($val); ?>')"
                         class="px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all whitespace-nowrap
-                                                                            <?php echo e($activeStatus === $val ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'); ?>">
+                                                                                                                            <?php echo e($activeStatus === $val ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'); ?>">
                         <?php echo e($label); ?>
 
                     </button>
@@ -155,7 +155,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
             
             <div class="p-4 rounded-2xl border shadow-sm flex items-center justify-between cursor-pointer hover:scale-[1.02] active:scale-95 transition-all
-                            <?php echo e($activeNetwork === 'all' ? 'border-primary ring-2 ring-primary/30 bg-primary/5 text-primary' : 'border-primary/20 bg-primary/5 text-primary'); ?>"
+                                                    <?php echo e($activeNetwork === 'all' ? 'border-primary ring-2 ring-primary/30 bg-primary/5 text-primary' : 'border-primary/20 bg-primary/5 text-primary'); ?>"
                 onclick="filterBy('network', 'all')">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Total</p>
@@ -181,7 +181,7 @@
                 ?>
                 <?php if($count > 0): ?>
                     <div class="p-4 rounded-2xl border shadow-sm flex items-center justify-between cursor-pointer transition-all
-                                                <?php echo e($isActive ? 'ring-4 scale-[1.02]' : 'hover:scale-[1.02] active:scale-95'); ?>"
+                                                                                                                        <?php echo e($isActive ? 'ring-4 scale-[1.02]' : 'hover:scale-[1.02] active:scale-95'); ?>"
                         style="<?php echo e($cardStyle); ?> <?php echo e($isActive ? 'ring-color:rgba(255,255,255,0.4);' : ''); ?>"
                         onclick="filterBy('network', '<?php echo e($net); ?>')">
                         <div>
@@ -210,7 +210,7 @@
                                 <input type="checkbox" id="selectAll"
                                     class="w-4 h-4 text-primary rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-primary/20 transition-all">
                             </th>
-                            <th class="px-5 py-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Order
+                            <th class="px-5 py-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Orders
                             </th>
                             <th class="px-5 py-3.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer
                             </th>
@@ -241,7 +241,9 @@
                                 
                                 <td class="px-5 py-3.5">
                                     <p class="font-mono text-xs font-bold text-primary">
-                                        #<?php echo e(strtoupper(substr($order->reference, 4, 10))); ?></p>
+                                        <?php echo e($order->reference); ?>
+
+                                    </p>
                                     <p class="text-[10px] text-slate-400 mt-0.5"><?php echo e($order->created_at->format('d M, H:i')); ?>
 
                                     </p>
@@ -406,7 +408,7 @@
             }
 
             if (selectAll) {
-                selectAll.addEventListener('change', function() {
+                selectAll.addEventListener('change', function () {
                     checkboxes.forEach(cb => {
                         cb.checked = this.checked;
                     });
@@ -527,7 +529,7 @@
             function exportAll() {
                 const url = new URL('<?php echo e(route("admin.orders.export", request()->all())); ?>');
                 window.location.href = url.href;
-                
+
                 // Refresh after a delay to show updated status (since export transitions validation to processing)
                 setTimeout(() => {
                     window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Export initiated. Refreshing list...', type: 'success' } }));

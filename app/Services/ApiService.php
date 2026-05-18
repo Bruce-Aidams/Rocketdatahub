@@ -37,17 +37,42 @@ class ApiService
         $headers = $this->parseHeaders($provider, $order);
 
         // 5. Send Request with Retries
+        $url = $this->replacePlaceholders($provider->base_url, $provider, $order);
         $response = Http::withHeaders($headers)
                     ->timeout($provider->timeout_seconds ?? 30)
                     ->retry($provider->retry_attempts ?? 3, 100)
-            ->{$provider->request_method ?? 'POST'}($provider->base_url, $requestBody);
+                    ->when(app()->environment('local'), function ($http) {
+                        return $http->withoutVerifying();
+                    })
+            ->{$provider->request_method ?? 'POST'}($url, $requestBody);
 
         // 5. Handle Response
-        $responseData = $response->json();
+        $responseData = $response->json() ?? [];
+        $statusCode = $response->status();
 
         Log::info("API Response for Order #{$order->id}: " . json_encode($responseData));
 
-        if ($response->successful() && $this->isSuccess($provider, $responseData)) {
+        $errorMessage = null;
+        $isSuccess = $response->successful() && $this->isSuccess($provider, $responseData);
+        if (!$isSuccess) {
+            $errorMessage = $this->extractError($provider, $responseData) ?? 'Unknown error from provider';
+        }
+
+        // Log this transaction for administrative transparency
+        try {
+            \App\Models\ApiLog::create([
+                'provider_id' => $provider->id,
+                'endpoint' => $url,
+                'method' => $provider->request_method ?? 'POST',
+                'status_code' => $statusCode,
+                'response' => json_encode($responseData),
+                'error_message' => $errorMessage
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Failed to write ApiLog: " . $e->getMessage());
+        }
+
+        if ($isSuccess) {
             return [
                 'success' => true,
                 'data' => $this->extractData($provider, $responseData),
@@ -56,7 +81,6 @@ class ApiService
             ];
         }
 
-        $errorMessage = $this->extractError($provider, $responseData) ?? 'Unknown error from provider';
         Log::error("Order #{$order->id} failed via {$provider->name}: $errorMessage");
 
         return [
@@ -104,6 +128,16 @@ class ApiService
         $dataAmount = $order->bundle->data_amount ?? '0';
         $numericAmount = preg_replace('/[^0-9.]/', '', $dataAmount);
 
+        $apiKey = $provider->api_key;
+        if (!empty($apiKey) && env($apiKey) !== null) {
+            $apiKey = env($apiKey);
+        }
+
+        $secretKey = $provider->secret_key;
+        if (!empty($secretKey) && env($secretKey) !== null) {
+            $secretKey = env($secretKey);
+        }
+
         $replacements = [
             'phone' => $order->recipient_phone,
             'amount' => $numericAmount ?: $dataAmount,
@@ -111,8 +145,8 @@ class ApiService
             'network' => $order->bundle->network,
             'request_id' => $order->id . '-' . time(),
             'callback_url' => url('/api/webhooks/incoming'),
-            'api_key' => $provider->api_key,
-            'secret_key' => $provider->secret_key,
+            'api_key' => $apiKey,
+            'secret_key' => $secretKey,
         ];
 
 

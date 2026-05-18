@@ -236,9 +236,16 @@
 
                                 <div class="relative group/field">
                                     <input type="number" step="0.01" name="price"
-                                        value="{{ number_format($bundle->custom_price, 2, '.', '') }}" required
+                                        value="{{ number_format($bundle->custom_price, 2, '.', '') }}"
+                                        min="{{ number_format($bundle->price, 2, '.', '') }}" required
                                         class="w-full h-12 pl-4 pr-4 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-lg font-black tabular-nums focus:ring-2 focus:ring-primary/20 text-slate-900 dark:text-white shadow-inner transition-colors">
                                 </div>
+                                <p class="text-[9px] font-bold text-amber-500 mt-1.5 uppercase tracking-wider flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                    Min Retail Price: ₵{{ number_format($bundle->price, 2) }}
+                                </p>
                             </div>
 
                             <button type="submit"

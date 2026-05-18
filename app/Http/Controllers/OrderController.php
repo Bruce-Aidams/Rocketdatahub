@@ -121,14 +121,17 @@ class OrderController extends Controller
             $summaryQuery->where('status', $request->status);
         }
 
-        // Reseller Filter (Storefront Customers Only)
+        // Reseller Filter (Both Referred Users' Orders AND Storefront Guest Orders)
         if ($request->filled('reseller_id')) {
             $resellerId = $request->reseller_id;
+            $referralIds = User::where('referred_by_id', $resellerId)->pluck('id');
 
-            // Only show storefront orders (guest purchases on reseller's store)
-            $resellerFilter = function ($q) use ($resellerId) {
-                $q->where('user_id', $resellerId)
-                    ->where('source', 'storefront');
+            $resellerFilter = function ($q) use ($resellerId, $referralIds) {
+                $q->whereIn('user_id', $referralIds)
+                    ->orWhere(function ($sub) use ($resellerId) {
+                        $sub->where('user_id', $resellerId)
+                            ->where('source', 'storefront');
+                    });
             };
 
             $query->where($resellerFilter);
@@ -293,7 +296,7 @@ class OrderController extends Controller
                     'cost' => $price,
                     'cost_price' => $bundle->cost_price ?? 0,
                     'status' => 'validation',
-                    'reference' => 'ORD-' . Str::uuid(),
+                    'reference' => Order::generateReference(),
                 ]);
 
                 $user->decrement('wallet_balance', $price);
@@ -330,7 +333,7 @@ class OrderController extends Controller
                 'cost' => $price,
                 'cost_price' => $bundle->cost_price ?? 0,
                 'status' => 'pending_payment',
-                'reference' => 'ORD-' . Str::uuid(),
+                'reference' => Order::generateReference(),
             ]);
 
             $initData = [
@@ -364,7 +367,7 @@ class OrderController extends Controller
                 'cost' => $price,
                 'cost_price' => $bundle->cost_price ?? 0,
                 'status' => 'awaiting_transfer',
-                'reference' => 'ORD-' . Str::uuid(),
+                'reference' => Order::generateReference(),
             ]);
 
             $msg = 'Order submitted. Please upload proof of payment in the Finance Hub to complete processing.';
@@ -520,7 +523,7 @@ class OrderController extends Controller
                     'cost' => $data['price'],
                     'cost_price' => $data['bundle']->cost_price ?? 0,
                     'status' => $status,
-                    'reference' => 'ORD-' . Str::uuid(),
+                    'reference' => Order::generateReference(),
                 ]);
 
                 if ($request->payment_method === 'wallet') {
@@ -617,7 +620,7 @@ class OrderController extends Controller
                 'cost' => $price,
                 'cost_price' => $bundle->cost_price ?? 0,
                 'status' => $request->status,
-                'reference' => 'ORD-ADM-' . strtoupper(Str::random(12)),
+                'reference' => Order::generateReference('ORD-ADM-'),
             ]);
 
             if ($request->status === 'delivered') {

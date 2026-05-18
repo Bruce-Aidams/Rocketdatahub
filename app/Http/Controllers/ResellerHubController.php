@@ -111,12 +111,11 @@ class ResellerHubController extends Controller
         $user = $this->getResellerUser();
         $bundle = Bundle::findOrFail($request->bundle_id);
 
-        // Reseller can't set price lower than their cost
-        $rolePrices = $bundle->role_prices ?: [];
-        $cost = $rolePrices[$user->role] ?? $bundle->price;
+        // Reseller can't set price lower than the main base price set by admin
+        $basePrice = (float) $bundle->price;
 
-        if ($request->price < $cost) {
-            return back()->with('error', 'Selling price cannot be lower than your cost (GHC ' . number_format($cost, 2) . ')');
+        if ((float) $request->price < $basePrice) {
+            return back()->with('error', 'Selling price cannot be lower than the main base price set by Admin (GHC ' . number_format($basePrice, 2) . ')');
         }
 
         ResellerPrice::updateOrCreate(

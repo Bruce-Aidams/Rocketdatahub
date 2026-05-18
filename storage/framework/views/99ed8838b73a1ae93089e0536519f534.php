@@ -198,7 +198,8 @@
                                     <td class="px-8 py-5">
                                         <span
                                             class="font-mono text-[11px] font-black text-primary tracking-tighter uppercase whitespace-nowrap bg-primary/5 px-2 py-1 rounded-md border border-primary/10">
-                                            #<?php echo e(strtoupper(substr($order->reference, 0, 10))); ?>...
+                                            <?php echo e($order->reference); ?>
+
                                         </span>
                                     </td>
                                     <td class="px-6 py-5">
@@ -288,7 +289,7 @@
                             <div class="flex items-center justify-between relative">
                                 <span
                                     class="font-mono text-[10px] font-black text-primary bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/10">
-                                    #<?php echo e(strtoupper(substr($order->reference, 0, 10))); ?>
+                                    <?php echo e($order->reference); ?>
 
                                 </span>
                                 <?php

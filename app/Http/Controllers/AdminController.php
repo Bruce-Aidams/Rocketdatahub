@@ -76,7 +76,7 @@ class AdminController extends Controller
         $totalAgentBalance = User::whereIn('role', ['retail_seller', 'super_agent', 'dealer'])->sum('wallet_balance');
 
         // 8. Pending Data (GB)
-        $pendingOrders = Order::with('bundle')->where('status', 'pending')->get();
+        $pendingOrders = Order::with('bundle')->where('status', 'validation')->get();
         $pendingDataGb = 0;
         foreach ($pendingOrders as $order) {
             $pendingDataGb += $this->parseDataAmountToGB($order->bundle?->data_amount ?? '0MB');
@@ -85,7 +85,7 @@ class AdminController extends Controller
 
         // Additional data for existing view sections
         $totalUsers = User::where('role', 'user')->count();
-        $pendingOrdersCount = Order::where('status', 'pending')->count();
+        $pendingOrdersCount = Order::where('status', 'validation')->count();
         $totalRevenueAllTime = Order::where('status', 'completed')->sum('cost');
         $totalProfitAllTime = Order::where('status', 'completed')->sum('profit');
         $recentOrders = Order::with(['user', 'bundle'])->latest()->take(5)->get();
@@ -164,6 +164,11 @@ class AdminController extends Controller
         return $settings;
     }
 
+    public function docs()
+    {
+        return view('admin.docs.index');
+    }
+
     public function getSettings()
     {
         $settings = \App\Models\Setting::all()->pluck('value', 'key');
@@ -235,7 +240,7 @@ class AdminController extends Controller
         $totalOrders = Order::whereBetween('created_at', $range)->count();
         $pendingDeposits = \App\Models\Deposit::where('status', 'pending')->count();
         $recentOrders = Order::with('user')->latest()->take(5)->get();
-        $pendingOrders = Order::where('status', 'pending')->count();
+        $pendingOrders = Order::where('status', 'validation')->count();
 
         $monthlyRevenue = Order::selectRaw('SUM(cost) as total, ' . $this->getDateFormat('%Y-%m') . ' as month')
             ->where('status', 'completed')
@@ -380,81 +385,6 @@ class AdminController extends Controller
         return \App\Models\ApiLog::with('provider')->latest()->paginate(50);
     }
 
-    public function getDataIntegration()
-    {
-        $settings = DB::table('data_integration_settings')->first();
-        if (!$settings) {
-            return response()->json(['is_active' => false]);
-        }
-        return response()->json($settings);
-    }
-
-    public function updateDataIntegration(Request $request)
-    {
-        $validated = $request->validate([
-            'base_url' => 'nullable|url',
-            'api_key' => 'nullable|string',
-            'webhook_url' => 'nullable|url',
-            'is_active' => 'boolean',
-        ]);
-
-        DB::table('data_integration_settings')->updateOrInsert(
-            ['id' => 1],
-            array_merge($validated, ['updated_at' => now()])
-        );
-
-        return response()->json(['message' => 'Settings updated successfully']);
-    }
-
-    public function testDataIntegrationConnection(Request $request)
-    {
-        $settings = DB::table('data_integration_settings')->first();
-
-        if (!$settings || !$settings->base_url) {
-            return response()->json(['success' => false, 'message' => 'No base URL configured'], 422);
-        }
-
-        try {
-            // We use a simple GET request to the base URL to test connectivity
-            // In a real scenario, this might hit a specific /health or /test endpoint
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Authorization' => 'Bearer ' . $settings->api_key,
-                'Accept' => 'application/json',
-                'X-Requested-With' => 'CloudTech-Integration'
-            ])->timeout(10)->get($settings->base_url);
-
-            $success = $response->successful();
-            $status = $response->status();
-
-            if ($success) {
-                $message = 'Connection successful! Status: ' . $status;
-            } elseif ($status === 401 || $status === 403) {
-                $message = 'Authentication failed (' . $status . '). Please check your API key.';
-            } elseif ($status === 400 || $status === 422) {
-                $message = 'Connection failed (Bad Request - ' . $status . '). Check your endpoint and parameters.';
-            } elseif ($status === 404) {
-                $message = 'Connection failed (404 Not Found). Check if the base URL path is fully correct.';
-            } else {
-                $message = 'Connection failed. Status: ' . $status;
-            }
-
-            DB::table('data_integration_settings')->where('id', $settings->id)->update([
-                'last_tested_at' => now(),
-                'test_status' => $success ? 'success' : 'failed',
-                'test_message' => $message
-            ]);
-
-            return response()->json(['success' => $success, 'message' => $message]);
-        } catch (\Exception $e) {
-            DB::table('data_integration_settings')->where('id', $settings->id)->update([
-                'last_tested_at' => now(),
-                'test_status' => 'failed',
-                'test_message' => $e->getMessage()
-            ]);
-
-            return response()->json(['success' => false, 'message' => 'Test failed: ' . $e->getMessage()], 500);
-        }
-    }
 
     public function getDashboardStats(Request $request)
     {

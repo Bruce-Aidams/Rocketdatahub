@@ -352,10 +352,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/api-management/providers/test', [\App\Http\Controllers\ApiController::class, 'testConnection'])->name('admin.api.providers.test');
         Route::post('/api-management/providers/{id}/toggle', [\App\Http\Controllers\ApiController::class, 'toggleActive'])->name('admin.api.providers.toggle');
 
-        // Data Integration
-        Route::get('/api-management/data-integration', [\App\Http\Controllers\AdminController::class, 'getDataIntegration'])->name('admin.api.data-integration.get');
-        Route::post('/api-management/data-integration', [\App\Http\Controllers\AdminController::class, 'updateDataIntegration'])->name('admin.api.data-integration.update');
-        Route::post('/api-management/data-integration/test', [\App\Http\Controllers\AdminController::class, 'testDataIntegrationConnection'])->name('admin.api.data-integration.test');
 
         // Notifications
         Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'adminIndex'])->name('admin.notifications');
@@ -370,6 +366,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/announcements/{announcement}', [\App\Http\Controllers\Admin\AnnouncementController::class, 'update'])->name('admin.announcements.update');
         Route::patch('/announcements/{announcement}/toggle', [\App\Http\Controllers\Admin\AnnouncementController::class, 'toggleActive'])->name('admin.announcements.toggle');
         Route::delete('/announcements/{announcement}', [\App\Http\Controllers\Admin\AnnouncementController::class, 'destroy'])->name('admin.announcements.destroy');
+
+        // Documentation
+        Route::get('/docs', [\App\Http\Controllers\AdminController::class, 'docs'])->name('admin.docs');
 
         // Settings
         Route::get('/settings', [\App\Http\Controllers\AdminController::class, 'getSettings'])->name('admin.settings');
