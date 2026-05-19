@@ -49,7 +49,9 @@ class Order extends Model
                     $savedEvents = [];
                 }
 
-                if ($order->status === 'completed' && in_array('Order Completed', $savedEvents)) {
+                if ($order->status === 'processing' && in_array('Order Processing', $savedEvents)) {
+                    \App\Jobs\SendWebhookJob::dispatch('Order Processing', $order->toArray());
+                } elseif ($order->status === 'delivered' && in_array('Order Completed', $savedEvents)) {
                     \App\Jobs\SendWebhookJob::dispatch('Order Completed', $order->toArray());
                 } elseif ($order->status === 'failed' && in_array('Order Failed', $savedEvents)) {
                     \App\Jobs\SendWebhookJob::dispatch('Order Failed', $order->toArray());
@@ -127,9 +129,14 @@ class Order extends Model
     public static function generateReference($prefix = 'ORD-')
     {
         $dateStr = date('Ymd');
+        $nextId = (static::max('id') ?? 0) + 1;
+
         do {
-            $ref = $prefix . $dateStr . '-' . rand(100000, 999999);
+            $counter = str_pad($nextId, 4, '0', STR_PAD_LEFT);
+            $ref = $prefix . $dateStr . '-' . $counter;
+            $nextId++;
         } while (static::where('reference', $ref)->exists());
+
         return $ref;
     }
 }

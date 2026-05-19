@@ -183,7 +183,7 @@
 
                                     $availableEventsJson = \App\Models\Setting::where('key', 'available_webhook_events')->first()?->value;
                                     if (!$availableEventsJson) {
-                                        $availableEvents = ['Order Created', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment'];
+                                        $availableEvents = ['Order Created', 'Order Processing', 'Order Completed', 'Order Failed', 'Deposit Successful', 'Manual Adjustment'];
                                     } else {
                                         $availableEvents = json_decode($availableEventsJson, true) ?? [];
                                     }

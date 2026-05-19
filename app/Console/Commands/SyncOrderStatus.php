@@ -36,6 +36,18 @@ class SyncOrderStatus extends Command
         $startTime = time();
         while (true) {
             try {
+                // 1. Process queued jobs (like ProcessOrder for new validating orders and SendWebhookJob)
+                // This ensures orders don't get stuck in 'validation' if a worker isn't running
+                \Illuminate\Support\Facades\Artisan::call('queue:work', [
+                    '--stop-when-empty' => true,
+                    '--timeout' => 60,
+                    '--tries' => 1
+                ]);
+
+                // 2. Explicitly pick up any stuck 'validation' orders
+                $this->processNewOrders();
+
+                // 3. Sync processing orders with external vendor
                 $this->syncOrders();
             } catch (\Exception $e) {
                 $this->error("Sync error: " . $e->getMessage());
@@ -145,6 +157,34 @@ class SyncOrderStatus extends Command
                 }
             } catch (\Exception $e) {
                 Log::error("Sync error for provider {$provider->name}: " . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Explicitly process any orders stuck in validation state
+     */
+    private function processNewOrders()
+    {
+        $orders = Order::where('status', 'validation')->get();
+        if ($orders->isEmpty()) {
+            return;
+        }
+
+        foreach ($orders as $order) {
+            try {
+                // Process the order synchronously to avoid waiting for queue workers
+                \App\Jobs\ProcessOrder::dispatchSync($order);
+                
+                // If using database queue, clean up the duplicate payload to avoid double-processing
+                if (\Illuminate\Support\Facades\Schema::hasTable('jobs')) {
+                    \Illuminate\Support\Facades\DB::table('jobs')
+                        ->where('payload', 'like', '%ProcessOrder%')
+                        ->where('payload', 'like', '%"id":' . $order->id . '%')
+                        ->delete();
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to explicitly process validation order #{$order->id}: " . $e->getMessage());
             }
         }
     }

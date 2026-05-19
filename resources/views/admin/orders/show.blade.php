@@ -126,7 +126,7 @@
                 <div class="mb-0">
                     <div
                         class="w-full text-center py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] mb-6 border
-                                    @if($order->status === 'delivered') bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 @elseif($order->status === 'validation') bg-blue-50 border-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 @elseif($order->status === 'failed') bg-rose-50 border-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800 @else bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 @endif">
+                                    @if($order->status === 'delivered') bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 @elseif($order->status === 'processing') bg-purple-50 border-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800 @elseif($order->status === 'validation') bg-blue-50 border-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 @elseif($order->status === 'failed') bg-rose-50 border-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800 @else bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 @endif">
                         {{ $order->status === 'validation' ? 'Validating' : (ucfirst($order->status)) }}
                     </div>
 
