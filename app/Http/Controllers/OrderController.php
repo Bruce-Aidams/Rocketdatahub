@@ -592,7 +592,7 @@ class OrderController extends Controller
     public function adminCreate()
     {
         $users = User::orderBy('name')->get();
-        $bundles = Bundle::with('network')->get()->groupBy('network');
+        $bundles = Bundle::orderBy('network')->orderBy('name')->get()->groupBy('network');
         return view('admin.orders.create', compact('users', 'bundles'));
     }
 
@@ -699,6 +699,52 @@ class OrderController extends Controller
         ProcessOrder::dispatch($order);
 
         return response()->json(['message' => 'Order re-queued for processing.']);
+    }
+
+    /**
+     * Admin: Bulk Actions (Status Update, Delete)
+     */
+    public function adminBulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string|in:delete,status_update',
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'required|integer|exists:orders,id',
+            'status' => 'required_if:action,status_update|string|in:pending_payment,awaiting_transfer,validation,processing,delivered,failed',
+        ]);
+
+        $action = $request->action;
+        $orderIds = $request->order_ids;
+
+        if ($action === 'delete') {
+            DB::transaction(function () use ($orderIds) {
+                // Delete associated transactions first
+                \App\Models\Transaction::whereIn('order_id', $orderIds)->delete();
+                Order::whereIn('id', $orderIds)->delete();
+            });
+
+            return response()->json(['message' => 'Selected orders deleted successfully.']);
+        }
+
+        if ($action === 'status_update') {
+            $status = $request->status;
+            $orders = Order::whereIn('id', $orderIds)->get();
+
+            DB::transaction(function () use ($orders, $status) {
+                /** @var \App\Models\Order $order */
+                foreach ($orders as $order) {
+                    if ($status === 'delivered') {
+                        $order->complete();
+                    } else {
+                        $order->update(['status' => $status]);
+                    }
+                }
+            });
+
+            return response()->json(['message' => 'Selected orders status updated successfully.']);
+        }
+
+        return response()->json(['message' => 'Invalid action.'], 400);
     }
 }
 

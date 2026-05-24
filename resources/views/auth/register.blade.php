@@ -38,6 +38,12 @@
                             management easy and fun!</p>
                     </div>
 
+                    @if(session('error'))
+                        <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
+                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">{{ session('error') }}</p>
+                        </div>
+                    @endif
+
                     @if($errors->any())
                         <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
                             <ul class="list-disc list-inside space-y-1">
@@ -47,6 +53,7 @@
                             </ul>
                         </div>
                     @endif
+
 
                     <form method="POST" action="{{ route('register') }}" x-ref="registerForm" @submit.prevent="submit"
                         class="space-y-4">

@@ -216,6 +216,13 @@ class AdminController extends Controller
             'net_profit' => $netProfit
         ];
 
+        $auditStats = [
+            'unbalanced' => \App\Models\Setting::where('key', 'system_ledger_unbalanced')->value('value') === '1',
+            'mismatch_amount' => (float) \App\Models\Setting::where('key', 'system_ledger_mismatch_amount')->value('value'),
+            'last_audit' => \App\Models\Setting::where('key', 'system_ledger_last_audit')->value('value'),
+            'audit_logs' => json_decode(\App\Models\Setting::where('key', 'system_ledger_audit_logs')->value('value') ?? '[]', true)
+        ];
+
         $monthlyData = Order::selectRaw($this->getDateFormat('%Y-%m') . ' as month, SUM(cost) as revenue, SUM(profit) as profit')
             ->where('status', 'completed')
             ->where('created_at', '>=', now()->subMonths(6))
@@ -223,7 +230,7 @@ class AdminController extends Controller
             ->orderBy('month', 'desc')
             ->get();
 
-        return view('admin.financials.index', compact('stats', 'monthlyData'));
+        return view('admin.financials.index', compact('stats', 'monthlyData', 'auditStats'));
     }
 
     public function analytics(Request $request)

@@ -135,6 +135,42 @@ class ResellerHubController extends Controller
         return back()->with('success', 'Store name updated successfully.');
     }
 
+    public function updateBranding(Request $request)
+    {
+        $request->validate([
+            'storefront_title'       => 'nullable|string|max:80',
+            'storefront_description' => 'nullable|string|max:300',
+            'storefront_theme_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'storefront_bg_color'    => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'storefront_logo_url'    => 'nullable|url|max:500',
+        ]);
+
+        $user = $this->getResellerUser();
+        $settings = $user->settings ?? [];
+
+        $keys = [
+            'storefront_title',
+            'storefront_description',
+            'storefront_theme_color',
+            'storefront_bg_color',
+            'storefront_logo_url'
+        ];
+
+        foreach ($keys as $key) {
+            if ($request->has($key)) {
+                $val = $request->input($key);
+                if ($val !== null && $val !== '') {
+                    $settings[$key] = $val;
+                } else {
+                    unset($settings[$key]);
+                }
+            }
+        }
+
+        $user->update(['settings' => $settings]);
+        return back()->with('success', 'Storefront branding updated successfully.');
+    }
+
     public function toggleStoreStatus()
     {
         $user = $this->getResellerUser();

@@ -112,6 +112,162 @@
             </div>
         </div>
 
+        {{-- Storefront Branding Customizer --}}
+        <div x-data="{
+            logoUrl: '{{ old('storefront_logo_url', $user->settings['storefront_logo_url'] ?? '') }}',
+            title: '{{ old('storefront_title', $user->settings['storefront_title'] ?? ($user->store_name ?? $user->name) . '\'s Data Hub') }}',
+            description: '{{ old('storefront_description', $user->settings['storefront_description'] ?? 'Select your preferred network and bundle size below to receive instant data delivery. Secure, fast, and reliable.') }}',
+            themeColor: '{{ old('storefront_theme_color', $user->settings['storefront_theme_color'] ?? '#6366f1') }}',
+            bgColor: '{{ old('storefront_bg_color', $user->settings['storefront_bg_color'] ?? '#0f172a') }}'
+        }"
+        class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 md:p-10 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                <svg class="w-32 h-32 text-slate-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                </svg>
+            </div>
+
+            <div class="relative z-10 space-y-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-1 bg-primary rounded-full"></div>
+                    <h3 class="text-slate-900 dark:text-white font-black uppercase tracking-[0.3em] text-[10px]">Storefront Branding & Customization</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    {{-- Form Side --}}
+                    <form action="{{ route('reseller.store.branding') }}" method="POST" class="space-y-6">
+                        @csrf
+                        
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Store Logo URL</label>
+                            <input type="url" name="storefront_logo_url" x-model="logoUrl"
+                                class="w-full h-14 bg-slate-50 dark:bg-slate-950 border-none rounded-2xl px-6 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-sm"
+                                placeholder="https://example.com/logo.png">
+                            <p class="text-[10px] font-medium text-slate-400">Provide a direct link to your store logo (PNG, JPG, or SVG). Recommended size: 200x200px.</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Storefront Title</label>
+                            <div class="relative">
+                                <input type="text" name="storefront_title" x-model="title" maxlength="80"
+                                    class="w-full h-14 bg-slate-50 dark:bg-slate-950 border-none rounded-2xl px-6 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-sm"
+                                    placeholder="e.g. My Premium VTU Hub">
+                                <span class="absolute right-4 bottom-4 text-[9px] font-black text-slate-400" x-text="title.length + '/80'"></span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Storefront Description</label>
+                            <div class="relative">
+                                <textarea name="storefront_description" x-model="description" maxlength="300" rows="3"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 border-none rounded-2xl px-6 py-4 font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-sm resize-none"
+                                    placeholder="Describe your storefront services..."></textarea>
+                                <span class="absolute right-4 bottom-4 text-[9px] font-black text-slate-400" x-text="description.length + '/300'"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Primary Color</label>
+                                <div class="flex gap-3">
+                                    <div class="relative w-14 h-14 rounded-2xl overflow-hidden shadow-md flex-shrink-0 border border-slate-200 dark:border-slate-800">
+                                        <input type="color" x-model="themeColor" name="storefront_theme_color"
+                                            class="absolute inset-0 w-full h-full p-0 border-none cursor-pointer scale-150">
+                                    </div>
+                                    <input type="text" x-model="themeColor"
+                                        class="w-full h-14 bg-slate-50 dark:bg-slate-950 border-none rounded-2xl px-4 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-xs font-mono"
+                                        placeholder="#6366f1">
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Background Color</label>
+                                <div class="flex gap-3">
+                                    <div class="relative w-14 h-14 rounded-2xl overflow-hidden shadow-md flex-shrink-0 border border-slate-200 dark:border-slate-800">
+                                        <input type="color" x-model="bgColor" name="storefront_bg_color"
+                                            class="absolute inset-0 w-full h-full p-0 border-none cursor-pointer scale-150">
+                                    </div>
+                                    <input type="text" x-model="bgColor"
+                                        class="w-full h-14 bg-slate-50 dark:bg-slate-950 border-none rounded-2xl px-4 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 transition-all shadow-inner text-xs font-mono"
+                                        placeholder="#0f172a">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full h-14 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/30 hover:bg-primary-focus transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Save Branding Customizations
+                        </button>
+                    </form>
+
+                    {{-- Preview Side --}}
+                    <div class="flex flex-col h-full bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-200/60 dark:border-slate-800 p-6 md:p-8 space-y-6 select-none relative overflow-hidden">
+                        <div class="absolute top-4 right-4 z-20">
+                            <span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-black uppercase tracking-widest text-slate-500">Live Preview</span>
+                        </div>
+
+                        {{-- Storefront Header Mockup --}}
+                        <div class="flex-1 flex flex-col justify-center items-center text-center p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 min-h-[300px] transition-all duration-300 relative"
+                            :style="'background-color: ' + bgColor + ';'">
+                            
+                            {{-- Logo --}}
+                            <div class="mb-4">
+                                <template x-if="logoUrl">
+                                    <img :src="logoUrl" alt="Store Logo" class="h-16 w-16 object-contain rounded-xl shadow-md bg-white p-1 border border-slate-100 mx-auto">
+                                </template>
+                                <template x-if="!logoUrl">
+                                    <div class="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center text-white/40 border border-white/10 font-bold text-xs mx-auto">
+                                        LOGO
+                                    </div>
+                                </template>
+                            </div>
+
+                            {{-- Badge --}}
+                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest mb-4 transition-all duration-300 mx-auto"
+                                :style="'color: ' + themeColor + '; background-color: ' + themeColor + '20;'">
+                                <span class="w-1.5 h-1.5 rounded-full animate-pulse" :style="'background-color: ' + themeColor + ';'"></span>
+                                Reseller Store
+                            </div>
+
+                            {{-- Title --}}
+                            <h2 class="text-xl md:text-2xl font-black uppercase tracking-tight mb-2 text-white line-clamp-2"
+                                x-text="title || 'My E-Store'">
+                            </h2>
+
+                            {{-- Description --}}
+                            <p class="text-xs text-slate-400 font-medium max-w-sm line-clamp-3 leading-relaxed mb-6"
+                                x-text="description || 'Your custom store description goes here.'">
+                            </p>
+
+                            {{-- Example Network Card --}}
+                            <div class="w-full max-w-xs bg-slate-900/40 backdrop-blur border border-white/5 p-4 rounded-2xl flex items-center justify-between mx-auto">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-colors"
+                                        :style="'background-color: ' + themeColor + '; color: #fff;'">
+                                        M
+                                    </div>
+                                    <div class="text-left">
+                                        <h4 class="text-xs font-black text-white uppercase">MTN Data</h4>
+                                        <p class="text-[8px] font-bold text-slate-500 uppercase">Instant</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-white transition-all duration-300"
+                                    :style="'background-color: ' + themeColor + ';'">
+                                    Buy
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Store Settings --}}
         <div
             class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 md:p-10 shadow-sm relative overflow-hidden">

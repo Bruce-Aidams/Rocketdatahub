@@ -12,7 +12,7 @@ class StorefrontController extends Controller
     public function show(Request $request, $referral_code)
     {
         $reseller = User::where('referral_code', $referral_code)
-            ->whereIn('role', ['agent', 'dealer', 'super_agent'])
+            ->whereIn('role', ['retail_seller', 'dealer', 'super_agent', 'agent'])
             ->firstOrFail();
 
         if (!$reseller->store_active) {
@@ -33,7 +33,7 @@ class StorefrontController extends Controller
     public function buy(Request $request, $referral_code, $network)
     {
         $reseller = User::where('referral_code', $referral_code)
-            ->whereIn('role', ['agent', 'dealer', 'super_agent'])
+            ->whereIn('role', ['retail_seller', 'dealer', 'super_agent', 'agent'])
             ->firstOrFail();
 
         if (!$reseller->store_active) {

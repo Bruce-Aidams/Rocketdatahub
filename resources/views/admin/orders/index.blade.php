@@ -196,6 +196,46 @@
             @endforeach
         </div>
 
+        {{-- Modern Inline Bulk Actions Bar --}}
+        <div id="bulkActionsBar" class="hidden bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 px-6 py-3.5 rounded-2xl mb-4 flex flex-wrap items-center justify-between gap-4 transition-all duration-300 ease-in-out opacity-0">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+                <span id="bulkSelectedCount" class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest tabular-nums">0 selected</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-4">
+                {{-- Bulk Edit --}}
+                <div class="flex items-center gap-2">
+                    <select id="bulkStatusSelect" class="h-9 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-wider outline-none dark:text-slate-300 cursor-pointer">
+                        <option value="" disabled selected>Change Status...</option>
+                        <option value="validation">Validating</option>
+                        <option value="processing">Processing</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                    <button type="button" onclick="executeBulkAction('status_update')" class="h-9 px-4 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary/90 active:scale-95 transition-all shadow-sm">
+                        Update
+                    </button>
+                </div>
+
+                {{-- Bulk Download --}}
+                <button type="button" onclick="downloadSelected()" class="h-9 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Download
+                </button>
+
+                {{-- Bulk Delete --}}
+                <button type="button" onclick="executeBulkAction('delete')" class="h-9 px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete
+                </button>
+            </div>
+        </div>
+
         {{-- Orders Table --}}
         <div
             class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
@@ -282,7 +322,7 @@
                                         $scMap = [
                                             'pending_payment' => 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 border-amber-200 dark:border-amber-800',
                                             'awaiting_transfer' => 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 border-orange-200 dark:border-orange-800',
-                                            'validation' => 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 border-blue-200 dark:border-blue-800',
+                                            'validation' => 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 border-amber-200 dark:border-amber-800',
                                             'processing' => 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 border-indigo-200 dark:border-indigo-800',
                                             'delivered' => 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 border-emerald-200 dark:border-emerald-700',
                                             'failed' => 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 border-rose-200 dark:border-rose-800',
@@ -385,15 +425,35 @@
             const selectAll = document.getElementById('selectAll');
             const checkboxes = document.querySelectorAll('.order-checkbox');
             const downloadBtn = document.getElementById('downloadSelectedBtn');
+            const bulkActionsBar = document.getElementById('bulkActionsBar');
+            const bulkSelectedCount = document.getElementById('bulkSelectedCount');
 
-            function toggleDownloadBtn() {
+            function updateBulkActionsBar() {
                 const selectedCount = document.querySelectorAll('.order-checkbox:checked').length;
+                
+                if (downloadBtn) {
+                    if (selectedCount > 0) {
+                        downloadBtn.disabled = false;
+                        downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        downloadBtn.disabled = true;
+                        downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+
                 if (selectedCount > 0) {
-                    downloadBtn.disabled = false;
-                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    bulkSelectedCount.textContent = `${selectedCount} selected`;
+                    bulkActionsBar.classList.remove('hidden');
+                    setTimeout(() => {
+                        bulkActionsBar.classList.remove('opacity-0');
+                        bulkActionsBar.classList.add('opacity-100');
+                    }, 50);
                 } else {
-                    downloadBtn.disabled = true;
-                    downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    bulkActionsBar.classList.remove('opacity-100');
+                    bulkActionsBar.classList.add('opacity-0');
+                    setTimeout(() => {
+                        bulkActionsBar.classList.add('hidden');
+                    }, 300);
                 }
             }
 
@@ -402,12 +462,12 @@
                     checkboxes.forEach(cb => {
                         cb.checked = this.checked;
                     });
-                    toggleDownloadBtn();
+                    updateBulkActionsBar();
                 });
             }
 
             checkboxes.forEach(cb => {
-                cb.addEventListener('change', toggleDownloadBtn);
+                cb.addEventListener('change', updateBulkActionsBar);
             });
 
             function downloadSelected() {
@@ -427,6 +487,58 @@
                     window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Download initiated. Statuses updated to processing.', type: 'success' } }));
                     setTimeout(() => window.location.reload(), 2000);
                 }, 1000);
+            }
+
+            async function executeBulkAction(action) {
+                const selectedIds = Array.from(document.querySelectorAll('.order-checkbox:checked'))
+                    .map(cb => cb.value);
+
+                if (selectedIds.length === 0) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'No orders selected', type: 'error' } }));
+                    return;
+                }
+
+                let body = {
+                    action: action,
+                    order_ids: selectedIds
+                };
+
+                if (action === 'status_update') {
+                    const status = document.getElementById('bulkStatusSelect').value;
+                    if (!status) {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Please select a status to apply', type: 'error' } }));
+                        return;
+                    }
+                    body.status = status;
+                }
+
+                if (action === 'delete') {
+                    if (!confirm(`Are you sure you want to delete these ${selectedIds.length} selected orders? This action is permanent.`)) {
+                        return;
+                    }
+                }
+
+                try {
+                    const response = await fetch('{{ route("admin.orders.bulk_action") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    if (response.ok) {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Bulk action applied successfully.', type: 'success' } }));
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        const data = await response.json();
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message || 'Bulk action failed', type: 'error' } }));
+                    }
+                } catch (e) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Network error', type: 'error' } }));
+                }
             }
 
 
@@ -492,7 +604,6 @@
             }
 
             // Delete order
-
             async function deleteOrder(orderId) {
                 if (!confirm('Delete this order? This will also remove associated transactions and cannot be undone.')) return;
                 try {

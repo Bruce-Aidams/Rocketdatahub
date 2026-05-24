@@ -9,13 +9,16 @@ use App\Models\Wallet;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+// Google OAuth callback - must be OUTSIDE the guest middleware so Google's redirect
+// is always processed even if a partial session already exists.
+Route::get('auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback'])->name('google.callback');
+
 Route::get('/verification-required', [\App\Http\Controllers\UserController::class, 'verificationNotice'])->middleware('auth')->name('verification.notice');
 Route::post('/request-verification', [\App\Http\Controllers\UserController::class, 'requestVerification'])->middleware('auth')->name('verification.request');
 
 Route::middleware(['guest', 'auth_throttle'])->group(function () {
-    // Google OAuth Routes
+    // Google OAuth - redirect (guests only)
     Route::get('auth/google', [\App\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('google.login');
-    Route::get('auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'handleGoogleCallback']);
 
     Route::get('login', function (Request $request) {
         if ($request->has('ref')) {
@@ -190,6 +193,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard/reseller-hub/store', [\App\Http\Controllers\ResellerHubController::class, 'manageStore'])->name('reseller.store.manage');
         Route::post('/dashboard/reseller-hub/store/prices', [\App\Http\Controllers\ResellerHubController::class, 'updatePrice'])->name('reseller.store.update-price');
         Route::post('/dashboard/reseller-hub/store/name', [\App\Http\Controllers\ResellerHubController::class, 'updateStoreName'])->name('reseller.store.update-name');
+        Route::post('/dashboard/reseller-hub/store/branding', [\App\Http\Controllers\ResellerHubController::class, 'updateBranding'])->name('reseller.store.branding');
         Route::post('/dashboard/reseller-hub/store/toggle', [\App\Http\Controllers\ResellerHubController::class, 'toggleStoreStatus'])->name('reseller.store.toggle');
         Route::post('/dashboard/reseller-hub/store/regenerate', [\App\Http\Controllers\ResellerHubController::class, 'regenerateStoreLink'])->name('reseller.store.regenerate');
         Route::get('/dashboard/reseller-hub/customer-orders', [\App\Http\Controllers\ResellerHubController::class, 'customerOrders'])->name('reseller.customer-orders');
@@ -312,6 +316,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/orders/{order}/update', [\App\Http\Controllers\OrderController::class, 'adminUpdate'])->name('admin.orders.update_v2');
         Route::delete('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'destroy'])->name('admin.orders.destroy');
         Route::get('/orders/export', [\App\Http\Controllers\OrderController::class, 'export'])->name('admin.orders.export');
+        Route::post('/orders/bulk-action', [\App\Http\Controllers\OrderController::class, 'adminBulkAction'])->name('admin.orders.bulk_action');
         Route::put('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'update'])->name('admin.orders.update');
         Route::post('/orders/{order}/retry', [\App\Http\Controllers\OrderController::class, 'retry'])->name('admin.orders.retry');
         Route::post('/orders/cleanup', [\App\Http\Controllers\AdminController::class, 'deleteOldOrders'])->name('admin.orders.cleanup');

@@ -68,15 +68,17 @@ class SyncOrderStatus extends Command
      */
     private function syncOrders()
     {
-        $orders = Order::where('status', 'processing')->get();
+        // Poll both processing and validation (validating) orders, since validating represents pending on external vendor site
+        $orders = Order::whereIn('status', ['processing', 'validation'])->get();
 
         if ($orders->isEmpty()) {
             return;
         }
 
+        $apiService = app(ApiService::class);
+
         // Group by provider to minimize external API hits
-        $providerOrders = $orders->groupBy(function ($order) {
-            $apiService = app(ApiService::class);
+        $providerOrders = $orders->groupBy(function ($order) use ($apiService) {
             $provider = $apiService->getProviderForOrder($order);
             return $provider ? $provider->id : null;
         });
@@ -96,67 +98,138 @@ class SyncOrderStatus extends Command
             if (!empty($apiKey) && env($apiKey) !== null) {
                 $apiKey = env($apiKey);
             }
-            foreach ($headers as $key => $value) {
-                $headers[$key] = str_replace(['{api_key}', '{{api_key}}'], $apiKey, $value);
+            $secretKey = $provider->secret_key;
+            if (!empty($secretKey) && env($secretKey) !== null) {
+                $secretKey = env($secretKey);
             }
 
-            try {
-                $response = Http::withHeaders($headers)
-                    ->when(app()->environment('local'), function ($http) {
-                        return $http->withoutVerifying();
-                    })
-                    ->get($provider->base_url);
+            foreach ($headers as $key => $value) {
+                $headers[$key] = str_replace(
+                    ['{api_key}', '{{api_key}}', '{secret_key}', '{{secret_key}}'],
+                    [$apiKey, $apiKey, $secretKey, $secretKey],
+                    $value
+                );
+            }
 
-                if (!$response->successful()) {
-                    Log::warning("Sync: Failed to fetch orders from {$provider->name}");
-                    continue;
-                }
-
-                $responseData = $response->json();
-                $externalOrders = $responseData['orders'] ?? $responseData['data'] ?? [];
-
-                if (empty($externalOrders)) {
-                    continue;
-                }
-
+            // Check if a dedicated status endpoint is configured
+            if (!empty($provider->status_endpoint)) {
                 foreach ($ordersList as $order) {
-                    // Extract saved external ID
-                    $extOrderId = $order->response_data['raw_response']['order_id'] ?? null;
-                    
-                    // Match external order
-                    $matched = null;
-                    foreach ($externalOrders as $extOrder) {
-                        if ($extOrderId && $extOrder['id'] == $extOrderId) {
-                            $matched = $extOrder;
-                            break;
-                        }
-                        
-                        // Fallback matching: phone and amount
-                        $phoneMatch = ($extOrder['recipient_msisdn'] ?? '') == $order->recipient_phone;
-                        $amountMatch = (float)($extOrder['amount'] ?? 0) == (float)$order->cost;
-                        if ($phoneMatch && $amountMatch) {
-                            $matched = $extOrder;
-                            break;
-                        }
-                    }
+                    try {
+                        $externalData = $apiService->fetchExternalStatus($order);
 
-                    if ($matched) {
-                        $vendorStatus = strtolower($matched['status'] ?? 'pending');
-                        
+                        if (!$externalData) {
+                            continue;
+                        }
+
+                        $vendorStatus = $externalData['status'];
+                        $responseData = $externalData['response'];
+
                         if (in_array($vendorStatus, ['completed', 'successful', 'delivered', 'success'])) {
-                            $order->complete(array_merge($order->response_data ?? [], ['sync_response' => $matched]));
-                            Log::info("Order #{$order->id} successfully synced and marked as delivered.");
+                            $order->complete(array_merge($order->response_data ?? [], ['sync_response' => $responseData]));
+                            Log::info("Order #{$order->id} successfully synced via status endpoint and marked as delivered.");
                         } elseif (in_array($vendorStatus, ['failed', 'error', 'reversed', 'refunded'])) {
                             $order->update([
                                 'status' => 'failed',
-                                'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $matched])
+                                'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $responseData])
                             ]);
-                            Log::info("Order #{$order->id} successfully synced and marked as failed.");
+                            Log::info("Order #{$order->id} successfully synced via status endpoint and marked as failed.");
+                        } elseif (in_array($vendorStatus, ['pending', 'validation', 'validating'])) {
+                            if ($order->status !== 'validation') {
+                                $order->update([
+                                    'status' => 'validation',
+                                    'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $responseData])
+                                ]);
+                                Log::info("Order #{$order->id} successfully synced via status endpoint and marked as validation.");
+                            }
+                        } elseif (in_array($vendorStatus, ['processing', 'queued'])) {
+                            if ($order->status !== 'processing') {
+                                $order->update([
+                                    'status' => 'processing',
+                                    'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $responseData])
+                                ]);
+                                Log::info("Order #{$order->id} successfully synced via status endpoint and marked as processing.");
+                            }
                         }
+                    } catch (\Exception $e) {
+                        Log::error("Sync error for Order #{$order->id} on provider {$provider->name}: " . $e->getMessage());
                     }
                 }
-            } catch (\Exception $e) {
-                Log::error("Sync error for provider {$provider->name}: " . $e->getMessage());
+            } else {
+                // Fallback to bulk-fetch logic (Legacy)
+                try {
+                    $response = Http::withHeaders($headers)
+                        ->when(app()->environment('local'), function ($http) {
+                            return $http->withoutVerifying();
+                        })
+                        ->get($provider->base_url);
+
+                    if (!$response->successful()) {
+                        Log::warning("Sync: Failed to fetch orders from {$provider->name}");
+                        continue;
+                    }
+
+                    $responseData = $response->json();
+                    $externalOrders = $responseData['orders'] ?? $responseData['data'] ?? [];
+
+                    if (empty($externalOrders)) {
+                        continue;
+                    }
+
+                    foreach ($ordersList as $order) {
+                        // Extract saved external ID
+                        $extOrderId = $order->response_data['raw_response']['order_id'] ?? null;
+                        
+                        // Match external order
+                        $matched = null;
+                        foreach ($externalOrders as $extOrder) {
+                            if ($extOrderId && $extOrder['id'] == $extOrderId) {
+                                $matched = $extOrder;
+                                break;
+                            }
+                            
+                            // Fallback matching: phone and amount
+                            $phoneMatch = ($extOrder['recipient_msisdn'] ?? '') == $order->recipient_phone;
+                            $amountMatch = (float)($extOrder['amount'] ?? 0) == (float)$order->cost;
+                            if ($phoneMatch && $amountMatch) {
+                                $matched = $extOrder;
+                                break;
+                            }
+                        }
+
+                        if ($matched) {
+                            $vendorStatus = strtolower($matched['status'] ?? 'pending');
+                            
+                            if (in_array($vendorStatus, ['completed', 'successful', 'delivered', 'success'])) {
+                                $order->complete(array_merge($order->response_data ?? [], ['sync_response' => $matched]));
+                                Log::info("Order #{$order->id} successfully synced and marked as delivered.");
+                            } elseif (in_array($vendorStatus, ['failed', 'error', 'reversed', 'refunded'])) {
+                                $order->update([
+                                    'status' => 'failed',
+                                    'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $matched])
+                                ]);
+                                Log::info("Order #{$order->id} successfully synced and marked as failed.");
+                            } elseif (in_array($vendorStatus, ['pending', 'validation', 'validating'])) {
+                                if ($order->status !== 'validation') {
+                                    $order->update([
+                                        'status' => 'validation',
+                                        'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $matched])
+                                    ]);
+                                    Log::info("Order #{$order->id} successfully synced and marked as validation.");
+                                }
+                            } elseif (in_array($vendorStatus, ['processing', 'queued'])) {
+                                if ($order->status !== 'processing') {
+                                    $order->update([
+                                        'status' => 'processing',
+                                        'response_data' => array_merge($order->response_data ?? [], ['sync_response' => $matched])
+                                    ]);
+                                    Log::info("Order #{$order->id} successfully synced and marked as processing.");
+                                }
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Sync error for provider {$provider->name}: " . $e->getMessage());
+                }
             }
         }
     }
@@ -166,7 +239,8 @@ class SyncOrderStatus extends Command
      */
     private function processNewOrders()
     {
-        $orders = Order::where('status', 'validation')->get();
+        // Only process newly created validation orders that haven't been submitted to the API yet (response_data is null)
+        $orders = Order::where('status', 'validation')->whereNull('response_data')->get();
         if ($orders->isEmpty()) {
             return;
         }

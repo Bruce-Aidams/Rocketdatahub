@@ -11,10 +11,10 @@
                                             loading: false,
                                             provider: { 
                                                 id: '', name: '', network_type: '', base_url: '', request_method: 'POST', 
-                                                request_headers: '', request_body: '', request_body_template: '',
                                                 timeout_seconds: 30, retry_attempts: 3,
                                                 response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
-                                                webhook_url: '', api_key: '', secret_key: '', is_active: true 
+                                                webhook_url: '', api_key: '', secret_key: '', is_active: true,
+                                                status_endpoint: '', status_request_method: 'GET'
                                             },
                                             resetForm() {
                                                 this.provider = { 
@@ -22,7 +22,8 @@
                                                     request_headers: '', request_body: '', request_body_template: '',
                                                     timeout_seconds: 30, retry_attempts: 3,
                                                     response_success_field: 'success', response_data_field: 'data', response_error_field: 'error',
-                                                    webhook_url: '', api_key: '', secret_key: '', is_active: true 
+                                                    webhook_url: '', api_key: '', secret_key: '', is_active: true,
+                                                    status_endpoint: '', status_request_method: 'GET'
                                                 };
                                                 this.editMode = false;
                                                 this.modalTab = 'general';
@@ -41,6 +42,8 @@
                                                 this.provider.response_success_field = p.response_success_field || 'success';
                                                 this.provider.response_data_field = p.response_data_field || 'data';
                                                 this.provider.response_error_field = p.response_error_field || 'error';
+                                                this.provider.status_endpoint = p.status_endpoint || '';
+                                                this.provider.status_request_method = p.status_request_method || 'GET';
 
                                                 this.editMode = true;
                                                 this.modalTab = 'general';
@@ -654,6 +657,26 @@
                                     <label
                                         class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Method</label>
                                     <select name="request_method" x-model="provider.request_method"
+                                        class="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all dark:text-white appearance-none cursor-pointer">
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="md:col-span-2 space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Status Check Endpoint URL (Optional)</label>
+                                    <input type="url" name="status_endpoint" x-model="provider.status_endpoint"
+                                        placeholder="https://api.example.com/status?ref={request_id}"
+                                        class="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-sm font-mono focus:ring-2 focus:ring-primary/20 transition-all dark:text-white">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Status Method</label>
+                                    <select name="status_request_method" x-model="provider.status_request_method"
                                         class="w-full h-12 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all dark:text-white appearance-none cursor-pointer">
                                         <option value="GET">GET</option>
                                         <option value="POST">POST</option>

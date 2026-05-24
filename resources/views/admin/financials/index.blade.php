@@ -100,6 +100,76 @@
                 </div>
             </div>
         </div>
+
+        <!-- Ledger Verification Panel -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-50 dark:border-slate-800 pb-4 mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ledger & Wallet Balance Audit</h3>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                        Financial Integrity Guard
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500 font-medium">Last audited: {{ $auditStats['last_audit'] ?? 'Never' }}</span>
+                </div>
+            </div>
+
+            @if($auditStats['unbalanced'])
+                <div class="flex items-start gap-4 p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-800/40 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-rose-800 dark:text-rose-400">Ledger Discrepancy Alert!</h4>
+                        <p class="text-xs text-rose-600 dark:text-rose-400/80 mt-1">
+                            The cumulative transaction ledger does not balance with current wallet allocations. Mismatch Amount: <strong class="font-bold">GHS {{ number_format($auditStats['mismatch_amount'], 2) }}</strong>. Please run <code>php artisan audit:wallets</code> for complete details.
+                        </p>
+                    </div>
+                </div>
+                
+                @if(!empty($auditStats['audit_logs']))
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <th class="py-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">User</th>
+                                <th class="py-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Wallet Balance</th>
+                                <th class="py-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Ledger Balance</th>
+                                <th class="py-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 dark:divide-slate-800 text-xs">
+                            @foreach($auditStats['audit_logs'] as $log)
+                            <tr>
+                                <td class="py-3 font-medium text-slate-900 dark:text-white">ID {{ $log['user_id'] }} - {{ $log['name'] }}</td>
+                                <td class="py-3 text-right text-slate-700 dark:text-slate-300">GHS {{ number_format($log['current_balance'], 2) }}</td>
+                                <td class="py-3 text-right text-slate-700 dark:text-slate-300">GHS {{ number_format($log['ledger_balance'], 2) }}</td>
+                                <td class="py-3 text-right font-bold text-rose-600">GHS {{ number_format($log['difference'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @endif
+            @else
+                <div class="flex items-start gap-4 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/40 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-emerald-800 dark:text-emerald-400">All Ledger Records Balanced</h4>
+                        <p class="text-xs text-emerald-600 dark:text-emerald-400/80 mt-1">
+                            The automated auditing mechanism has verified that all system wallets perfectly balance with the double-entry transactions log database. Ledger integrity is 100% verified.
+                        </p>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 
     <!-- Monthly Analysis -->

@@ -16,12 +16,12 @@ class ApiService
      * @return array
      * @throws \Exception
      */
-    public function processOrder(Order $order): array
+    public function processOrder(Order $order, ?ApiProvider $provider = null): array
     {
         Log::info("Processing Order #{$order->id} for Bundle: {$order->bundle->name} ({$order->bundle->network})");
 
         // 1. Find active provider for the network
-        $provider = $this->getProviderForOrder($order);
+        $provider = $provider ?: $this->getProviderForOrder($order);
 
         if (!$provider) {
             Log::error("No active API provider found for network: {$order->bundle->network}");
@@ -38,6 +38,8 @@ class ApiService
 
         // 5. Send Request with Retries
         $url = $this->replacePlaceholders($provider->base_url, $provider, $order);
+        // Normalize double slashes (except after http:// or https://)
+        $url = preg_replace('/([^:])(\/{2,})/', '$1/', $url);
         $response = Http::withHeaders($headers)
                     ->timeout($provider->timeout_seconds ?? 30)
                     ->retry($provider->retry_attempts ?? 3, 100)
@@ -194,6 +196,115 @@ class ApiService
     }
 
     /**
+     * Fetch the order status from the external provider.
+     *
+     * @param Order $order
+     * @return array|null [status => string, response => array]
+     */
+    public function fetchExternalStatus(Order $order): ?array
+    {
+        $provider = $this->getProviderForOrder($order);
+        if (!$provider || empty($provider->status_endpoint)) {
+            return null;
+        }
+
+        try {
+            $headers = $provider->request_headers ?? [];
+            if (!is_array($headers)) $headers = [];
+
+            $apiKey = $provider->api_key;
+            if (!empty($apiKey) && env($apiKey) !== null) {
+                $apiKey = env($apiKey);
+            }
+            $secretKey = $provider->secret_key;
+            if (!empty($secretKey) && env($secretKey) !== null) {
+                $secretKey = env($secretKey);
+            }
+
+            foreach ($headers as $key => $value) {
+                $headers[$key] = str_replace(
+                    ['{api_key}', '{{api_key}}', '{secret_key}', '{{secret_key}}'],
+                    [$apiKey, $apiKey, $secretKey, $secretKey],
+                    $value
+                );
+            }
+
+            $extOrderId = $order->response_data['raw_response']['order_id'] 
+                ?? $order->response_data['data']['order_id'] 
+                ?? $order->response_data['raw_response']['data']['order_id'] 
+                ?? '';
+
+            $replacements = [
+                'request_id' => $order->id,
+                'id' => $order->id,
+                'reference' => $order->reference,
+                'order_id' => $extOrderId,
+                'phone' => $order->recipient_phone,
+                'api_key' => $apiKey,
+                'secret_key' => $secretKey,
+            ];
+
+            $url = $provider->status_endpoint;
+            foreach ($replacements as $k => $v) {
+                $url = str_replace(['{{' . $k . '}}', '{' . $k . '}'], $v, $url);
+            }
+            // Normalize double slashes (except after http:// or https://)
+            $url = preg_replace('/([^:])(\/{2,})/', '$1/', $url);
+
+            $method = strtoupper($provider->status_request_method ?? 'GET');
+
+            Log::info("fetchExternalStatus: Querying vendor URL: {$url} (Method: {$method}) for Order #{$order->id}");
+
+            $response = Http::withHeaders($headers)
+                ->timeout(15)
+                ->when(app()->environment('local'), function ($http) {
+                    return $http->withoutVerifying();
+                })
+                ->send($method, $url);
+
+            if (!$response->successful()) {
+                Log::warning("fetchExternalStatus: Status check failed for Order #{$order->id} on {$provider->name}");
+                return null;
+            }
+
+            $responseData = $response->json();
+            $successField = $provider->response_success_field ?? 'status';
+            
+            // Extract the actual transaction status
+            $vendorStatus = null;
+            
+            // If successField is not 'success' and is set, check it first as it might be a custom status field
+            if ($successField !== 'success' && $successField !== 'status') {
+                $vendorStatus = data_get($responseData, $successField);
+            }
+            
+            // Otherwise, search standard status/state fields
+            if (empty($vendorStatus) || is_bool($vendorStatus)) {
+                $vendorStatus = data_get($responseData, 'status')
+                    ?? data_get($responseData, 'data.status')
+                    ?? data_get($responseData, 'state')
+                    ?? data_get($responseData, 'data.state')
+                    ?? data_get($responseData, $successField)
+                    ?? 'pending';
+            }
+            
+            // Ensure status is normalized to a lowercase string, converting booleans safely
+            if (is_bool($vendorStatus)) {
+                $vendorStatus = $vendorStatus ? 'success' : 'failed';
+            }
+            $vendorStatus = strtolower(is_string($vendorStatus) ? $vendorStatus : 'pending');
+
+            return [
+                'status' => $vendorStatus,
+                'response' => $responseData
+            ];
+        } catch (\Exception $e) {
+            Log::error("fetchExternalStatus: Error for Order #{$order->id}: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Find the best active provider for a given order.
      */
     public function getProviderForOrder(Order $order): ?ApiProvider
@@ -211,5 +322,23 @@ class ApiService
         }
 
         return $provider;
+    }
+
+    /**
+     * Find all active providers for a given order (specific network first, then universal).
+     */
+    public function getAllActiveProvidersForOrder(Order $order): \Illuminate\Support\Collection
+    {
+        $specific = ApiProvider::where('network_type', $order->bundle->network)
+            ->where('is_active', true)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $universal = ApiProvider::whereNull('network_type')
+            ->where('is_active', true)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return $specific->merge($universal);
     }
 }

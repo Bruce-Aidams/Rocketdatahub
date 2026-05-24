@@ -56,6 +56,10 @@ class Order extends Model
                 } elseif ($order->status === 'failed' && in_array('Order Failed', $savedEvents)) {
                     \App\Jobs\SendWebhookJob::dispatch('Order Failed', $order->toArray());
                 }
+
+                if ($order->status === 'failed') {
+                    $order->refund();
+                }
             }
         });
     }
@@ -124,6 +128,122 @@ class Order extends Model
                 ]);
             }
         }
+    }
+
+    /**
+     * Refund the customer/reseller for a failed order.
+     */
+    public function refund()
+    {
+        // 1. Determine if the order has been paid/charged
+        $isPaid = false;
+        if ($this->payment_method === 'wallet') {
+            $isPaid = true;
+        } elseif ($this->payment_reference) {
+            $isPaid = true;
+        } else {
+            $originalStatus = $this->getOriginal('status');
+            if (in_array($originalStatus, ['validation', 'processing', 'delivered'])) {
+                $isPaid = true;
+            }
+        }
+
+        if (!$isPaid) {
+            \Illuminate\Support\Facades\Log::info("Refund skipped for Order #{$this->id}: Order was not paid.");
+            return;
+        }
+
+        // 2. Check if already refunded to avoid double refunding
+        $alreadyRefunded = \App\Models\Transaction::where('order_id', $this->id)
+            ->where(function ($q) {
+                $q->where('description', 'like', '%Refund%')
+                  ->orWhere('description', 'like', '%Reversal%');
+            })->exists();
+
+        if ($alreadyRefunded) {
+            \Illuminate\Support\Facades\Log::info("Refund skipped for Order #{$this->id}: Already refunded/reversed.");
+            return;
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () {
+            // 3. Handle Storefront vs Direct Customer Order
+            if ($this->source === 'storefront') {
+                $reseller = $this->user;
+                if ($reseller) {
+                    // Refund wholesale cost (credit)
+                    $reseller->increment('wallet_balance', (float) $this->cost_price);
+                    $reseller->transactions()->create([
+                        'order_id' => $this->id,
+                        'amount' => $this->cost_price,
+                        'type' => 'credit',
+                        'reference' => 'WHR-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'status' => 'success',
+                        'description' => "Wholesale Refund for failed storefront order #{$this->reference}",
+                        'metadata' => [
+                            'reason' => 'Order status returned failed',
+                            'original_status' => $this->getOriginal('status'),
+                        ],
+                    ]);
+
+                    // Reverse storefront revenue (debit)
+                    $reseller->decrement('wallet_balance', (float) $this->cost);
+                    $reseller->transactions()->create([
+                        'order_id' => $this->id,
+                        'amount' => $this->cost,
+                        'type' => 'debit',
+                        'reference' => 'SRV-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'status' => 'success',
+                        'description' => "Reversal of storefront revenue for failed order #{$this->reference}",
+                        'metadata' => [
+                            'reason' => 'Order status returned failed',
+                            'original_status' => $this->getOriginal('status'),
+                        ],
+                    ]);
+
+                    \Illuminate\Support\Facades\Log::info("Processed storefront refund/reversal for Reseller #{$reseller->id} on failed order #{$this->id}");
+                }
+            } else {
+                $user = $this->user;
+                if ($user) {
+                    // Direct customer refund (credit)
+                    $user->increment('wallet_balance', (float) $this->cost);
+                    $user->transactions()->create([
+                        'order_id' => $this->id,
+                        'amount' => $this->cost,
+                        'type' => 'credit',
+                        'reference' => 'REF-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'status' => 'success',
+                        'description' => "Refund for failed order #{$this->reference}",
+                        'metadata' => [
+                            'reason' => 'Order status returned failed',
+                            'original_status' => $this->getOriginal('status'),
+                        ],
+                    ]);
+
+                    \Illuminate\Support\Facades\Log::info("Refunded GHS {$this->cost} to User #{$user->id} for failed order #{$this->id}");
+                }
+            }
+
+            // 4. Reverse any referral commissions paid for this order
+            $commissions = \App\Models\Commission::where('order_id', $this->id)->get();
+            /** @var \App\Models\Commission $commission */
+            foreach ($commissions as $commission) {
+                $referrer = $commission->user;
+                if ($referrer && $commission->status === 'earned') {
+                    $referrer->decrement('wallet_balance', (float) $commission->amount);
+                    $referrer->transactions()->create([
+                        'order_id' => $this->id,
+                        'amount' => $commission->amount,
+                        'type' => 'debit',
+                        'reference' => 'REV-COM-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                        'status' => 'success',
+                        'description' => "Reversal of reseller commission for failed order #{$this->reference}",
+                    ]);
+                    $commission->update(['status' => 'cancelled']);
+                    \Illuminate\Support\Facades\Log::info("Reverted commission of GHS {$commission->amount} for referrer #{$referrer->id}");
+                }
+            }
+        });
     }
 
     public static function generateReference($prefix = 'ORD-')

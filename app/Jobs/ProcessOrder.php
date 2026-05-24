@@ -28,6 +28,14 @@ class ProcessOrder implements ShouldQueue
     }
 
     /**
+     * Get the middleware the job should pass through.
+     */
+    public function middleware(): array
+    {
+        return [new \Illuminate\Queue\Middleware\RateLimited('vendor-api')];
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(ApiService $apiService): void
@@ -38,45 +46,109 @@ class ProcessOrder implements ShouldQueue
             return;
         }
 
+        // If the order has already been submitted to the provider (response_data is present) and it is in 'validation' state, skip it to prevent duplicate submission.
+        if ($this->order->status === 'validation' && $this->order->response_data !== null) {
+            Log::info("Order ID: " . $this->order->id . " is already in validation/pending state with the provider. Skipping duplicate submit.");
+            return;
+        }
+
         Log::info("Processing Order ID: " . $this->order->id . " (Current Status: " . $this->order->status . ")");
 
         try {
-            // Check for provider availability first
-            $provider = $apiService->getProviderForOrder($this->order);
+            // Get all active providers eligible for this order
+            $providers = $apiService->getAllActiveProvidersForOrder($this->order);
             
-            if (!$provider) {
+            if ($providers->isEmpty()) {
                 Log::info("No active API provider found for Order ID: " . $this->order->id . ". This may be a manual order. Keeping status as: " . $this->order->status);
                 return;
             }
 
-            // Transition from validation to processing only when provider exists
+            // Transition from validation to processing
             $this->order->update(['status' => 'processing']);
 
-            $result = $apiService->processOrder($this->order);
+            $result = null;
+            $success = false;
+            $failedAttempts = [];
 
-            if ($result['success']) {
+            foreach ($providers as $provider) {
+                Log::info("Attempting order placement on Order #{$this->order->id} with Provider: {$provider->name} (ID: {$provider->id})");
+                
+                try {
+                    $result = $apiService->processOrder($this->order, $provider);
+                    
+                    if ($result && isset($result['success']) && $result['success']) {
+                        $success = true;
+                        break;
+                    }
+                    
+                    $errorMessage = $result['message'] ?? 'API failed response';
+                    Log::warning("Provider {$provider->name} (ID: {$provider->id}) failed to process Order #{$this->order->id}: {$errorMessage}");
+                    $failedAttempts[] = [
+                        'provider_id' => $provider->id,
+                        'provider_name' => $provider->name,
+                        'error' => $errorMessage,
+                        'timestamp' => now()->toDateTimeString()
+                    ];
+                } catch (\Exception $e) {
+                    Log::error("Provider {$provider->name} (ID: {$provider->id}) threw exception for Order #{$this->order->id}: " . $e->getMessage());
+                    $failedAttempts[] = [
+                        'provider_id' => $provider->id,
+                        'provider_name' => $provider->name,
+                        'error' => $e->getMessage(),
+                        'timestamp' => now()->toDateTimeString()
+                    ];
+                }
+            }
+
+            if ($success && $result) {
                 $rawResponse = $result['raw_response'] ?? [];
-                $vendorStatus = strtolower($rawResponse['status'] ?? $rawResponse['data']['status'] ?? 'completed');
+                
+                $vendorStatus = $rawResponse['status'] 
+                    ?? $rawResponse['data']['status'] 
+                    ?? $rawResponse['state'] 
+                    ?? $rawResponse['data']['state'] 
+                    ?? 'completed';
+                
+                if (is_bool($vendorStatus)) {
+                    $vendorStatus = $vendorStatus ? 'completed' : 'failed';
+                }
+                $vendorStatus = strtolower(is_string($vendorStatus) ? $vendorStatus : 'completed');
 
-                if (in_array($vendorStatus, ['pending', 'processing', 'queued'])) {
-                    // Update response data but keep status as processing (do not call complete() yet)
+                // Merge failed attempts history into result response data if there were fallbacks
+                if (!empty($failedAttempts)) {
+                    $result['fallback_attempts'] = $failedAttempts;
+                }
+
+                if (in_array($vendorStatus, ['pending', 'validation', 'validating'])) {
+                    $this->order->update([
+                        'status' => 'validation',
+                        'response_data' => $result
+                    ]);
+                    Log::info("Order ID: " . $this->order->id . " is pending (validating) on vendor site. Kept in validation state for sync worker.");
+                } elseif (in_array($vendorStatus, ['processing', 'queued'])) {
                     $this->order->update([
                         'status' => 'processing',
                         'response_data' => $result
                     ]);
-                    Log::info("Order ID: " . $this->order->id . " is pending/processing on vendor site. Kept in processing state for sync worker.");
+                    Log::info("Order ID: " . $this->order->id . " is processing on vendor site.");
                 } else {
                     $this->order->complete($result);
                     Log::info("Order ID: " . $this->order->id . " delivered successfully via API.");
                 }
             } else {
-                $errorMessage = $result['message'] ?? 'Unknown API error';
+                // If we ran out of providers, fail the order entirely
+                $errorMessage = 'All active providers failed. Attempts: ' . json_encode($failedAttempts);
+                
                 $this->order->update([
                     'status' => 'failed',
-                    'response_data' => $result
+                    'response_data' => [
+                        'success' => false,
+                        'message' => $errorMessage,
+                        'failed_attempts' => $failedAttempts
+                    ]
                 ]);
                 
-                $this->notifyAdmins("Order #{$this->order->reference} Failed", "Customer: {$this->order->recipient_phone}. Error: {$errorMessage}");
+                $this->notifyAdmins("Order #{$this->order->reference} Failed", "Customer: {$this->order->recipient_phone}. Error: All active providers failed.");
                 Log::warning("Order ID: " . $this->order->id . " failed API processing. Message: " . $errorMessage);
             }
         } catch (\Exception $e) {

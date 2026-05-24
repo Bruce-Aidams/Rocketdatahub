@@ -4,34 +4,45 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $reseller->store_name ?? $reseller->name }}'s Data Hub - {{ config('app.name') }}</title>
+    <title>{{ $reseller->settings['storefront_title'] ?? ($reseller->store_name ?? $reseller->name) . "'s Data Hub" }} - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @if(isset($reseller->settings['storefront_theme_color']))
+    <style>
+        :root {
+            --primary: {{ $reseller->settings['storefront_theme_color'] }} !important;
+            --color-primary: {{ $reseller->settings['storefront_theme_color'] }} !important;
+        }
+    </style>
+    @endif
 </head>
 
-<body class="antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+<body class="antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen" style="{{ isset($reseller->settings['storefront_bg_color']) ? 'background-color: ' . $reseller->settings['storefront_bg_color'] . ' !important;' : '' }}">
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-20 space-y-8 md:space-y-16">
         {{-- Store Branding --}}
         <div class="text-center space-y-4 md:space-y-6">
             <div
-                class="inline-flex items-center gap-3 px-4 py-2 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-[0.2em] animate-in fade-in slide-in-from-top-4 duration-1000">
+                class="inline-flex items-center gap-3 px-4 py-2 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-[0.2em] animate-in fade-in slide-in-from-top-4 duration-1000" style="{{ isset($reseller->settings['storefront_theme_color']) ? 'color: ' . $reseller->settings['storefront_theme_color'] . '; background-color: ' . $reseller->settings['storefront_theme_color'] . '1a;' : '' }}">
                 <span class="relative flex h-2 w-2">
                     <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" style="{{ isset($reseller->settings['storefront_theme_color']) ? 'background-color: ' . $reseller->settings['storefront_theme_color'] . ';' : '' }}"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary" style="{{ isset($reseller->settings['storefront_theme_color']) ? 'background-color: ' . $reseller->settings['storefront_theme_color'] . ';' : '' }}"></span>
                 </span>
                 Official Reseller Store
             </div>
+            @if(!empty($reseller->settings['storefront_logo_url']))
+                <div class="flex justify-center my-2 animate-in fade-in zoom-in duration-700">
+                    <img src="{{ $reseller->settings['storefront_logo_url'] }}" alt="{{ $reseller->store_name ?? $reseller->name }} Logo" class="h-20 w-20 object-contain rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 bg-white p-2">
+                </div>
+            @endif
             <h1
                 class="text-3xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none animate-in fade-in slide-in-from-bottom-4 duration-700">
-                {{ $reseller->store_name ?? $reseller->name }}'s <span class="text-primary block md:inline">Data
-                    Hub</span>
+                {{ $reseller->settings['storefront_title'] ?? ($reseller->store_name ?? $reseller->name) . "'s Data Hub" }}
             </h1>
             <p
                 class="max-w-2xl mx-auto text-sm md:text-lg text-slate-500 dark:text-slate-400 font-medium animate-in fade-in slide-in-from-bottom-6 duration-1000 px-4">
-                Select your preferred network and bundle size below to receive instant data delivery. Secure, fast, and
-                reliable.
+                {{ $reseller->settings['storefront_description'] ?? 'Select your preferred network and bundle size below to receive instant data delivery. Secure, fast, and reliable.' }}
             </p>
         </div>
 
