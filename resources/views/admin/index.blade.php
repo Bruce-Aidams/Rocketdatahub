@@ -85,7 +85,7 @@
                     @foreach([
                         ['route' => 'admin.orders', 'label' => 'Manage Orders', 'desc' => 'Pending data orders', 'icon' => '1'],
                         ['route' => 'admin.deposits', 'label' => 'Manage Deposits', 'desc' => 'Confirm user funding', 'icon' => '2'],
-                        ['route' => 'admin.api', 'label' => 'API Management', 'desc' => 'Monitor API connections', 'icon' => '3'],
+                        // ['route' => 'admin.api', 'label' => 'API Management', 'desc' => 'Monitor API connections', 'icon' => '3'],
                         ['route' => 'admin.notifications', 'label' => 'Send Notifications', 'desc' => 'Platform alerts', 'icon' => '4'],
                     ] as $action)
                         <a href="{{ route($action['route']) }}"

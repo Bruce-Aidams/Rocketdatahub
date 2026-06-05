@@ -465,26 +465,34 @@ class OrderController extends Controller
         }
 
         if (!in_array($request->payment_method, ['paystack', 'momo', 'transfer', 'wallet'])) {
-            return back()->with('error', 'Invalid payment method selected.');
+            $msg = 'Invalid payment method selected.';
+            return $request->expectsJson()
+                ? response()->json(['message' => $msg], 422)
+                : back()->with('error', $msg);
         }
 
         $allSettings = Setting::getManyCached(['enable_paystack', 'enable_momo_deposits', 'enable_manual_transfer']);
 
         if ($request->payment_method === 'paystack' && ($allSettings['enable_paystack'] ?? '1') !== '1') {
-            return back()->with('error', 'Paystack gateway is currently disabled.');
+            $msg = 'Paystack gateway is currently disabled.';
+            return $request->expectsJson() ? response()->json(['message' => $msg], 422) : back()->with('error', $msg);
         }
         if ($request->payment_method === 'momo' && ($allSettings['enable_momo_deposits'] ?? '1') !== '1') {
-            return back()->with('error', 'MOMO payments are currently disabled.');
+            $msg = 'MOMO payments are currently disabled.';
+            return $request->expectsJson() ? response()->json(['message' => $msg], 422) : back()->with('error', $msg);
         }
         if ($request->payment_method === 'transfer' && ($allSettings['enable_manual_transfer'] ?? '1') !== '1') {
-            return back()->with('error', 'Manual bank transfers are currently disabled.');
+            $msg = 'Manual bank transfers are currently disabled.';
+            return $request->expectsJson() ? response()->json(['message' => $msg], 422) : back()->with('error', $msg);
         }
 
         $isPaystack = in_array($request->payment_method, ['paystack', 'momo']);
 
         if ($request->payment_method === 'wallet' && $user->wallet_balance < $totalCost) {
             $msg = "Insufficient wallet balance. Total: GHS " . number_format($totalCost, 2);
-            return back()->with('error', $msg);
+            return $request->expectsJson()
+                ? response()->json(['message' => $msg], 402)
+                : back()->with('error', $msg);
         }
 
         // Calculate Charge if Paystack/MOMO
@@ -563,16 +571,21 @@ class OrderController extends Controller
         }
 
         if ($request->payment_method === 'transfer') {
-            return redirect()->route('orders.index')->with('success', 'Order submitted. Please upload proof of payment in the Finance Hub to complete processing.');
+            $msg = 'Order submitted. Please upload proof of payment in the Finance Hub to complete processing.';
+            return $request->expectsJson()
+                ? response()->json(['status' => true, 'message' => $msg, 'redirect' => route('orders.index')])
+                : redirect()->route('orders.index')->with('success', $msg);
         }
 
         foreach ($orders as $order) {
             ProcessOrder::dispatch($order);
         }
 
-        return redirect()->route('orders.index')->with('success', count($orders) . ' orders placed successfully.');
+        $msg = count($orders) . ' orders placed successfully.';
         session()->forget('cart');
-        return redirect()->route('orders.index')->with('success', count($orders) . ' orders placed successfully.');
+        return $request->expectsJson()
+            ? response()->json(['status' => true, 'message' => $msg, 'redirect' => route('orders.index')])
+            : redirect()->route('orders.index')->with('success', $msg);
     }
 
     private function getPriceForUser($bundle, $user)

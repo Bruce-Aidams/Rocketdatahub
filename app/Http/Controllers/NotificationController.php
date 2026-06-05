@@ -11,6 +11,18 @@ class NotificationController extends Controller
     // User: Get my notifications (JSON for polling)
     public function index(Request $request)
     {
+        // Guard: If accessed directly in a browser (not via fetch/XHR), redirect to dashboard.
+        // This prevents the JSON output from appearing as the page content when
+        // Laravel's auth middleware stores this URL as the "intended" redirect.
+        $isAjax = $request->ajax()
+            || $request->wantsJson()
+            || $request->header('X-Requested-With') === 'XMLHttpRequest'
+            || str_contains($request->header('Accept', ''), 'application/json');
+
+        if (!$isAjax) {
+            return redirect()->route('dashboard');
+        }
+
         $user = $request->user();
         $unreadCount = $user->notifications()->where('is_read', false)->count();
         $notifications = $user->notifications()

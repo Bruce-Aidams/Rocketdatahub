@@ -1,3 +1,8 @@
+{{--
+============================================================
+API INTEGRATION COMMENTED OUT
+To re-enable, uncomment the code below.
+============================================================
 @extends('layouts.dashboard')
 
 @section('title', 'API Access')
@@ -35,7 +40,7 @@
         <!-- Alert: New Key Created -->
         @if(session('new_key'))
             <div
-                class="rounded-[3rem] border border-emerald-200/50 bg-emerald-50/50 backdrop-blur-xl dark:bg-emerald-900/10 dark:border-emerald-900/20 p-10 shadow-2xl shadow-emerald-200/10 dark:shadow-none animate-in zoom-in-95 duration-500">
+                class="rounded-[3rem] border border-emerald-200/50 bg-emerald-50/50 backdrop-blur-xl dark:bg-emerald-950/10 dark:border-emerald-900/20 p-10 shadow-2xl shadow-emerald-200/10 dark:shadow-none animate-in zoom-in-95 duration-500">
                 <div class="flex flex-col space-y-4 pb-6 border-b border-emerald-100/50 dark:border-emerald-800/50">
                     <h3 class="text-xl font-black tracking-tighter flex items-center gap-3 text-emerald-600">
                         <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center">
@@ -101,7 +106,7 @@
                                 <label class="text-[10px] font-black uppercase tracking-[0.2em] pl-1 text-slate-400">TTL
                                     (Days)</label>
                                 <input type="number" name="expires_in_days" value="365" min="1" max="365" required
-                                    class="w-full h-14 px-6 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-black tracking-tight focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white dark:focus:bg-slate-900 focus:bg-white font-black">
+                                    class="w-full h-14 px-6 bg-slate-100/50 dark:bg-slate-800/50 border-none rounded-2xl text-sm font-black tracking-tight focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white dark:focus:bg-slate-900 focus:bg-white font-black font-mono">
                             </div>
                         </div>
                         <div class="flex gap-4 pt-4">
@@ -531,3 +536,4 @@
         }
     </script>
 @endsection
+--}}

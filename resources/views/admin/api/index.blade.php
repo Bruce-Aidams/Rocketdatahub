@@ -1,3 +1,8 @@
+{{--
+============================================================
+API INTEGRATION COMMENTED OUT
+To re-enable, uncomment the code below.
+============================================================
 @extends('layouts.admin')
 
 @section('title', 'API Management')
@@ -905,3 +910,4 @@
         </div>
     </div>
 @endsection
+--}}

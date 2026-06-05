@@ -1,3 +1,7 @@
+> [!CAUTION]
+> **API INTEGRATION DISABLED**
+> All API features, keys, routes, and provider integrations have been commented out and disabled in this codebase.
+
 # API Integration Guide
 
 This document provides a comprehensive guide for connecting your RocketDataHub platform to external applications, and for allowing external applications to interact with RocketDataHub.

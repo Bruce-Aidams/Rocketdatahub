@@ -1,13 +1,22 @@
 <?php
 
+/**
+ * ============================================================
+ * API INTEGRATION COMMENTED OUT
+ * All API provider management functions have been disabled.
+ * To re-enable, uncomment the code below.
+ * ============================================================
+ */
+
 namespace App\Http\Controllers;
 
-use App\Models\ApiProvider;
-use App\Models\ApiLog;
+// use App\Models\ApiProvider;
+// use App\Models\ApiLog;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    /*
     // List all providers
     public function index(Request $request)
     {
@@ -342,4 +351,5 @@ class ApiController extends Controller
             'is_active' => $provider->is_active
         ]);
     }
+    */
 }

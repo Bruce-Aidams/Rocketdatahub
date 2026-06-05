@@ -25,6 +25,9 @@
 <body
     class="antialiased min-h-screen text-foreground selection:bg-primary/20 selection:text-primary transition-colors duration-300">
 
+    
+    <?php echo $__env->make('partials._site_bg', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
     <!-- Sonner Toasts -->
     <?php if (isset($component)) { $__componentOriginalabfd08d099e5120d99fc78cfc4d6eb8e = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalabfd08d099e5120d99fc78cfc4d6eb8e = $attributes; } ?>

@@ -1,13 +1,22 @@
 <?php
 
+/**
+ * ============================================================
+ * API INTEGRATION COMMENTED OUT
+ * All webhook handling functions have been disabled.
+ * To re-enable, uncomment the code below.
+ * ============================================================
+ */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
-use Illuminate\Support\Facades\Log;
+// use App\Models\Order;
+// use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
+    /*
     public function handle(Request $request)
     {
         // 1. Log the incoming webhook
@@ -225,4 +234,6 @@ class WebhookController extends Controller
         }
         return false;
     }
+    */
 }
+

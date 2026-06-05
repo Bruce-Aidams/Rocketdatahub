@@ -1,21 +1,50 @@
 <?php
 
+/**
+ * ============================================================
+ * API INTEGRATION COMMENTED OUT
+ * All API service functions (order processing, external status checks) have been disabled.
+ * To re-enable, uncomment the code below.
+ * ============================================================
+ */
+
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\ApiProvider;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+// use App\Models\Order;
+// use App\Models\ApiProvider;
+// use Illuminate\Support\Facades\Http;
+// use Illuminate\Support\Facades\Log;
 
 class ApiService
 {
-    /**
+    public function getProviderForOrder($order)
+    {
+        return null;
+    }
+
+    public function getAllActiveProvidersForOrder($order): \Illuminate\Support\Collection
+    {
+        return collect();
+    }
+
+    public function processOrder($order, $provider = null): array
+    {
+        return ['success' => false, 'message' => 'API integration is disabled.'];
+    }
+
+    public function fetchExternalStatus($order): ?array
+    {
+        return null;
+    }
+
+    /*
+    **
      * Process an order by sending it to the appropriate API provider.
      *
      * @param Order $order
      * @return array
      * @throws \Exception
-     */
+     *
     public function processOrder(Order $order, ?ApiProvider $provider = null): array
     {
         Log::info("Processing Order #{$order->id} for Bundle: {$order->bundle->name} ({$order->bundle->network})");
@@ -39,7 +68,7 @@ class ApiService
         // 5. Send Request with Retries
         $url = $this->replacePlaceholders($provider->base_url, $provider, $order);
         // Normalize double slashes (except after http:// or https://)
-        $url = preg_replace('/([^:])(\/{2,})/', '$1/', $url);
+        $url = preg_replace('/([^:])(\\/{2,})/', '$1/', $url);
         $response = Http::withHeaders($headers)
                     ->timeout($provider->timeout_seconds ?? 30)
                     ->retry($provider->retry_attempts ?? 3, 100)
@@ -93,9 +122,9 @@ class ApiService
         ];
     }
 
-    /**
+    **
      * Build the request body by replacing placeholders in the template.
-     */
+     *
     private function buildRequestBody(ApiProvider $provider, Order $order)
     {
         if (empty($provider->request_body_template)) {
@@ -106,9 +135,9 @@ class ApiService
         return json_decode($template, true);
     }
 
-    /**
+    **
      * Parse headers and replace placeholders.
-     */
+     *
     private function parseHeaders(ApiProvider $provider, Order $order)
     {
         $headers = $provider->request_headers ?? [];
@@ -121,10 +150,10 @@ class ApiService
         return $headers;
     }
 
-    /**
+    **
      * Centralized placeholder replacement logic.
      * Supports both {key} and {{key}} formats.
-     */
+     *
     private function replacePlaceholders(string $string, ApiProvider $provider, Order $order): string
     {
         $dataAmount = $order->bundle->data_amount ?? '0';
@@ -163,9 +192,9 @@ class ApiService
     }
 
 
-    /**
+    **
      * Check if the response indicates success based on provider config.
-     */
+     *
     private function isSuccess(ApiProvider $provider, array $response)
     {
         $successField = $provider->response_success_field ?? 'success';
@@ -177,30 +206,30 @@ class ApiService
         return $value === true || $value === 'true' || $value === 'success' || $value === '00';
     }
 
-    /**
+    **
      * Extract relevant data from response.
-     */
+     *
     private function extractData(ApiProvider $provider, array $response)
     {
         $dataField = $provider->response_data_field ?? 'data';
         return data_get($response, $dataField, []);
     }
 
-    /**
+    **
      * Extract error message from response.
-     */
+     *
     private function extractError(ApiProvider $provider, array $response)
     {
         $errorField = $provider->response_error_field ?? 'message';
         return data_get($response, $errorField, 'API Request Failed');
     }
 
-    /**
+    **
      * Fetch the order status from the external provider.
      *
      * @param Order $order
      * @return array|null [status => string, response => array]
-     */
+     *
     public function fetchExternalStatus(Order $order): ?array
     {
         $provider = $this->getProviderForOrder($order);
@@ -249,7 +278,7 @@ class ApiService
                 $url = str_replace(['{{' . $k . '}}', '{' . $k . '}'], $v, $url);
             }
             // Normalize double slashes (except after http:// or https://)
-            $url = preg_replace('/([^:])(\/{2,})/', '$1/', $url);
+            $url = preg_replace('/([^:])(\\/{2,})/', '$1/', $url);
 
             $method = strtoupper($provider->status_request_method ?? 'GET');
 
@@ -304,9 +333,9 @@ class ApiService
         }
     }
 
-    /**
+    **
      * Find the best active provider for a given order.
-     */
+     *
     public function getProviderForOrder(Order $order): ?ApiProvider
     {
         // 1. Try specific network match
@@ -324,9 +353,9 @@ class ApiService
         return $provider;
     }
 
-    /**
+    **
      * Find all active providers for a given order (specific network first, then universal).
-     */
+     *
     public function getAllActiveProvidersForOrder(Order $order): \Illuminate\Support\Collection
     {
         $specific = ApiProvider::where('network_type', $order->bundle->network)
@@ -341,4 +370,5 @@ class ApiService
 
         return $specific->merge($universal);
     }
+    */
 }

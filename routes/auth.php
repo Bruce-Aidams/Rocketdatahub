@@ -45,7 +45,16 @@ Route::middleware(['guest', 'auth_throttle'])->group(function () {
             }
 
             session()->flash('success', 'Welcome back, ' . $user->name . '!');
-            return redirect()->intended('dashboard');
+            // Get and sanitise the intended URL — never redirect to JSON/API/poll endpoints
+            $intendedUrl = session()->pull('url.intended', route('dashboard'));
+            $blocked = ['/poll', '/api/', '/webhooks/', '/notifications/poll'];
+            foreach ($blocked as $pattern) {
+                if (str_contains($intendedUrl, $pattern)) {
+                    $intendedUrl = route('dashboard');
+                    break;
+                }
+            }
+            return redirect($intendedUrl);
         }
 
         throw ValidationException::withMessages([
@@ -219,6 +228,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/dashboard/billing', [\App\Http\Controllers\WalletController::class, 'billingHistory'])->name('billing.index');
 
+        /*
+        ============================================================
+        API INTEGRATION COMMENTED OUT
+        ============================================================
         Route::get('/dashboard/api-keys', function (Request $request) {
             $apiKeys = $request->user()->apiKeys()->latest()->get();
             return view('dashboard.api-keys', compact('apiKeys'));
@@ -227,6 +240,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/dashboard/api-keys', [App\Http\Controllers\ApiKeyController::class, 'generateKey'])->name('api-keys.store');
         Route::post('/dashboard/api-keys/{id}/regenerate', [App\Http\Controllers\ApiKeyController::class, 'regenerateKey'])->name('api-keys.regenerate');
         Route::delete('/dashboard/api-keys/{id}', [App\Http\Controllers\ApiKeyController::class, 'revokeKey'])->name('api-keys.destroy');
+        */
 
         Route::get('/dashboard/settings', function () {
             $user = Auth::user();
@@ -349,6 +363,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/analytics', [\App\Http\Controllers\AdminController::class, 'analytics'])->name('admin.analytics');
         Route::get('/profit', [\App\Http\Controllers\AdminController::class, 'profit'])->name('admin.profit');
 
+        /*
+        ============================================================
+        API INTEGRATION COMMENTED OUT
+        ============================================================
         // API Management
         Route::get('/api-management', [\App\Http\Controllers\ApiController::class, 'index'])->name('admin.api');
         Route::post('/api-management/providers', [\App\Http\Controllers\ApiController::class, 'store'])->name('admin.api.providers.store');
@@ -356,6 +374,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/api-management/providers/{id}', [\App\Http\Controllers\ApiController::class, 'destroy'])->name('admin.api.providers.destroy');
         Route::post('/api-management/providers/test', [\App\Http\Controllers\ApiController::class, 'testConnection'])->name('admin.api.providers.test');
         Route::post('/api-management/providers/{id}/toggle', [\App\Http\Controllers\ApiController::class, 'toggleActive'])->name('admin.api.providers.toggle');
+        */
 
 
         // Notifications
@@ -372,8 +391,13 @@ Route::middleware('auth')->group(function () {
         Route::patch('/announcements/{announcement}/toggle', [\App\Http\Controllers\Admin\AnnouncementController::class, 'toggleActive'])->name('admin.announcements.toggle');
         Route::delete('/announcements/{announcement}', [\App\Http\Controllers\Admin\AnnouncementController::class, 'destroy'])->name('admin.announcements.destroy');
 
+        /*
+        ============================================================
+        API INTEGRATION COMMENTED OUT
+        ============================================================
         // Documentation
         Route::get('/docs', [\App\Http\Controllers\AdminController::class, 'docs'])->name('admin.docs');
+        */
 
         // Settings
         Route::get('/settings', [\App\Http\Controllers\AdminController::class, 'getSettings'])->name('admin.settings');

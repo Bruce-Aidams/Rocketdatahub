@@ -249,6 +249,7 @@ class OrderRefundTest extends TestCase
      */
     public function test_webhook_status_fetching_and_mapping()
     {
+        $this->markTestSkipped('API Webhook integration is disabled.');
         $user = User::factory()->create(['wallet_balance' => 100.00]);
         $bundle = Bundle::create([
             'network' => 'MTN',

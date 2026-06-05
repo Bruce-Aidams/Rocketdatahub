@@ -6,7 +6,7 @@
         ['name' => 'Users', 'href' => '/admin/users', 'icon' => 'users', 'color' => 'blue'],
         ['name' => 'Resellers', 'href' => '/admin/resellers', 'icon' => 'user-group', 'color' => 'orange'],
         ['name' => 'Referrals', 'href' => '/admin/referrals', 'icon' => 'users', 'color' => 'pink'],
-        ['name' => 'API Management', 'href' => '/admin/api-management', 'icon' => 'chip', 'color' => 'cyan'],
+        // ['name' => 'API Management', 'href' => '/admin/api-management', 'icon' => 'chip', 'color' => 'cyan'],
         ['name' => 'Analytics', 'href' => '/admin/analytics', 'icon' => 'bar-chart', 'color' => 'violet'],
         ['name' => 'Profit Calculator', 'href' => route('admin.profit'), 'icon' => 'calculator', 'color' => 'emerald'],
         ['name' => 'Financials', 'href' => '/admin/financials', 'icon' => 'clipboard-list', 'color' => 'green'],

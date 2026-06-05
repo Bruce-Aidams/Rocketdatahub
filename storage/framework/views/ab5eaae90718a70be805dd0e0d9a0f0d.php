@@ -1,13 +1,13 @@
-@php
+<?php
     $unreadNotifications = auth()->user()->notifications()->where('is_read', false)->latest()->take(5)->get();
     // Cache the count from the collection to avoid another DB hit
     $unreadCount = $unreadNotifications->count();
-@endphp
+?>
 
 <header
     class="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between transition-colors duration-300">
     <div class="flex items-center gap-6 flex-1">
-        {{-- Mobile Menu Toggle --}}
+        
         <button @click="sidebarOpen = true"
             class="lg:hidden p-2.5 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-500 dark:text-slate-400 transition-all active:scale-95">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,14 +16,14 @@
             </svg>
         </button>
 
-        {{-- Mobile Logo --}}
+        
         <div class="lg:hidden flex items-center shrink-0">
             <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                <img src="{{ asset('favicon.ico') }}" alt="Logo" class="w-6 h-6">
+                <img src="<?php echo e(asset('favicon.ico')); ?>" alt="Logo" class="w-6 h-6">
             </div>
         </div>
 
-        {{-- Sidebar Collapse Toggle (Desktop) --}}
+        
         <button @click="isCollapsed = !isCollapsed"
             class="hidden lg:flex p-2.5 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 dark:text-slate-500 hover:text-primary transition-all active:scale-95 group relative">
             <svg x-show="isCollapsed" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
             </svg>
         </button>
 
-        {{-- Search Center --}}
+        
         <div class="relative w-full max-w-md hidden md:block group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-primary transition-colors duration-300"
@@ -50,17 +50,17 @@
     </div>
 
     <div class="flex items-center gap-4">
-        {{-- Notifications Dropdown --}}
+        
         <div class="relative" x-data="{ 
             open: false, 
-            unreadCount: {{ $unreadCount }},
-            notifications: @js($unreadNotifications->map(fn($n) => [
+            unreadCount: <?php echo e($unreadCount); ?>,
+            notifications: <?php echo \Illuminate\Support\Js::from($unreadNotifications->map(fn($n) => [
                 'id' => $n->id,
                 'title' => $n->title,
                 'message' => $n->message,
                 'type' => $n->type,
                 'time_pretty' => $n->created_at->diffForHumans()
-            ])),
+            ]))->toHtml() ?>,
             markNotificationAsRead(id, element) {
                 // Optimistic UI: Filter out the notification immediately
                 this.notifications = this.notifications.filter(n => n.id !== id);
@@ -81,7 +81,7 @@
             },
             init() {
                 setInterval(() => {
-                    fetch('{{ route('notifications.poll') }}', {
+                    fetch('<?php echo e(route('notifications.poll')); ?>', {
                         headers: {
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
@@ -172,7 +172,7 @@
 
                 <template x-if="unreadCount > 0">
                     <div class="mt-2 pt-2 border-t border-slate-50 dark:border-slate-800">
-                        <a href="{{ url('/dashboard/notifications') }}"
+                        <a href="<?php echo e(url('/dashboard/notifications')); ?>"
                             class="flex items-center justify-center py-2 text-[9px] font-black text-primary uppercase tracking-[0.2em] hover:bg-primary/5 rounded-xl transition-all">
                             View all notifications
                         </a>
@@ -181,7 +181,7 @@
             </div>
         </div>
 
-        {{-- Profile Dropdown --}}
+        
         <div class="relative" x-data="{ open: false }">
             <button @click="open = !open" @click.outside="open = false"
                 class="flex items-center gap-3 p-1.5 focus:outline-none transition-all active:scale-95 group">
@@ -189,7 +189,7 @@
                     <div
                         class="absolute inset-0 bg-primary/20 blur-md rounded-full scale-0 group-hover:scale-125 transition-transform duration-500">
                     </div>
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=6366f1&color=fff&bold=true"
+                    <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(auth()->user()->name)); ?>&background=6366f1&color=fff&bold=true"
                         class="w-full h-full rounded-xl border border-slate-100 dark:border-slate-800 relative z-10">
                 </div>
             </button>
@@ -200,19 +200,21 @@
                 class="absolute right-0 mt-4 w-64 bg-white dark:bg-slate-900 rounded-3xl p-3 shadow-2xl border border-slate-100 dark:border-slate-800 z-50">
                 <div class="p-4 border-b border-slate-50 dark:border-slate-800 mb-2">
                     <p class="font-bold text-sm text-slate-900 dark:text-white truncate uppercase tracking-tight">
-                        {{ auth()->user()->name }}
+                        <?php echo e(auth()->user()->name); ?>
+
                     </p>
                     <p class="text-[10px] font-bold text-slate-400 truncate mt-0.5 uppercase tracking-wider">
-                        {{ auth()->user()->email }}
+                        <?php echo e(auth()->user()->email); ?>
+
                     </p>
                 </div>
 
                 <div class="space-y-1">
-                    <a href="{{ url('/dashboard/profile') }}"
+                    <a href="<?php echo e(url('/dashboard/profile')); ?>"
                         class="flex items-center justify-between px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-all">
                         <span>My Profile</span>
                     </a>
-                    <a href="{{ url('/dashboard/settings') }}"
+                    <a href="<?php echo e(url('/dashboard/settings')); ?>"
                         class="flex items-center justify-between px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-all">
                         <span>Settings</span>
                     </a>
@@ -220,8 +222,8 @@
 
                 <div class="border-t border-slate-50 dark:border-slate-800 my-2"></div>
 
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
+                <form action="<?php echo e(route('logout')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
                     <button type="submit"
                         class="flex items-center gap-3 px-4 py-4 rounded-xl text-[10px] font-black text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all w-full text-left uppercase tracking-[0.2em]">
                         Sign Out
@@ -230,4 +232,4 @@
             </div>
         </div>
     </div>
-</header>
+</header><?php /**PATH C:\Users\bruce\OneDrive\Desktop\Projects\RocketDataHub\resources\views/components/dashboard-header.blade.php ENDPATH**/ ?>

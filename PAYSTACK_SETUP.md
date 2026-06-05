@@ -1,3 +1,7 @@
+> [!CAUTION]
+> **API INTEGRATION DISABLED**
+> All API features, keys, routes, and provider integrations have been commented out and disabled in this codebase.
+
 # Paystack Integration Setup Guide
 
 ## Quick Start

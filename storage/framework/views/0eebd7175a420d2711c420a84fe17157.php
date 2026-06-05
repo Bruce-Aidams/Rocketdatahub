@@ -1,15 +1,14 @@
-@extends('layouts.dashboard')
-@section('title', 'Buy Data')
+<?php $__env->startSection('title', 'Buy Data'); ?>
 
-@php
+<?php
     /** @var \Illuminate\Database\Eloquent\Collection|\App\Models\Bundle[] $bundles */
     /** @var \Illuminate\Support\Collection $networks */
-@endphp
+?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div x-data="purchasePage">
 
-        {{-- Confirmation Modal --}}
+        
         <template x-teleport="body">
             <div x-show="confirmModal.visible" class="fixed inset-0 z-[100] flex items-center justify-center p-4 ">
                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="confirmModal.visible = false"
@@ -55,7 +54,7 @@
             </div>
         </template>
 
-        {{-- Bulk Preview Modal --}}
+        
         <template x-teleport="body">
             <div x-show="bulkPreviewModal.visible" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="bulkPreviewModal.visible = false"
@@ -176,7 +175,7 @@
             </div>
         </template>
 
-        {{-- Toast Notification --}}
+        
         <div x-show="toast.visible" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0"
@@ -200,9 +199,9 @@
             </div>
         </div>
 
-        {{-- Main Content --}}
+        
         <div class="max-w-6xl mx-auto space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {{-- Header --}}
+            
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <div
@@ -223,7 +222,7 @@
             </div>
 
             <div class="grid gap-6 md:grid-cols-5">
-                {{-- Form Section --}}
+                
                 <div class="md:col-span-3">
                     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm h-full overflow-hidden transition-colors duration-500"
                         :class="getNetworkColor(selectedNetwork, 'border')">
@@ -233,7 +232,7 @@
                             <p class="text-sm text-slate-500">Follow the steps to complete your purchase.</p>
                         </div>
                         <div class="p-6">
-                            {{-- Tab switch --}}
+                            
                             <div class="flex border-b border-slate-100 dark:border-slate-800 mb-6 pb-4 gap-4">
                                 <button type="button" @click="activeMode = 'single'"
                                     class="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 border-none cursor-pointer"
@@ -250,7 +249,7 @@
                             <div x-show="activeMode === 'single'">
                                 <form @submit.prevent="handleSubmit" class="space-y-6">
 
-                                {{-- Step 1: Select Network --}}
+                                
                                 <div class="space-y-2" x-ref="step1">
                                     <label
                                         class="text-sm font-semibold flex items-center gap-2 text-slate-700 dark:text-slate-300">
@@ -282,7 +281,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Step 2: Select Bundle --}}
+                                
                                 <div class="space-y-2 transition-all duration-300" x-ref="step2"
                                     :class="!selectedNetwork ? 'opacity-50 pointer-events-none' : ''">
                                     <label
@@ -315,7 +314,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Step 3: Recipient Phone --}}
+                                
                                 <div class="space-y-2 transition-all duration-300" x-ref="step3"
                                     :class="!selectedBundleId ? 'opacity-50 pointer-events-none' : ''">
                                     <label
@@ -358,7 +357,7 @@
 
 
 
-                                {{-- Step 4: Payment Method --}}
+                                
                                 <div class="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800 transition-all duration-300"
                                     :class="!phoneState.valid ? 'opacity-50 pointer-events-none grayscale' : ''">
                                     <label
@@ -370,7 +369,7 @@
                                     </label>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {{-- Wallet Option --}}
+                                        
                                         <div @click="paymentMethod = 'wallet'"
                                             class="cursor-pointer relative overflow-hidden rounded-2xl border transition-all duration-300 group"
                                             :class="paymentMethod === 'wallet' ? getNetworkColor(selectedNetwork, 'active-payment') : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'">
@@ -412,10 +411,10 @@
                                                             class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Balance</span>
                                                         <span
                                                             class="text-sm font-mono font-black text-slate-700 dark:text-slate-200">GHS
-                                                            {{ number_format(auth()->user()->wallet_balance, 2) }}</span>
+                                                            <?php echo e(number_format(auth()->user()->wallet_balance, 2)); ?></span>
                                                     </div>
 
-                                                    <div x-show="selectedBundle && {{ auth()->user()->wallet_balance }} < parseFloat(selectedBundle.price)"
+                                                    <div x-show="selectedBundle && <?php echo e(auth()->user()->wallet_balance); ?> < parseFloat(selectedBundle.price)"
                                                         class="mt-2 text-[10px] text-red-500 font-bold flex items-center gap-1 animate-pulse">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
@@ -433,7 +432,7 @@
                                             </div>
                                         </div>
 
-                                        {{-- Paystack Option --}}
+                                        
                                         <div @click="paymentMethod = 'paystack'"
                                             class="cursor-pointer relative overflow-hidden rounded-2xl border transition-all duration-300 group"
                                             :class="paymentMethod === 'paystack' ? getNetworkColor(selectedNetwork, 'active-payment') : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'">
@@ -490,14 +489,14 @@
                                     </div>
                                 </div>
 
-                                {{-- Mobile Invoice Preview --}}
+                                
                                 <div x-show="selectedBundleId" x-transition:enter="transition ease-out duration-300"
                                     x-transition:enter-start="opacity-0 translate-y-4"
                                     x-transition:enter-end="opacity-100 translate-y-0" class="md:hidden pb-6">
                                     <div class="relative overflow-hidden rounded-2xl p-6 text-white shadow-xl transition-colors duration-500"
                                         :class="getNetworkColor(selectedNetwork, 'card-bg')">
 
-                                        {{-- Header with Clear Button --}}
+                                        
                                         <div class="flex justify-between items-start mb-6 border-b border-white/20 pb-4">
                                             <div>
                                                 <h4
@@ -518,7 +517,7 @@
                                         </div>
 
                                         <div class="space-y-4">
-                                            {{-- Network Edit --}}
+                                            
                                             <div class="flex justify-between items-center group cursor-pointer"
                                                 @click="$refs.step1.scrollIntoView({behavior: 'smooth', block: 'center'})">
                                                 <div>
@@ -536,7 +535,7 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Bundle Edit --}}
+                                            
                                             <div class="flex justify-between items-center group cursor-pointer"
                                                 @click="$refs.step2.scrollIntoView({behavior: 'smooth', block: 'center'}); $refs.step2.classList.add('ring-2', 'ring-primary/20'); setTimeout(() => $refs.step2.classList.remove('ring-2', 'ring-primary/20'), 1000)">
                                                 <div class="flex-1 pr-4">
@@ -555,7 +554,7 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Phone Edit --}}
+                                            
                                             <div class="flex justify-between items-center group cursor-pointer"
                                                 @click="$refs.step3.scrollIntoView({behavior: 'smooth', block: 'center'})">
                                                 <div>
@@ -582,9 +581,9 @@
                                     </div>
                                 </div>
 
-                                {{-- Pay Button --}}
+                                
                                 <button type="submit"
-                                    :disabled="isLoading || !selectedBundleId || !phoneState.valid || (paymentMethod === 'wallet' && selectedBundle && {{ auth()->user()->wallet_balance }} < parseFloat(selectedBundle.price))"
+                                    :disabled="isLoading || !selectedBundleId || !phoneState.valid || (paymentMethod === 'wallet' && selectedBundle && <?php echo e(auth()->user()->wallet_balance); ?> < parseFloat(selectedBundle.price))"
                                     class="w-full h-16 text-lg shadow-xl transition-all active:scale-[0.98] rounded-2xl font-black text-white flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                                     :class="isLoading ? 'bg-slate-400 cursor-wait' : getNetworkColor(selectedNetwork, 'btn')">
                                     <span x-show="!isLoading"
@@ -609,9 +608,9 @@
                             </form>
                             </div>
 
-                            {{-- Bulk Order Mode --}}
+                            
                             <div x-show="activeMode === 'bulk'" class="space-y-6" x-cloak>
-                                {{-- Step 1: Select Network --}}
+                                
                                 <div class="space-y-2">
                                     <label class="text-sm font-semibold flex items-center gap-2 text-slate-700 dark:text-slate-300">
                                         <div class="w-6 h-6 bg-slate-100 dark:bg-slate-800 rounded-md flex items-center justify-center text-[10px] font-bold">1</div>
@@ -635,7 +634,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Step 2: Pasted Text and File --}}
+                                
                                 <div class="space-y-4 transition-all duration-300" :class="!selectedNetwork ? 'opacity-50 pointer-events-none' : ''">
                                     <label class="text-sm font-semibold flex items-center gap-2 text-slate-700 dark:text-slate-300">
                                         <div class="w-6 h-6 bg-slate-100 dark:bg-slate-800 rounded-md flex items-center justify-center text-[10px] font-bold">2</div>
@@ -664,7 +663,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Process Button --}}
+                                
                                 <button type="button" @click="processBulkInput"
                                     :disabled="isLoading || !selectedNetwork || (!bulkText.trim() && !uploadedFileContent.length)"
                                     class="w-full h-14 text-sm shadow-xl transition-all active:scale-[0.98] rounded-xl font-black text-white flex items-center justify-center gap-3 border-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -679,13 +678,13 @@
                     </div>
                 </div>
 
-                {{-- Live Preview Section --}}
+                
                 <div class="hidden md:block md:col-span-2 space-y-6">
-                    {{-- Preview Card --}}
+                    
                     <div class="text-white rounded-2xl overflow-hidden relative shadow-2xl min-h-[300px] flex flex-col justify-between border-none transition-colors duration-500"
                         :class="getNetworkColor(selectedNetwork, 'card-bg')">
 
-                        {{-- Decorative Patterns --}}
+                        
                         <div
                             class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none">
                         </div>
@@ -714,7 +713,7 @@
                             </div>
 
                             <div class="space-y-6">
-                                {{-- Network Edit --}}
+                                
                                 <div class="space-y-1 cursor-pointer group"
                                     @click="$refs.step1.scrollIntoView({behavior: 'smooth', block: 'center'})">
                                     <div class="flex items-center gap-2">
@@ -730,7 +729,7 @@
                                         x-text="selectedNetwork || '---'"></p>
                                 </div>
 
-                                {{-- Bundle Edit --}}
+                                
                                 <div class="space-y-1 cursor-pointer group"
                                     @click="$refs.step2.scrollIntoView({behavior: 'smooth', block: 'center'}); $refs.step2.classList.add('ring-2', 'ring-primary/20'); setTimeout(() => $refs.step2.classList.remove('ring-2', 'ring-primary/20'), 1000)">
                                     <div class="flex items-center gap-2">
@@ -747,7 +746,7 @@
                                     </p>
                                 </div>
 
-                                {{-- Recipient Edit --}}
+                                
                                 <div class="space-y-1 cursor-pointer group"
                                     @click="$refs.step3.scrollIntoView({behavior: 'smooth', block: 'center'})">
                                     <div class="flex items-center gap-2">
@@ -774,7 +773,7 @@
                         </div>
                     </div>
 
-                    {{-- Warning Card --}}
+                    
                     <div
                         class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex gap-5">
                         <div
@@ -794,7 +793,7 @@
                 </div>
             </div>
 
-            {{-- Cart / Placed Orders Section --}}
+            
             <div x-show="cartItems.length > 0" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0"
                 class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-colors duration-500 mt-6" x-cloak>
@@ -830,7 +829,7 @@
                     </div>
                 </div>
 
-                {{-- Cart Table --}}
+                
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
@@ -848,14 +847,14 @@
                                 <tr class="hover:bg-slate-50/30 dark:hover:bg-slate-800/10 transition-colors duration-200">
                                     <td class="px-6 py-4 text-xs font-bold text-slate-500" x-text="index + 1"></td>
                                     
-                                    {{-- Recipient Phone Input --}}
+                                    
                                     <td class="px-6 py-3">
                                         <input type="text" x-model="item.phone" @input="validateCartItem(item)"
                                             class="w-full h-10 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold tracking-wider outline-none"
                                             :class="item.valid ? 'focus:border-emerald-500' : 'border-red-300 dark:border-red-900/50 focus:border-red-500'">
                                     </td>
                                     
-                                    {{-- Selected Bundle Select --}}
+                                    
                                     <td class="px-6 py-3">
                                         <select x-model="item.bundleId" @change="updateCartItemBundle(item)"
                                             class="w-full h-10 px-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold cursor-pointer outline-none focus:border-primary">
@@ -866,12 +865,12 @@
                                         </select>
                                     </td>
                                     
-                                    {{-- Price --}}
+                                    
                                     <td class="px-6 py-4 text-xs font-mono font-black text-slate-700 dark:text-slate-300">
                                         GHS <span x-text="parseFloat(item.price).toFixed(2)"></span>
                                     </td>
                                     
-                                    {{-- Validation Badge --}}
+                                    
                                     <td class="px-6 py-4">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wide"
                                             :class="item.valid ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400'"
@@ -879,7 +878,7 @@
                                         </span>
                                     </td>
                                     
-                                    {{-- Actions --}}
+                                    
                                     <td class="px-6 py-3 text-center">
                                         <button type="button" @click="deleteCartItem(item.id)"
                                             class="w-8 h-8 rounded-lg flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors border-none bg-transparent cursor-pointer">
@@ -894,7 +893,7 @@
                     </table>
                 </div>
 
-                {{-- Cart Checkout controls --}}
+                
                 <div class="p-6 md:p-8 bg-slate-50/50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                         <div class="space-y-1">
@@ -934,14 +933,14 @@
             </div>
         </div>
 
-        @push('scripts')
+        <?php $__env->startPush('scripts'); ?>
             <script src="https://js.paystack.co/v1/inline.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
             <script>
                 document.addEventListener('alpine:init', () => {
                     Alpine.data('purchasePage', () => ({
-                        bundles: {!! json_encode($bundles) !!},
-                        networks: {!! json_encode($networks) !!},
+                        bundles: <?php echo json_encode($bundles); ?>,
+                        networks: <?php echo json_encode($networks); ?>,
                         selectedNetwork: '',
                         selectedBundleId: '',
                         phone: '',
@@ -1095,7 +1094,7 @@
 
                             // Check Wallet Balance if Wallet selected
                             if (this.paymentMethod === 'wallet') {
-                                const balance = {{ auth()->user()->wallet_balance }};
+                                const balance = <?php echo e(auth()->user()->wallet_balance); ?>;
                                 const price = parseFloat(this.selectedBundle.price);
                                 if (balance < price) {
                                     this.showToast('Insufficient wallet balance.', 'error');
@@ -1114,12 +1113,12 @@
                             this.isLoading = true;
 
                             try {
-                                const response = await fetch('{{ route('orders.store') }}', {
+                                const response = await fetch('<?php echo e(route('orders.store')); ?>', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
                                         'Accept': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                                     },
                                     body: JSON.stringify({
                                         bundle_id: this.selectedBundleId,
@@ -1141,7 +1140,7 @@
                                 } else {
                                     this.showToast('Order placed successfully!', 'success');
                                     setTimeout(() => {
-                                        window.location.href = data.redirect || '{{ route('orders.index') }}';
+                                        window.location.href = data.redirect || '<?php echo e(route('orders.index')); ?>';
                                     }, 1000);
                                 }
 
@@ -1419,7 +1418,7 @@
 
                         proceedToCartCheckout() {
                             if (this.paymentMethod === 'wallet') {
-                                const balance = {{ auth()->user()->wallet_balance }};
+                                const balance = <?php echo e(auth()->user()->wallet_balance); ?>;
                                 if (balance < this.totalCartPrice) {
                                     this.showToast('Insufficient wallet balance.', 'error');
                                     return;
@@ -1441,12 +1440,12 @@
                             this.isLoading = true;
                             
                             try {
-                                const response = await fetch('{{ route('orders.bulk.store') }}', {
+                                const response = await fetch('<?php echo e(route('orders.bulk.store')); ?>', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
                                         'Accept': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                                     },
                                     body: JSON.stringify({
                                         payment_method: this.paymentMethod,
@@ -1468,7 +1467,7 @@
                                 } else {
                                     this.showToast(data.message || 'Orders placed successfully!', 'success');
                                     setTimeout(() => {
-                                        window.location.href = data.redirect || '{{ route('orders.index') }}';
+                                        window.location.href = data.redirect || '<?php echo e(route('orders.index')); ?>';
                                     }, 1000);
                                 }
                             } catch (e) {
@@ -1479,5 +1478,6 @@
                     }));
                 });
             </script>
-        @endpush
-@endsection
+        <?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\bruce\OneDrive\Desktop\Projects\RocketDataHub\resources\views/dashboard/orders/new.blade.php ENDPATH**/ ?>

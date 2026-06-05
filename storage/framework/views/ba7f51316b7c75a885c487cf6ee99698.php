@@ -1,4 +1,4 @@
-@php
+<?php
     $menuItems = [
         ['name' => 'Dashboard', 'href' => '/dashboard', 'icon' => 'layout-dashboard', 'color' => 'indigo'],
         ['name' => 'Partner Hub', 'href' => '/dashboard/reseller-hub', 'icon' => 'globe', 'color' => 'indigo', 'reseller_only' => true],
@@ -33,7 +33,7 @@
         'clipboard-list' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>',
         'bar-chart' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/>',
     ];
-@endphp
+?>
 
 <aside
     class="h-screen bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300 transform shadow-sm lg:shadow-none overflow-x-hidden group/sidebar"
@@ -45,10 +45,10 @@
     <div class="flex items-center h-20 border-b border-slate-50 dark:border-slate-800/50 relative overflow-hidden"
         :class="(isCollapsed && !sidebarOpen) ? 'justify-center' : 'px-8'">
         <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
-        <a href="{{ url('/dashboard') }}"
+        <a href="<?php echo e(url('/dashboard')); ?>"
             class="flex items-center gap-4 group/logo whitespace-nowrap overflow-hidden relative z-10">
             <div class="shrink-0">
-                <img src="{{ asset('favicon.ico') }}" alt="Logo"
+                <img src="<?php echo e(asset('favicon.ico')); ?>" alt="Logo"
                     class="w-8 h-8 rounded-lg shadow-sm group-hover/logo:scale-110 transition-all duration-500 bg-white p-1 ring-1 ring-slate-100 dark:ring-slate-800">
             </div>
             <div x-show="!isCollapsed || sidebarOpen" x-cloak
@@ -61,46 +61,47 @@
         </a>
     </div>
 
-    {{-- Navigation --}}
+    
     <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto custom-scrollbar overflow-x-hidden">
-        @foreach($menuItems as $item)
-            @if(isset($item['reseller_only']) && $item['reseller_only'] && !auth()->user()->isReseller())
-                @continue
-            @endif
-            @php
+        <?php $__currentLoopData = $menuItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if(isset($item['reseller_only']) && $item['reseller_only'] && !auth()->user()->isReseller()): ?>
+                <?php continue; ?>
+            <?php endif; ?>
+            <?php
                 $isActive = request()->is(ltrim($item['href'], '/')) || (request()->is('dashboard') && $item['href'] === '/dashboard');
                 // Active Colors Mapping
                 $activeBgClass = 'bg-' . $item['color'] . '-500/10';
                 $activeTextClass = 'text-' . $item['color'] . '-500';
                 $activeShadowClass = 'shadow-lg shadow-' . $item['color'] . '-500/20';
-            @endphp
-            <a href="{{ url($item['href']) }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group/nav {{ $isActive ? $activeBgClass . ' ' . $activeTextClass . ' ' . $activeShadowClass : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent' }}"
+            ?>
+            <a href="<?php echo e(url($item['href'])); ?>"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group/nav <?php echo e($isActive ? $activeBgClass . ' ' . $activeTextClass . ' ' . $activeShadowClass : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent'); ?>"
                 :class="(isCollapsed && !sidebarOpen) && 'justify-center px-0 h-12 w-12 mx-auto'"
-                :title="(isCollapsed && !sidebarOpen) ? '{{ $item['name'] }}' : ''">
+                :title="(isCollapsed && !sidebarOpen) ? '<?php echo e($item['name']); ?>' : ''">
                 <span
-                    class="shrink-0 transition-all duration-300 group-hover/nav:scale-110 {{ $isActive ? $activeTextClass : 'text-slate-400 group-hover/nav:text-' . $item['color'] . '-500' }}">
+                    class="shrink-0 transition-all duration-300 group-hover/nav:scale-110 <?php echo e($isActive ? $activeTextClass : 'text-slate-400 group-hover/nav:text-' . $item['color'] . '-500'); ?>">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {!! $icons[$item['icon']] !!}
+                        <?php echo $icons[$item['icon']]; ?>
+
                     </svg>
                 </span>
                 <span x-show="!isCollapsed || sidebarOpen" x-cloak
-                    class="text-[11px] font-bold uppercase tracking-wider transition-all duration-300 animate-in slide-in-from-left-2">{{ $item['name'] }}</span>
+                    class="text-[11px] font-bold uppercase tracking-wider transition-all duration-300 animate-in slide-in-from-left-2"><?php echo e($item['name']); ?></span>
             </a>
 
-            {{-- Dividers --}}
-            @if($loop->index === 1 || $loop->index === 5 || $loop->index === 9)
+            
+            <?php if($loop->index === 1 || $loop->index === 5 || $loop->index === 9): ?>
                 <div x-show="!isCollapsed || sidebarOpen" class="px-5 pt-6 pb-2">
                     <div class="h-px bg-slate-100 dark:bg-slate-800 flex-1"></div>
                 </div>
-            @endif
-        @endforeach
+            <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </nav>
 
-    {{-- Footer/Logout --}}
+    
     <div class="p-6 border-t border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
+        <form action="<?php echo e(route('logout')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
             <button type="submit"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 transition-all duration-300 w-full group overflow-hidden border border-transparent font-bold text-[10px] uppercase tracking-widest"
                 :class="(isCollapsed && !sidebarOpen) ? 'justify-center px-0 h-12 w-12 mx-auto' : ''">
@@ -113,4 +114,4 @@
             </button>
         </form>
     </div>
-</aside>
+</aside><?php /**PATH C:\Users\bruce\OneDrive\Desktop\Projects\RocketDataHub\resources\views/components/sidebar.blade.php ENDPATH**/ ?>

@@ -164,10 +164,15 @@ class AdminController extends Controller
         return $settings;
     }
 
+    /*
+    ============================================================
+    API INTEGRATION COMMENTED OUT
+    ============================================================
     public function docs()
     {
         return view('admin.docs.index');
     }
+    */
 
     public function getSettings()
     {
@@ -349,6 +354,10 @@ class AdminController extends Controller
         ]);
     }
 
+    /*
+    ============================================================
+    API INTEGRATION COMMENTED OUT
+    ============================================================
     public function getApiProviders()
     {
         return \App\Models\ApiProvider::latest()->get();
@@ -391,6 +400,7 @@ class AdminController extends Controller
     {
         return \App\Models\ApiLog::with('provider')->latest()->paginate(50);
     }
+    */
 
 
     public function getDashboardStats(Request $request)

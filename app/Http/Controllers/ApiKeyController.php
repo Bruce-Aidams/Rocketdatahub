@@ -1,17 +1,26 @@
 <?php
 
+/**
+ * ============================================================
+ * API INTEGRATION COMMENTED OUT
+ * All API key management functions have been disabled.
+ * To re-enable, uncomment the code below.
+ * ============================================================
+ */
+
 namespace App\Http\Controllers;
 
-use App\Models\ApiKey;
+// use App\Models\ApiKey;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Str;
+// use Illuminate\Support\Facades\Hash;
 
 class ApiKeyController extends Controller
 {
-    /**
+    /*
+    **
      * Generate a new API key
-     */
+     *
     public function generateKey(Request $request)
     {
         $request->validate([
@@ -63,9 +72,9 @@ class ApiKeyController extends Controller
         ]);
     }
 
-    /**
+    **
      * List all API keys for the authenticated user
-     */
+     *
     public function listKeys(Request $request)
     {
         $user = $request->user();
@@ -80,9 +89,9 @@ class ApiKeyController extends Controller
         ]);
     }
 
-    /**
+    **
      * Revoke (delete) an API key
-     */
+     *
     public function revokeKey(Request $request, $id)
     {
         $user = $request->user();
@@ -109,9 +118,9 @@ class ApiKeyController extends Controller
         return back()->with('success', 'API Key deleted successfully.');
     }
 
-    /**
+    **
      * Regenerate an existing API key
-     */
+     *
     public function regenerateKey(Request $request, $id)
     {
         $user = $request->user();
@@ -153,9 +162,9 @@ class ApiKeyController extends Controller
         ]);
     }
 
-    /**
+    **
      * Get API key usage statistics
-     */
+     *
     public function getKeyStats(Request $request, $id)
     {
         $user = $request->user();
@@ -182,4 +191,6 @@ class ApiKeyController extends Controller
             'days_until_expiry' => $apiKey->expires_at ? now()->diffInDays($apiKey->expires_at, false) : null,
         ]);
     }
+    */
 }
+

@@ -53,7 +53,11 @@ class GoogleAuthController extends Controller
         try {
             $user = $this->findOrCreateUser($googleUser);
             Auth::login($user, true); // remember=true for convenience
-            return redirect()->intended(route('dashboard'));
+            $intendedUrl = redirect()->intended(route('dashboard'))->getTargetUrl();
+            if (str_contains($intendedUrl, '/poll') || str_contains($intendedUrl, '/api/') || str_contains($intendedUrl, '/webhooks/')) {
+                return redirect()->route('dashboard');
+            }
+            return redirect($intendedUrl);
         } catch (\Exception $e) {
             Log::error('Google OAuth user creation/login failed: ' . $e->getMessage());
             return redirect()->route('login')

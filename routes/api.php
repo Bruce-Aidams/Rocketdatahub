@@ -56,6 +56,10 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
     Route::get('/payouts', [PayoutController::class, 'index']);
     Route::post('/payouts', [PayoutController::class, 'store']);
 
+    /*
+    ============================================================
+    API INTEGRATION COMMENTED OUT
+    ============================================================
     // API Key Management
     Route::prefix('api-keys')->group(function () {
         Route::get('/', [ApiKeyController::class, 'listKeys']);
@@ -64,6 +68,7 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
         Route::post('/{id}/regenerate', [ApiKeyController::class, 'regenerateKey']);
         Route::get('/{id}/stats', [ApiKeyController::class, 'getKeyStats']);
     });
+    */
 
     // Orders (User)
     Route::get('/orders', [OrderController::class, 'index']);
@@ -122,6 +127,10 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
         Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'adminIndex']);
         Route::post('/notifications', [App\Http\Controllers\NotificationController::class, 'store']);
 
+        /*
+        ============================================================
+        API INTEGRATION COMMENTED OUT
+        ============================================================
         // API Management
         Route::get('/api-providers', [App\Http\Controllers\ApiController::class, 'index']);
         Route::post('/api-providers', [App\Http\Controllers\ApiController::class, 'store']);
@@ -130,12 +139,18 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
         Route::post('/api-providers/test', [App\Http\Controllers\ApiController::class, 'testConnection']);
         Route::post('/api-providers/{id}/toggle', [App\Http\Controllers\ApiController::class, 'toggleActive']);
         Route::get('/api-logs', [App\Http\Controllers\ApiController::class, 'logs']);
+        */
     });
 });
 
 
 Route::post('/paystack/webhook', [PaystackController::class, 'handleWebhook']);
+/*
+============================================================
+API INTEGRATION COMMENTED OUT
+============================================================
 Route::post('/webhooks/incoming', [App\Http\Controllers\WebhookController::class, 'handle']);
+*/
 
 // Public Status Endpoint (Outside auth middleware)
 Route::get('/system/status', function () {
@@ -145,6 +160,10 @@ Route::get('/system/status', function () {
     ]);
 });
 
+/*
+============================================================
+API INTEGRATION COMMENTED OUT
+============================================================
 // Mock Vending Partner API for Local Connection and Flow Testing
 Route::post('/mock-vendor', function (Illuminate\Http\Request $request) {
     $apiKey = $request->header('X-API-Key') ?? str_replace('Bearer ', '', $request->header('Authorization'));
@@ -170,3 +189,4 @@ Route::post('/mock-vendor', function (Illuminate\Http\Request $request) {
         ]
     ]);
 });
+*/
