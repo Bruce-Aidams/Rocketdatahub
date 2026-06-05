@@ -21,7 +21,7 @@
             <!-- Overview -->
             <div class="prose dark:prose-invert max-w-none">
                 <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-sm md:text-base">
-                    CloudTech's API Manager allows you to connect to any external data vending platform without writing code. By configuring <strong>Active Providers</strong>, you can automatically route customer data orders to your vendors in real-time. Follow this guide to set up your first connection.
+                    RocketDataHub's API Manager allows you to connect to any external data vending platform without writing code. By configuring <strong>Active Providers</strong>, you can automatically route customer data orders to your vendors in real-time. Follow this guide to set up your first connection.
                 </p>
             </div>
 
@@ -147,7 +147,7 @@
                             </div>
                             <h5 class="text-sm font-black uppercase text-slate-900 dark:text-white">Sending Webhooks</h5>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed mb-4">You can set a <strong>Webhook Callback URL</strong> in the Security tab of any Provider. CloudTech will push an event to that URL when an order completes.</p>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed mb-4">You can set a <strong>Webhook Callback URL</strong> in the Security tab of any Provider. RocketDataHub will push an event to that URL when an order completes.</p>
                         <div class="bg-slate-900 rounded-xl p-4 font-mono text-[10px] text-slate-300 border border-slate-800">
                             <span class="text-purple-400">{</span><br>
                             <span class="pl-4">"event": <span class="text-emerald-400">"order.completed"</span>,</span><br>

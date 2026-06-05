@@ -18,7 +18,7 @@
                 <div>
                     <h2 class="text-3xl font-black tracking-tight text-blue-900 dark:text-white uppercase">API Keys</h2>
                     <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">Manage your API keys to
-                        integrate CloudTech with your own applications.</p>
+                        integrate RocketDataHub with your own applications.</p>
                 </div>
             </div>
             <button @click="formOpen = !formOpen"
@@ -245,7 +245,7 @@
         </div>
 
 
-        <!-- CloudTech API Documentation View -->
+        <!-- RocketDataHub API Documentation View -->
         <div
             class="space-y-8 pt-10 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <div

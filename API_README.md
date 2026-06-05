@@ -1,18 +1,18 @@
 # API Integration Guide
 
-This document provides a comprehensive guide for connecting your CloudTech platform to external applications, and for allowing external applications to interact with CloudTech.
+This document provides a comprehensive guide for connecting your RocketDataHub platform to external applications, and for allowing external applications to interact with RocketDataHub.
 
 ---
 
-## 1. INBOUND: Connecting an External App to CloudTech
+## 1. INBOUND: Connecting an External App to RocketDataHub
 
-If you want an external mobile app, storefront, or website to interact with CloudTech (e.g., to fetch data bundles and place orders on behalf of users), use the following guide.
+If you want an external mobile app, storefront, or website to interact with RocketDataHub (e.g., to fetch data bundles and place orders on behalf of users), use the following guide.
 
 ### Authentication
 
-CloudTech uses Bearer Tokens (API Keys) for authentication. 
+RocketDataHub uses Bearer Tokens (API Keys) for authentication. 
 
-1. Log into your CloudTech dashboard.
+1. Log into your RocketDataHub dashboard.
 2. Navigate to **API Access / API Keys**.
 3. Generate a new key and save it securely.
 
@@ -89,12 +89,12 @@ Retrieve the details and current status of a specific order.
 
 ---
 
-## 2. OUTBOUND: Connecting CloudTech to an External Data/VTU Provider
+## 2. OUTBOUND: Connecting RocketDataHub to an External Data/VTU Provider
 
-If you want CloudTech to automatically fulfill orders by connecting to a third-party VTU or Data provider's API, follow these steps.
+If you want RocketDataHub to automatically fulfill orders by connecting to a third-party VTU or Data provider's API, follow these steps.
 
 ### Setup Steps
-1. Log in to CloudTech as an **Admin**.
+1. Log in to RocketDataHub as an **Admin**.
 2. Navigate to **Admin > API Management > API Providers**.
 3. Click **Add New Provider** and configure the connection details provided by your third-party API.
 
@@ -108,7 +108,7 @@ If you want CloudTech to automatically fulfill orders by connecting to a third-p
     "Content-Type": "application/json"
   }
   ```
-- **Request Body Template**: Instruct CloudTech how to format the data sent to the external API using placeholders.
+- **Request Body Template**: Instruct RocketDataHub how to format the data sent to the external API using placeholders.
   - `{{phone}}` -> Replaced with the customer's phone number.
   - `{{amount}}` -> Replaced with the data bundle plan.
   - `{{network}}` -> Replaced with the network name.
@@ -123,16 +123,16 @@ If you want CloudTech to automatically fulfill orders by connecting to a third-p
     "ref": "{{request_id}}"
   }
   ```
-- **Response Settings**: Define how CloudTech knows the order was successful.
+- **Response Settings**: Define how RocketDataHub knows the order was successful.
   - **Success Field**: The JSON key in the response that indicates status (e.g., `status`).
   - **Success Value**: The value that means success (e.g., `success`, `true`, or `200`).
 
-Once configured, click **Test Connection** to ensure the third-party API is reachable, then toggle the provider to **Active**. CloudTech will now automatically route matching data orders through this provider.
+Once configured, click **Test Connection** to ensure the third-party API is reachable, then toggle the provider to **Active**. RocketDataHub will now automatically route matching data orders through this provider.
 
 ---
 
 ## 3. Webhooks
 
-CloudTech supports webhooks for real-time status updates:
-- **Incoming Webhooks**: `POST /api/webhooks/incoming` - External providers can send status updates to this endpoint to transition pending CloudTech orders to `delivered` or `failed`.
-- **Outgoing Webhooks**: Can be configured in the API integrations so that CloudTech automatically pings your external server when an order finishes processing.
+RocketDataHub supports webhooks for real-time status updates:
+- **Incoming Webhooks**: `POST /api/webhooks/incoming` - External providers can send status updates to this endpoint to transition pending RocketDataHub orders to `delivered` or `failed`.
+- **Outgoing Webhooks**: Can be configured in the API integrations so that RocketDataHub automatically pings your external server when an order finishes processing.

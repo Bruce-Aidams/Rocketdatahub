@@ -20,13 +20,13 @@
     <style>
         body {
             font-family: 'Outfit', sans-serif;
-            background: #000;
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px) saturate(1.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 40px rgba(100,100,180,.12);
         }
 
         .animate-float {
@@ -34,35 +34,22 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-20px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
         .glow-blue {
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
         }
     </style>
 </head>
 
-<body class="bg-black text-white antialiased min-h-screen flex items-center justify-center p-4 md:p-6">
-    <!-- Neural Background -->
-    <div class="fixed inset-0 opacity-20 pointer-events-none">
-        <svg width="100%" height="100%" class="absolute inset-0">
-            <defs>
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(59,130,246,0.1)" stroke-width="1" />
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-    </div>
+<body class="antialiased min-h-screen flex items-center justify-center p-4 md:p-6 text-slate-800">
+
+    {{-- Gradient background --}}
+    @include('partials._site_bg')
+
+    {{-- No neural grid needed on light bg --}}
 
     <div class="relative w-full max-w-2xl z-10" x-data="{ requested: {{ session('success') ? 'true' : 'false' }} }">
         <!-- Main Card -->
@@ -85,15 +72,14 @@
             <!-- Content -->
             <div class="space-y-4 sm:space-y-6">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl md:text-5xl font-black tracking-tighter uppercase mb-2">Access
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter mb-2 text-slate-800">Access
                         Restricted</h1>
-                    <p
-                        class="text-blue-500 font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[8px] sm:text-[10px] md:text-xs">
-                        Security Protocols Active</p>
+                    <p class="text-indigo-500 font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[8px] sm:text-[10px] md:text-xs">
+                        Verification Pending</p>
                 </div>
 
                 <div class="max-w-md mx-auto">
-                    <p class="text-slate-400 text-xs sm:text-sm md:text-base leading-relaxed">
+                    <p class="text-slate-500 text-xs sm:text-sm md:text-base leading-relaxed">
                         Your account is currently in a <strong>Pending Verification</strong> state. To maintain the
                         security of our data ecosystem, all new accounts must be manually approved by our security team.
                     </p>
@@ -101,7 +87,7 @@
 
                 <!-- Status Indicator -->
                 <div
-                    class="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 bg-white/5 rounded-xl sm:rounded-2xl border border-white/10">
+                    class="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 bg-amber-50 rounded-xl sm:rounded-2xl border border-amber-200">
                     <div class="relative flex h-2 w-2 sm:h-3 sm:w-3">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -154,10 +140,10 @@
         <!-- System Meta -->
         <div class="mt-6 sm:mt-8 flex justify-between items-center px-2 sm:px-4">
             <div class="flex items-center gap-1.5">
-                <div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500"></div>
-                <span class="font-mono text-[8px] sm:text-[9px] text-slate-500 uppercase">Enclave Node Gh-1</span>
+                <div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-indigo-500"></div>
+                <span class="font-mono text-[8px] sm:text-[9px] text-slate-400 uppercase">RocketDataHub</span>
             </div>
-            <span class="font-mono text-[8px] sm:text-[9px] text-slate-500">ID:
+            <span class="font-mono text-[8px] sm:text-[9px] text-slate-400">ID:
                 {{ strtoupper(substr(auth()->user()->id, 0, 8)) }}</span>
         </div>
     </div>

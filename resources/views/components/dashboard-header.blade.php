@@ -50,9 +50,6 @@
     </div>
 
     <div class="flex items-center gap-4">
-        {{-- Theme Switcher --}}
-        <x-theme-toggle />
-
         {{-- Notifications Dropdown --}}
         <div class="relative" x-data="{ 
             open: false, 

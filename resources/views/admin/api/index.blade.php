@@ -880,7 +880,7 @@
                 </div>
             </div>
         </div>
-        <!-- CloudTech API Documentation View -->
+        <!-- RocketDataHub API Documentation View -->
         <div x-show="tab === 'docs'" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-12 border border-slate-100 dark:border-slate-800 shadow-sm text-center">
                 

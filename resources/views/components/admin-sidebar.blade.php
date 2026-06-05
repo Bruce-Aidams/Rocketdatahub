@@ -59,7 +59,7 @@
             <div x-show="!isCollapsed || sidebarOpen" x-cloak
                 class="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500">
                 <span
-                    class="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">CloudTech</span>
+                    class="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">RocketDataHub</span>
                 <span class="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-widest">Admin Portal</span>
             </div>
         </a>

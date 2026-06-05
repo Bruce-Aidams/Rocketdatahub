@@ -190,9 +190,9 @@
                 <tr>
                     <td>
                         @if(file_exists(public_path('images/logo.png')))
-                            <img src="{{ public_path('images/logo.png') }}" class="logo" alt="CloudTech Logo">
+                            <img src="{{ public_path('images/logo.png') }}" class="logo" alt="RocketDataHub Logo">
                         @else
-                            <h2 style="margin:0; font-size: 24px;">CLOUDTECH</h2>
+                            <h2 style="margin:0; font-size: 24px;">ROCKETDATAHUB</h2>
                         @endif
                     </td>
                     <td>
@@ -262,7 +262,7 @@
 
         <div class="footer">
             <div class="footer-logo">
-                <strong style="color: #64748b; font-size: 12px;">CloudTech Data Services</strong>
+                <strong style="color: #64748b; font-size: 12px;">RocketDataHub Data Services</strong>
             </div>
             <p style="margin: 0;">Thank you for your business!</p>
             <p style="margin: 4px 0 0 0; opacity: 0.7;">This is an electronically generated receipt.</p>

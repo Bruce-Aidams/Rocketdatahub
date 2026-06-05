@@ -54,7 +54,7 @@
             <div x-show="!isCollapsed || sidebarOpen" x-cloak
                 class="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500">
                 <span
-                    class="font-bold text-lg tracking-tight text-slate-900 dark:text-slate-100 leading-none group-hover/logo:text-primary transition-colors">CloudTech</span>
+                    class="font-bold text-lg tracking-tight text-slate-900 dark:text-slate-100 leading-none group-hover/logo:text-primary transition-colors">RocketDataHub</span>
                 <span
                     class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Platform</span>
             </div>

@@ -1,153 +1,122 @@
-<footer
-    class="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-20 relative overflow-hidden">
-    <!-- Abstract Footer Blurs -->
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -z-10 animate-pulse"></div>
-    <div class="absolute top-0 left-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px] -z-10"></div>
+<footer class="relative overflow-hidden" style="background: linear-gradient(135deg, #0f0c29 0%, #1a1060 40%, #0d1b4b 70%, #080e2a 100%);">
 
-    <div class="container mx-auto px-4 sm:px-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-            <div class="col-span-2 lg:col-span-2 space-y-4">
-                <a href="{{ url('/') }}" class="flex items-center gap-2 group">
-                    <div
-                        class="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm group-hover:rotate-12 transition-all duration-500 border border-slate-50 dark:border-slate-800 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent"></div>
-                        <img src="{{ asset('favicon.ico') }}" alt="Logo" class="w-6 h-6 relative z-10">
-                    </div>
-                    <span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white">CloudTech</span>
+    {{-- Ambient glow orbs --}}
+    <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(79,140,255,0.12) 0%, transparent 70%);"></div>
+    <div class="absolute top-0 left-0 w-80 h-80 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(99,100,255,0.10) 0%, transparent 70%);"></div>
+
+    <div class="relative z-10 container mx-auto px-4 sm:px-8 pt-16 pb-8">
+
+        {{-- Top: Logo + tagline left, nav columns right --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 pb-12 border-b border-white/10">
+
+            {{-- Brand Column --}}
+            <div class="space-y-5">
+                <a href="{{ url('/') }}" class="inline-flex items-center gap-4 group">
+                    <img src="{{ asset('logo.png') }}"
+                         alt="RocketDataHub Logo"
+                         class="w-14 h-14 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_12px_rgba(79,140,255,0.5)]">
+                    <span class="font-black text-2xl tracking-tight text-white">
+                        Rocket Data
+                    </span>
                 </a>
-                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-xs font-medium">
-                    Simplifying digital access for everyone in Ghana. Trusted platform for affordable data
-                    bundles and instant delivery.
+
+                <p class="text-slate-400 text-sm leading-relaxed max-w-sm">
+                    Ghana's fastest automated data vending hub. Instant delivery of MTN, Telecel, and AirtelTigo bundles — 24 hours, 7 days.
                 </p>
-            </div>
 
-            <div class="space-y-4">
-                <h4 class="font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                    Services</h4>
-                <nav class="flex flex-col gap-3 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <a href="{{ url('/') }}#networks"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
-                        MTN Offers
-                    </a>
-                    <a href="{{ url('/') }}#networks"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        Telecel Bundles
-                    </a>
-                    <a href="{{ url('/') }}#networks"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        AT Packages
-                    </a>
-                    <a href="{{ url('/dashboard/settings') }}"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        Notifications
-                    </a>
-                </nav>
-            </div>
-
-            <div class="space-y-4">
-                <h4 class="font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">Company
-                </h4>
-                <nav class="flex flex-col gap-3 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <a href="{{ url('/') }}#features"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
-                        About CloudTech
-                    </a>
+                {{-- Social Buttons --}}
+                <div class="flex items-center gap-3 pt-2">
                     <a href="https://wa.me/233000000000" target="_blank"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
-                        Contact Sales
+                       class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all duration-300 hover:scale-110">
+                        <span class="sr-only">WhatsApp</span>
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                        </svg>
+                    </a>
+                    <a href="https://t.me/+KUnX1Gs5cvQ5NDE8" target="_blank"
+                       class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all duration-300 hover:scale-110">
+                        <span class="sr-only">Telegram</span>
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 10l-4 4 6 6 4-16-18 7 4 2 2 6 3-4"/>
+                        </svg>
                     </a>
                     <a href="{{ url('/register') }}"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
-                        Join as Agent
+                       class="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold tracking-wide transition-all duration-300 hover:scale-105 flex items-center gap-1.5 shadow-lg shadow-indigo-900/40">
+                        Get Started
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
-                    <a href="{{ url('/dashboard/api-keys') }}"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
-                        Developer API
-                    </a>
-                </nav>
-            </div>
-
-            <div class="space-y-4">
-                <h4 class="font-bold text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">Support
-                </h4>
-                <nav class="flex flex-col gap-3 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <a href="https://t.me/+KUnX1Gs5cvQ5NDE8" target="_blank"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        Help Center
-                    </a>
-                    <a href="{{ url('/') }}#pricing"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        Terms of Service
-                    </a>
-                    <a href="{{ url('/') }}#pricing"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/link:bg-primary transition-colors"></span>
-                        Privacy Policy
-                    </a>
-                    <a href="{{ url('/dashboard') }}"
-                        class="hover:text-primary transition-colors flex items-center gap-2 group/link">
-                        <span
-                            class="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 group-hover/link:bg-primary transition-colors"></span>
-                        System Status
-                    </a>
-                </nav>
-            </div>
-        </div>
-
-        <div
-            class="pt-10 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="flex flex-col items-center md:items-start gap-2">
-                <p class="text-xs font-semibold text-slate-400 dark:text-slate-500">
-                    © {{ date('Y') }} CloudTech Global. Built with precision in Ghana.
-                </p>
-                <div
-                    class="flex gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-300 dark:text-slate-600">
-                    <span>Powering Digital Freedom</span>
-                    <span class="text-primary">•</span>
-                    <span>Ultra-Cheap Deals</span>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="https://wa.me/233000000000" target="_blank"
-                    class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-emerald-500 hover:bg-emerald-500/5 hover:scale-110 transition-all duration-300 shadow-sm">
-                    <span class="sr-only">WhatsApp</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path
-                            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
-                        </path>
-                    </svg>
-                </a>
-                <a href="https://t.me/+KUnX1Gs5cvQ5NDE8" target=""
-                    class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-500 hover:bg-indigo-500/5 hover:scale-110 transition-all duration-300 shadow-sm">
-                    <span class="sr-only">Telegram</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 10l-4 4 6 6 4-16-18 7 4 2 2 6 3-4"></path>
-                    </svg>
-                </a>
+
+            {{-- Nav Links --}}
+            <div class="grid grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h4 class="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-400">Quick Links</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="{{ url('/') }}#pricing"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Data Bundles
+                        </a>
+                        <a href="{{ url('/') }}#features"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Features
+                        </a>
+                        <a href="{{ url('/login') }}"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Login
+                        </a>
+                        <a href="{{ url('/register') }}"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Register
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-400">Support</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="https://wa.me/233000000000" target="_blank"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Contact Us
+                        </a>
+                        <a href="https://t.me/+KUnX1Gs5cvQ5NDE8" target="_blank"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Telegram Help
+                        </a>
+                        <a href="{{ url('/') }}#pricing"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            Pricing
+                        </a>
+                        <a href="{{ url('/dashboard') }}"
+                           class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2 group/link">
+                            <span class="w-1 h-1 rounded-full bg-indigo-500/50 group-hover/link:bg-indigo-400 transition-colors"></span>
+                            My Account
+                        </a>
+                    </nav>
+                </div>
             </div>
         </div>
+
+        {{-- Bottom bar --}}
+        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-slate-500">
+                © {{ date('Y') }}
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 font-semibold">RocketDataHub</span>.
+                All rights reserved. Built with ❤️ in Ghana.
+            </p>
+            <div class="flex gap-5 text-[10px] font-semibold uppercase tracking-widest text-slate-600">
+                <span class="text-indigo-500">Powered by Webstech Digital</span>
+                <span>•</span>
+                <span>0551518931</span>
+            </div>
+        </div>
+
     </div>
 </footer>

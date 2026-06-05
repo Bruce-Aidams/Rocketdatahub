@@ -1,94 +1,107 @@
 @php($hideNav = true)
 @extends('layouts.app')
 
-@section('title', 'Forgot Password')
+@section('title', 'Recover Password')
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
-        x-data="{ 
-                        loading: false,
-                        submit() {
-                            this.loading = true;
-                            this.$refs.forgotForm.submit();
-                        }
-                     }">
-        <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
-            <!-- Logo Header -->
-            <a href="{{ url('/') }}" class="flex flex-col items-center gap-3 mb-8 group">
-                <div
-                    class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 transition-transform group-hover:scale-105 duration-300">
-                    <img src="{{ asset('favicon.ico') }}" alt="Logo"
-                        class="w-8 h-8 transition-transform group-hover:rotate-12">
-                </div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
-                    {{ config('app.name') }}
-                </h1>
+
+<div class="auth-page" x-data="{
+        loading: false,
+        submit() { this.loading = true; this.$refs.forgotForm.submit(); }
+    }">
+
+    <div class="auth-bg">
+        <div class="auth-bg-orb auth-bg-orb-1"></div>
+        <div class="auth-bg-orb auth-bg-orb-2"></div>
+    </div>
+
+    <div class="auth-card">
+
+        {{-- ─── Left: Brand copy ─── --}}
+        <div class="auth-left">
+            <a href="{{ url('/') }}" class="auth-logo-link">
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="auth-logo-img">
+                <span class="auth-logo-name">{{ config('app.name') }}</span>
             </a>
-
-            <!-- Forgot Password Card -->
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl shadow-[0_2px_10px_0_rgba(67,89,113,0.1)] dark:shadow-none border-none overflow-hidden">
-                <div class="p-8">
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-1">Forgot Password? 🔒</h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Enter your email and we'll
-                            send you instructions to reset your password</p>
-                    </div>
-
-                    @if (session('status'))
-                        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">{{ session('status') }}</p>
-                        </div>
-                    @endif
-
-                    @if($errors->any())
-                        <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">{{ $errors->first() }}</p>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('password.email') }}" x-ref="forgotForm" @submit.prevent="submit"
-                        class="space-y-5">
-                        @csrf
-
-                        <div class="space-y-2">
-                            <label for="email"
-                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">Email</label>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                                class="w-full h-11 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/10 transition-all text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-300"
-                                placeholder="Enter your email">
-                        </div>
-
-                        <button type="submit" :disabled="loading"
-                            class="w-full h-11 bg-primary text-white rounded-lg font-bold text-sm shadow-[0_4px_12px_rgba(105,108,255,0.4)] hover:bg-primary/90 hover:shadow-[0_4px_12px_rgba(105,108,255,0.5)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
-                            <template x-if="!loading">
-                                <span>Send Reset Link</span>
-                            </template>
-                            <template x-if="loading">
-                                <div class="flex items-center gap-1 animate-pulse-text font-bold">
-                                    <span>Sending Link</span>
-                                    <span class="flex items-center">
-                                        <span class="animate-typing-dot" style="animation-delay: 0s">.</span>
-                                        <span class="animate-typing-dot" style="animation-delay: 0.2s">.</span>
-                                        <span class="animate-typing-dot" style="animation-delay: 0.4s">.</span>
-                                    </span>
-                                </div>
-                            </template>
-                        </button>
-
-                        <div class="pt-2 text-center">
-                            <a href="{{ route('login') }}"
-                                class="flex items-center justify-center gap-2 text-sm text-primary font-bold hover:underline">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 19l-7-7 7-7" />
-                                </svg>
-                                Back to login
-                            </a>
-                        </div>
-                    </form>
-                </div>
+            <div class="auth-brand-copy">
+                <h1 class="auth-heading">Forgot Your<br>Password? 🔒</h1>
+                <p class="auth-subtext">
+                    Enter your email and we'll send you a reset link.<br>
+                    Remember it?
+                    <a href="{{ route('login') }}" class="auth-link-blue">Sign in here!</a>
+                </p>
             </div>
         </div>
+
+        {{-- ─── Center: 3D Character ─── --}}
+        <div class="auth-character">
+            <img src="{{ asset('images/auth-character.png') }}"
+                 alt="Floating character"
+                 class="auth-char-img"
+                 onerror="this.style.display='none'">
+        </div>
+
+        {{-- ─── Right: Form ─── --}}
+        <div class="auth-right">
+
+            @if(session('status'))
+                <div class="auth-alert auth-alert-success">{{ session('status') }}</div>
+            @endif
+            @if($errors->any())
+                <div class="auth-alert auth-alert-error">{{ $errors->first() }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('password.email') }}" x-ref="forgotForm" @submit.prevent="submit" class="auth-form">
+                @csrf
+
+                {{-- Email --}}
+                <div class="auth-field">
+                    <input id="email" type="email" name="email" value="{{ old('email') }}"
+                           required autofocus placeholder="Enter Email Address"
+                           class="auth-input">
+                    <span class="auth-input-icon">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </span>
+                </div>
+
+                {{-- Submit --}}
+                <button type="submit" :disabled="loading" class="auth-btn-primary">
+                    <template x-if="!loading"><span>Send Reset Link</span></template>
+                    <template x-if="loading">
+                        <span class="auth-loading">
+                            Sending
+                            <span class="auth-dots"><span>.</span><span>.</span><span>.</span></span>
+                        </span>
+                    </template>
+                </button>
+
+                {{-- Back to login --}}
+                <div style="text-align:center; margin-top:.5rem;">
+                    <a href="{{ route('login') }}" class="auth-back-link">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        Back to Sign In
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
     </div>
+</div>
+
+@include('auth._auth_styles')
+
+<style>
+.auth-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .82rem;
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: none;
+}
+.auth-back-link:hover { text-decoration: underline; }
+</style>
+
 @endsection

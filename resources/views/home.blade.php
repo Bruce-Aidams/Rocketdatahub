@@ -1,285 +1,608 @@
 @extends('layouts.app')
 
+@section('title', 'Ghana\'s Fast Data Vending Hub')
+
 @section('content')
-    <div class="flex flex-col min-h-screen bg-background dark:bg-slate-950 transition-colors duration-500">
-        <main class="flex-1 pt-16">
-            <!-- Hero Section -->
-            <section class="relative overflow-hidden py-16 md:py-24 lg:py-40">
-                <!-- Unique UI Signature: Digital Neural Network Animation -->
-                <x-hero-network-animation />
+<style>
+    /* ── Poppins site-wide override ── */
+    body, .font-sans { font-family: 'Poppins', sans-serif; }
 
-                <!-- Abstract Background Elements (Reduced opacity/blur for cleaner look with network) -->
-                <div
-                    class="absolute top-0 right-0 w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-primary/5 rounded-full blur-[80px] md:blur-[120px] -z-10 animate-pulse">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-indigo-500/5 rounded-full blur-[60px] md:blur-[100px] -z-10">
-                </div>
+    /* ── Dark space hero background ── */
+    .hero-space-bg {
+        background: linear-gradient(135deg, #0f0c29 0%, #1a1060 30%, #0d1b4b 60%, #080e2a 100%);
+        position: relative;
+        overflow: hidden;
+    }
 
-                <div class="container mx-auto px-4 md:px-6">
-                    <div class="flex flex-col items-center text-center space-y-6 md:space-y-10 max-w-4xl mx-auto"
-                        x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)">
+    /* ── Starfield canvas ── */
+    #starfield { position: absolute; inset: 0; z-index: 0; }
 
-                        <div x-show="show" x-transition:enter="transition ease-out duration-700"
-                            x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
-                            class="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] md:text-xs font-black uppercase tracking-widest">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                            Instant Delivery
-                        </div>
+    /* ── Rocket float ── */
+    @keyframes rocket-float {
+        0%, 100% { transform: translateY(0px); }
+        50%       { transform: translateY(-20px); }
+    }
+    @keyframes flame-flicker {
+        0%, 100% { transform: scaleY(1) scaleX(1);    opacity: 1; }
+        25%       { transform: scaleY(1.2) scaleX(.85); opacity: .9; }
+        50%       { transform: scaleY(.88) scaleX(1.1); opacity: 1; }
+        75%       { transform: scaleY(1.1) scaleX(.92); opacity: .85; }
+    }
+    @keyframes flame-mid-flicker {
+        0%, 100% { transform: scaleY(1);   opacity: 1; }
+        33%       { transform: scaleY(1.25); opacity: .8; }
+        66%       { transform: scaleY(.82); opacity: 1; }
+    }
+    @keyframes particle-rise {
+        0%   { transform: translateY(0)    scale(1); opacity: .85; }
+        100% { transform: translateY(-90px) scale(0); opacity: 0; }
+    }
+    @keyframes stat-float {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(-7px); }
+    }
+    @keyframes glow-pulse {
+        0%, 100% { opacity: .3; transform: scale(1); }
+        50%       { opacity: .65; transform: scale(1.04); }
+    }
+    @keyframes earth-spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
 
-                        <div class="space-y-4 md:space-y-6">
-                            <h1 x-show="show" x-transition:enter="transition ease-out duration-700 delay-200"
-                                x-transition:enter-start="opacity-0 translate-y-8"
-                                x-transition:enter-end="opacity-100 translate-y-0"
-                                class="text-3xl sm:text-4xl md:text-7xl font-black tracking-tight leading-[1.1] text-foreground">
-                                The smartest way to <br />
-                                <span
-                                    class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-purple-600 italic text-gradient-animate text-glitch">refill
-                                    your data.</span>
-                            </h1>
-                            <p x-show="show" x-transition:enter="transition ease-out duration-700 delay-400"
-                                x-transition:enter-start="opacity-0 translate-y-8"
-                                x-transition:enter-end="opacity-100 translate-y-0"
-                                class="text-sm md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
-                                Experience ultra-cheap, automated data bundles for all networks. Secure,
-                                reliable, and processed in milliseconds.
-                            </p>
-                        </div>
+    .rocket-wrap   { animation: rocket-float 4s ease-in-out infinite; }
+    .flame-outer   { animation: flame-flicker     .18s ease-in-out infinite; transform-origin: 50% 0; }
+    .flame-mid     { animation: flame-mid-flicker  .22s ease-in-out infinite; transform-origin: 50% 0; }
+    .flame-inner   { animation: flame-mid-flicker  .14s ease-in-out infinite .05s; transform-origin: 50% 0; }
+    .ptcl          { animation: particle-rise linear infinite; transform-origin: center bottom; }
+    .stat-1        { animation: stat-float 3.2s ease-in-out infinite; }
+    .stat-2        { animation: stat-float 2.8s ease-in-out infinite .6s; }
+    .stat-3        { animation: stat-float 3.6s ease-in-out infinite 1.1s; }
+    .stat-4        { animation: stat-float 3.0s ease-in-out infinite .4s; }
+    .glow-halo     { animation: glow-pulse 3s ease-in-out infinite; }
+    .earth-ring    { animation: earth-spin 60s linear infinite; transform-origin: 50% 50%; }
 
-                        <div x-show="show" x-transition:enter="transition ease-out duration-700 delay-600"
-                            x-transition:enter-start="opacity-0 translate-y-8"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            class="flex flex-col sm:flex-row items-center gap-3 md:gap-4 w-full sm:w-auto">
-                            <a href="{{ url('/register') }}"
-                                class="h-12 md:h-14 px-8 md:px-10 rounded-xl md:rounded-2xl bg-primary text-white text-base md:text-lg font-bold shadow-2xl shadow-primary/30 w-full sm:w-auto flex items-center justify-center group hover:scale-105 transition-all">
-                                Get Started
-                                <svg class="w-4 h-4 md:w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </a>
-                        </div>
+    /* ── Hero gradient underline on keyword ── */
+    .kw { color: #4f8cff; }
 
-                        <!-- Network logos showcase -->
-                        <div x-show="show" x-transition:enter="transition ease-out duration-700 delay-800"
-                            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" id="networks"
-                            class="pt-4 md:pt-8 w-full">
-                            <p
-                                class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 md:mb-8">
-                                Trusted
-                                networks</p>
-                            <div class="flex flex-wrap justify-center items-center gap-6 md:gap-20">
-                                <div
-                                    class="flex flex-col items-center gap-2 group/net transition-all duration-500 hover:scale-110">
-                                    <div
-                                        class="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-yellow-400 flex items-center justify-center shadow-lg shadow-yellow-400/20 group-hover/net:rotate-12 transition-transform">
-                                        <span class="font-black text-black text-xs md:text-base">MTN</span>
-                                    </div>
-                                </div>
+    /* ── Dotted connector lines ── */
+    .connector-line {
+        position: absolute;
+        border: 1px dashed rgba(99,150,255,.25);
+        pointer-events: none;
+        z-index: 1;
+    }
 
-                                <div
-                                    class="flex flex-col items-center gap-2 group/net transition-all duration-500 hover:scale-110">
-                                    <div
-                                        class="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-600/20 group-hover/net:-rotate-12 transition-transform">
-                                        <span class="font-black text-white text-[10px] md:text-xs">Telecel</span>
-                                    </div>
-                                </div>
+    /* ── Pricing / other section theming ── */
+    .section-light { background: #f8f9ff; }
+    .section-white { background: #ffffff; }
 
-                                <div
-                                    class="flex flex-col items-center gap-2 group/net transition-all duration-500 hover:scale-110">
-                                    <div
-                                        class="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover/net:rotate-12 transition-transform">
-                                        <span class="font-black text-white text-[8px] md:text-[10px]">AirtelTigo</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+    /* ── Shimmer & Glow Badge ── */
+    @keyframes shimmer {
+        0% { transform: translateX(-150%) skewX(-25deg); }
+        100% { transform: translateX(150%) skewX(-25deg); }
+    }
+    @keyframes badge-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(16,185,129,0.15), inset 0 0 4px rgba(16,185,129,0.05); }
+        50%       { box-shadow: 0 0 16px rgba(16,185,129,0.35), inset 0 0 8px rgba(16,185,129,0.15); }
+    }
+    .shimmer-badge {
+        position: relative;
+        overflow: hidden;
+        animation: badge-glow 3s ease-in-out infinite;
+    }
+    .shimmer-badge::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(16,185,129,0.25), transparent);
+        transform: translateX(-150%) skewX(-25deg);
+        animation: shimmer 4.5s infinite ease-in-out;
+        pointer-events: none;
+    }
+</style>
 
+{{-- ═══════════════════════════════════════════
+     HERO — full-width dark space scene
+     ═══════════════════════════════════════════ --}}
+<div class="hero-space-bg w-full min-h-screen flex flex-col" style="padding-top: 80px;">
 
-            <!-- Features Grid -->
-            <section id="features" class="py-24 bg-slate-50/50 dark:bg-slate-900/50">
-                <div class="container mx-auto px-4 md:px-6">
-                    <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
-                        <h2 class="text-3xl md:text-5xl font-black tracking-tight text-foreground">Built for
-                            Performance.</h2>
-                        <p class="text-muted-foreground">Our platform is engineered with the latest
-                            technologies to ensure your deals are handled with peak efficiency.</p>
-                    </div>
+    <canvas id="starfield"></canvas>
 
-                    <div class="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
-                        <x-feature-card title="Automatic Fulfillment"
-                            description="No waiting games. Our internal API engine processes your data requests the moment payment is confirmed.">
-                            <x-slot name="icon">
-                                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                            </x-slot>
-                        </x-feature-card>
+    {{-- Beautiful Curved Earth Globe at the Bottom --}}
+    <div class="absolute bottom-[-500px] md:bottom-[-700px] left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] md:w-[1400px] md:h-[1400px] rounded-full pointer-events-none z-[1]" style="
+        background: radial-gradient(circle at 50% 0%, #1e3a8a 0%, #0d153b 50%, #070a1e 100%);
+        box-shadow: inset 0 30px 100px rgba(255,255,255,0.15),
+                    inset 0 10px 40px rgba(79,140,255,0.25),
+                    0 0 120px 30px rgba(59,130,246,0.3);
+    ">
+        {{-- Earth's glowing atmosphere aura --}}
+        <div class="absolute inset-0 rounded-full" style="
+            background: radial-gradient(circle at 50% 0%, rgba(99,150,255,0.35) 0%, rgba(59,130,246,0.15) 40%, transparent 70%);
+            filter: blur(15px);
+        "></div>
+        
+        {{-- Spinning continents/grid --}}
+        <div class="absolute inset-0 w-full h-full opacity-35 earth-ring">
+            <svg class="w-full h-full" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {{-- continents outline --}}
+                <path d="M350,150 C420,120 480,180 500,220 C520,260 480,320 450,340 C420,360 380,320 330,350 C280,380 250,300 280,260 C310,220 280,180 350,150 Z" fill="#2563eb" opacity="0.5" filter="blur(2px)" />
+                <path d="M650,250 C700,200 780,220 800,280 C820,340 760,380 720,400 C680,420 630,380 600,420 C570,460 520,410 550,360 C580,310 600,300 650,250 Z" fill="#1d4ed8" opacity="0.4" filter="blur(2px)" />
+                <path d="M200,450 C250,420 300,460 320,500 C340,540 310,580 280,600 C250,620 220,580 180,610 C140,640 120,580 140,540 C160,500 150,480 200,450 Z" fill="#2563eb" opacity="0.4" filter="blur(2px)" />
+                <path d="M450,550 C500,520 520,580 550,600 C580,620 600,680 570,720 C540,760 480,720 450,750 C420,780 400,720 420,680 C440,640 400,600 450,550 Z" fill="#1e40af" opacity="0.4" filter="blur(2px)" />
 
-                        <x-feature-card title="Vault Security"
-                            description="Industry-standard encryption and secure Paystack integration mean your funds and data are always protected.">
-                            <x-slot name="icon">
-                                <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.040L3 14.535a45.241 45.241 0 0012 8.192 45.241 45.241 0 0012-8.192l-.382-8.509z" />
-                                </svg>
-                            </x-slot>
-                        </x-feature-card>
-
-                        <x-feature-card title="Smart Analytics"
-                            description="Track your spending and data usage with real-time charts and detailed history reports.">
-                            <x-slot name="icon">
-                                <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                            </x-slot>
-                        </x-feature-card>
-
-                        <x-feature-card title="Ghana-First Native"
-                            description="Full support for MTN, Telecel, and AT networks with localized prefixes and validation.">
-                            <x-slot name="icon">
-                                <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-                                </svg>
-                            </x-slot>
-                        </x-feature-card>
-
-                        <x-feature-card title="Agent Ecosystem"
-                            description="Earn commissions by becoming an agent. Scale your business with our dedicated agent tools.">
-                            <x-slot name="icon">
-                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                            </x-slot>
-                        </x-feature-card>
-
-                        <x-feature-card title="API Ready"
-                            description="Integrate our services into your own apps with our robust, documented developer API.">
-                            <x-slot name="icon">
-                                <svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                </svg>
-                            </x-slot>
-                        </x-feature-card>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Pricing / Products Section -->
-            <section id="pricing" class="py-24 relative overflow-hidden">
-                <div class="container mx-auto px-4 md:px-6">
-                    <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
-                        <h2 class="text-3xl md:text-5xl font-black tracking-tight text-foreground">Featured
-                            Offers.</h2>
-                        <p class="text-muted-foreground">Hand-picked data bundles with the best value for your
-                            money. Instant activation guaranteed.</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                        @foreach($bundles as $product)
-                            @php
-                                $net = strtoupper($product->network);
-                                $netMap = [
-                                    'MTN' => ['bg' => 'bg-yellow-400', 'text' => 'text-yellow-950', 'ring' => 'ring-yellow-400/50'],
-                                    'TELECEL' => ['bg' => 'bg-red-600', 'text' => 'text-white', 'ring' => 'ring-red-600/50'],
-                                    'AT' => ['bg' => 'bg-blue-600', 'text' => 'text-white', 'ring' => 'ring-blue-600/50'],
-                                    'AIRTELTIGO' => ['bg' => 'bg-blue-600', 'text' => 'text-white', 'ring' => 'ring-blue-600/50'],
-                                ];
-                                $theme = $netMap[$net] ?? ['bg' => 'bg-slate-900', 'text' => 'text-white', 'ring' => 'ring-slate-500/50'];
-                            @endphp
-
-                            <div
-                                class="group relative bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300">
-
-                                {{-- Image / Visual Header --}}
-                                <div
-                                    class="aspect-[4/3] bg-slate-50 dark:bg-slate-800/50 relative flex items-center justify-center overflow-hidden group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors">
-                                    @if($product->image_url)
-                                        <img src="{{ $product->image_url }}"
-                                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                                    @else
-                                        <div
-                                            class="absolute inset-0 bg-gradient-to-tr from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900/50 opacity-50">
-                                        </div>
-                                        <div
-                                            class="flex flex-col items-center gap-2 opacity-30 group-hover:opacity-50 transition-opacity text-slate-400 z-10">
-                                            <!-- Dynamic Network Icon Placeholder if no image -->
-                                            <span
-                                                class="text-xs font-black uppercase tracking-widest">{{ $product->network }}</span>
-                                        </div>
-                                    @endif
-
-                                    {{-- Network Badge --}}
-                                    <div class="absolute top-3 left-3 md:top-4 md:left-4 z-20">
-                                        <span
-                                            class="px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black tracking-widest uppercase shadow-lg backdrop-blur-md {{ $theme['bg'] }} {{ $theme['text'] }}">
-                                            {{ $product->network }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {{-- Card Content --}}
-                                <div class="p-4 md:p-6 space-y-4">
-                                    <div>
-                                        <h3
-                                            class="text-base md:text-lg font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight line-clamp-1 group-hover:text-primary transition-colors">
-                                            {{ $product->name }}
-                                        </h3>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-wide">
-                                                {{ $product->data_amount }}
-                                            </span>
-                                            @if($product->validity)
-                                                <span
-                                                    class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-wide">
-                                                    {{ $product->validity }}
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        class="pt-4 border-t border-slate-50 dark:border-slate-800/50 flex items-end justify-between gap-2">
-                                        <div>
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                                                Price</p>
-                                            <p
-                                                class="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums">
-                                                ₵{{ number_format($product->price, 2) }}
-                                            </p>
-                                        </div>
-
-                                        <a href="{{ url('/login?redirect=purchase&bundle=' . $product->id) }}"
-                                            class="h-10 px-5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:bg-primary dark:hover:bg-primary dark:hover:text-white transition-all shadow-lg shadow-slate-900/10 dark:shadow-none flex items-center justify-center group/btn relative overflow-hidden">
-                                            <span class="relative z-10 flex items-center gap-1">
-                                                Buy
-                                                <svg class="w-3 h-3 transition-transform group-hover/btn:translate-x-1"
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                        d="M9 5l7 7-7 7"></path>
-                                                </svg>
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-        </main>
+                {{-- Network/Data dots connecting across the globe --}}
+                <g stroke="#60a5fa" stroke-width="1.5" opacity="0.7">
+                    <line x1="380" y1="200" x2="480" y2="240" stroke-dasharray="4,4" />
+                    <line x1="480" y1="240" x2="630" y2="300" stroke-dasharray="4,4" />
+                    <line x1="330" y1="330" x2="280" y2="500" stroke-dasharray="4,4" />
+                    <line x1="630" y1="300" x2="720" y2="350" stroke-dasharray="4,4" />
+                    <line x1="450" y1="580" x2="570" y2="700" stroke-dasharray="4,4" />
+                    <line x1="280" y1="500" x2="450" y2="580" stroke-dasharray="4,4" />
+                </g>
+                <g fill="#93c5fd">
+                    <circle cx="380" cy="200" r="5" class="animate-pulse" />
+                    <circle cx="480" cy="240" r="6" />
+                    <circle cx="630" cy="300" r="5" />
+                    <circle cx="280" cy="500" r="6" class="animate-pulse" />
+                    <circle cx="720" cy="350" r="5" />
+                    <circle cx="450" cy="580" r="6" />
+                    <circle cx="570" cy="700" r="5" class="animate-pulse" />
+                </g>
+            </svg>
+        </div>
     </div>
+
+    <div class="relative z-10 flex-1 flex items-center">
+        <div class="w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center min-h-[calc(100vh-80px)] py-10 lg:py-16">
+
+                {{-- ─── LEFT: copy ─── --}}
+                <div class="space-y-6 lg:space-y-8 text-center lg:text-left">
+
+                    {{-- Badge --}}
+                    <div class="shimmer-badge inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-semibold tracking-wide backdrop-blur-md mx-auto lg:mx-0">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span>Live 24/7 Data Vending</span>
+                    </div>
+
+                    {{-- Heading --}}
+                    <div class="space-y-3">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.1] tracking-tight">
+                            Data bundles<br>
+                            that <span class="kw">launch</span> instantly.
+                        </h1>
+                        <p class="text-sm sm:text-[1rem] text-slate-300 leading-relaxed max-w-[500px] mx-auto lg:mx-0">
+                            Get the cheapest high-speed data bundles for MTN, Telecel, and AirtelTigo. Instantly processed and delivered to your phone in seconds.
+                        </p>
+                    </div>
+
+                    {{-- CTAs --}}
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                        <a href="{{ url('/register') }}"
+                           class="h-11 sm:h-12 px-6 sm:px-8 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all shadow-lg shadow-indigo-700/40 flex items-center gap-2 active:scale-95">
+                            Explore Data
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                        <a href="#pricing"
+                           class="h-11 sm:h-12 px-6 sm:px-8 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition-all flex items-center gap-2 active:scale-95">
+                            See Platform
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    {{-- Social proof --}}
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-5 pt-4 border-t border-white/10">
+                        <div class="flex items-center -space-x-3">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
+                        </div>
+                        <div>
+                            <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                            <p class="text-xs text-slate-400 font-medium">50k+ Happy Customers</p>
+                        </div>
+                        <div class="w-px h-8 bg-white/10 hidden sm:block"></div>
+                        <div class="hidden sm:block">
+                            <p class="text-lg font-bold text-white leading-none">4.9/5</p>
+                            <p class="text-xs text-slate-400">Average Rating</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- ─── RIGHT: Rocket Scene — hidden on mobile ─── --}}
+                <div class="hidden lg:flex lg:order-2 relative items-center justify-center" style="min-height: 560px;">
+
+                    {{-- Glow halo behind rocket --}}
+                    <div class="glow-halo absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-72 h-72 rounded-full" style="background: radial-gradient(circle, rgba(79,140,255,.22) 0%, rgba(100,80,255,.12) 50%, transparent 70%);"></div>
+                    </div>
+
+                    {{-- Dotted connector hint lines --}}
+                    <div class="connector-line" style="top:22%; left:18%; width:90px; transform: rotate(-20deg);"></div>
+                    <div class="connector-line" style="top:18%; right:14%; width:80px; transform: rotate(18deg);"></div>
+                    <div class="connector-line" style="bottom:22%; left:20%; width:75px; transform: rotate(15deg);"></div>
+                    <div class="connector-line" style="bottom:18%; right:16%; width:85px; transform: rotate(-15deg);"></div>
+
+                    {{-- Stat Card: Data Quality (top-left) --}}
+                    <div class="stat-1 absolute z-20" style="top: 5%; left: 2%;">
+                        <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 px-4 py-3.5 shadow-2xl min-w-[150px]">
+                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Data Quality</p>
+                            <div class="flex items-center gap-3">
+                                <svg width="42" height="42" viewBox="0 0 42 42">
+                                    <circle cx="21" cy="21" r="16" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="4"/>
+                                    <circle cx="21" cy="21" r="16" fill="none" stroke="#4f8cff" stroke-width="4"
+                                            stroke-dasharray="100.53" stroke-dashoffset="12" stroke-linecap="round"
+                                            transform="rotate(-90 21 21)"/>
+                                </svg>
+                                <div>
+                                    <p class="text-base font-bold text-white leading-none">98.7%</p>
+                                    <p class="text-[9px] text-slate-400">Accuracy</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Stat Card: Insights (top-right) --}}
+                    <div class="stat-2 absolute z-20" style="top: 2%; right: 2%;">
+                        <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 px-4 py-3.5 shadow-2xl min-w-[140px]">
+                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Insights Delivered</p>
+                            <p class="text-2xl font-bold text-white leading-none">12.6K</p>
+                            <p class="text-[9px] text-emerald-400 font-semibold mt-1">↑ 18.3%</p>
+                            <div class="flex items-end gap-0.5 mt-2 h-6">
+                                <div class="w-2 h-2 bg-indigo-400/40 rounded-sm"></div>
+                                <div class="w-2 h-3 bg-indigo-400/50 rounded-sm"></div>
+                                <div class="w-2 h-2.5 bg-indigo-400/50 rounded-sm"></div>
+                                <div class="w-2 h-4 bg-indigo-400/70 rounded-sm"></div>
+                                <div class="w-2 h-3.5 bg-indigo-500/80 rounded-sm"></div>
+                                <div class="w-2 h-6 bg-indigo-500 rounded-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Stat Card: Data Points (bottom-left) --}}
+                    <div class="stat-3 absolute z-20" style="bottom: 8%; left: 2%;">
+                        <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 px-4 py-3.5 shadow-2xl min-w-[145px]">
+                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Data Points Processed</p>
+                            <p class="text-2xl font-bold text-white leading-none">2.4B</p>
+                            <p class="text-[9px] text-emerald-400 font-semibold mt-1">↑ 24.5%</p>
+                            <svg class="mt-2" width="100" height="22" viewBox="0 0 100 22">
+                                <defs>
+                                    <linearGradient id="sg" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#4f8cff"/>
+                                        <stop offset="100%" stop-color="#4f8cff" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <polyline points="0,20 17,15 33,18 50,9 67,13 83,5 100,2"
+                                          fill="none" stroke="#4f8cff" stroke-width="1.5"
+                                          stroke-linecap="round" stroke-linejoin="round"/>
+                                <polygon points="0,20 17,15 33,18 50,9 67,13 83,5 100,2 100,22 0,22"
+                                         fill="url(#sg)" opacity="0.2"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    {{-- Stat Card: Uptime (bottom-right) --}}
+                    <div class="stat-4 absolute z-20" style="bottom: 5%; right: 2%;">
+                        <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 px-4 py-3.5 shadow-2xl min-w-[130px]">
+                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1">System Uptime</p>
+                            <p class="text-2xl font-bold text-white leading-none">99.99%</p>
+                            <div class="w-full h-1 bg-white/10 rounded-full mt-2.5 overflow-hidden">
+                                <div class="h-full bg-indigo-400 rounded-full" style="width:99.99%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ROCKET SVG --}}
+                    <div class="rocket-wrap relative z-10" style="width:220px; height:420px;">
+                        <svg viewBox="0 0 220 420" width="220" height="420" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="rkt-body" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%"   stop-color="#b8c5e8"/>
+                                    <stop offset="45%"  stop-color="#eef1f8"/>
+                                    <stop offset="100%" stop-color="#9aabda"/>
+                                </linearGradient>
+                                <linearGradient id="rkt-nose" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%"   stop-color="#4f8cff"/>
+                                    <stop offset="100%" stop-color="#b8c5e8"/>
+                                </linearGradient>
+                                <linearGradient id="rkt-fin" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%"   stop-color="#3b6de0"/>
+                                    <stop offset="100%" stop-color="#1e3a8a"/>
+                                </linearGradient>
+                                <linearGradient id="fl-outer" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%"   stop-color="#fde68a"/>
+                                    <stop offset="45%"  stop-color="#f59e0b"/>
+                                    <stop offset="100%" stop-color="transparent"/>
+                                </linearGradient>
+                                <linearGradient id="fl-mid" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%"   stop-color="#fff7ed"/>
+                                    <stop offset="55%"  stop-color="#f97316"/>
+                                    <stop offset="100%" stop-color="transparent"/>
+                                </linearGradient>
+                                <linearGradient id="fl-inner" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%"   stop-color="#ffffff"/>
+                                    <stop offset="65%"  stop-color="#fde68a"/>
+                                    <stop offset="100%" stop-color="transparent"/>
+                                </linearGradient>
+                                <filter id="rkt-glow">
+                                    <feGaussianBlur stdDeviation="4" result="b"/>
+                                    <feComposite in="SourceGraphic" in2="b" operator="over"/>
+                                </filter>
+                            </defs>
+
+                            {{-- Earth / launch pad glow --}}
+                            <ellipse cx="110" cy="395" rx="70" ry="15" fill="rgba(255,150,30,.15)"/>
+                            <ellipse cx="110" cy="395" rx="40" ry="8"  fill="rgba(255,180,60,.20)"/>
+
+                            {{-- Left fin --}}
+                            <polygon points="70,285 45,340 72,318" fill="url(#rkt-fin)" opacity=".92"/>
+                            <polygon points="71,285 51,330 72,312" fill="#5b8af5" opacity=".35"/>
+
+                            {{-- Right fin --}}
+                            <polygon points="150,285 175,340 148,318" fill="url(#rkt-fin)" opacity=".92"/>
+                            <polygon points="149,285 169,330 148,312" fill="#5b8af5" opacity=".35"/>
+
+                            {{-- Body --}}
+                            <rect x="72" y="145" width="76" height="165" rx="8" fill="url(#rkt-body)"/>
+                            {{-- Body stripe --}}
+                            <rect x="72" y="215" width="76" height="16" rx="0" fill="#4f8cff" opacity=".2"/>
+                            {{-- Vertical text --}}
+                            <text x="110" y="188" font-family="Poppins,sans-serif" font-size="7.5" font-weight="700"
+                                  fill="#1e3a8a" text-anchor="middle" letter-spacing="2.5"
+                                  transform="rotate(-90 110 188)">ROCKET DATA</text>
+
+                            {{-- Nose cone --}}
+                            <path d="M72,145 Q72,60 110,35 Q148,60 148,145 Z" fill="url(#rkt-nose)"/>
+                            {{-- Nose highlight --}}
+                            <path d="M84,138 Q86,82 110,58 Q113,82 109,138 Z" fill="white" opacity=".22"/>
+
+                            {{-- Porthole window --}}
+                            <circle cx="110" cy="173" r="18" fill="#1e2a5e" stroke="#8fb3ff" stroke-width="3.5"/>
+                            <circle cx="110" cy="173" r="13" fill="#172050"/>
+                            <circle cx="104" cy="168" r="4"  fill="white" opacity=".35"/>
+                            <circle cx="110" cy="173" r="18" fill="none" stroke="#4f8cff" stroke-width="1" opacity=".7"/>
+
+                            {{-- Nozzle --}}
+                            <rect x="88" y="305" width="44" height="12" rx="4" fill="#1e3a8a"/>
+                            <rect x="93" y="311" width="34" height="6"  rx="3" fill="#3b6de0" opacity=".6"/>
+
+                            {{-- Outer flame --}}
+                            <g class="flame-outer" style="transform-origin: 110px 317px;">
+                                <ellipse cx="110" cy="352" rx="27" ry="52" fill="url(#fl-outer)" opacity=".85" filter="url(#rkt-glow)"/>
+                            </g>
+                            {{-- Mid flame --}}
+                            <g class="flame-mid" style="transform-origin: 110px 317px;">
+                                <ellipse cx="110" cy="348" rx="17" ry="40" fill="url(#fl-mid)" opacity=".9"/>
+                            </g>
+                            {{-- Inner flame --}}
+                            <g class="flame-inner" style="transform-origin: 110px 317px;">
+                                <ellipse cx="110" cy="336" rx="8"  ry="22" fill="url(#fl-inner)"/>
+                            </g>
+
+                            {{-- Particles --}}
+                            <circle class="ptcl" cx="96"  cy="360" r="3.5" fill="#f59e0b" opacity=".75" style="animation-duration:1.1s;animation-delay:0s;"/>
+                            <circle class="ptcl" cx="116" cy="375" r="3"   fill="#fde68a" opacity=".65" style="animation-duration:.9s; animation-delay:.15s;"/>
+                            <circle class="ptcl" cx="124" cy="355" r="2.5" fill="#fb923c" opacity=".55" style="animation-duration:1.3s;animation-delay:.3s;"/>
+                            <circle class="ptcl" cx="102" cy="368" r="2.5" fill="#f97316" opacity=".70" style="animation-duration:.75s;animation-delay:.5s;"/>
+                            <circle class="ptcl" cx="110" cy="380" r="4"   fill="#fef3c7" opacity=".45" style="animation-duration:1.0s;animation-delay:.22s;"/>
+                            <circle class="ptcl" cx="88"  cy="370" r="2"   fill="#f59e0b" opacity=".60" style="animation-duration:.85s;animation-delay:.4s;"/>
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Starfield JS --}}
+<script>
+(function(){
+    const c = document.getElementById('starfield');
+    const ctx = c.getContext('2d');
+    function resize(){ c.width = c.offsetWidth; c.height = c.offsetHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    const stars = Array.from({length:180}, () => ({
+        x: Math.random(), y: Math.random(),
+        r: Math.random()*.9+.3,
+        a: Math.random(),
+        s: Math.random()*.0005+.0002
+    }));
+    function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        stars.forEach(s=>{
+            s.a = (s.a + s.s) % (Math.PI*2);
+            const op = .3 + .5*Math.abs(Math.sin(s.a));
+            ctx.beginPath();
+            ctx.arc(s.x*c.width, s.y*c.height, s.r, 0, Math.PI*2);
+            ctx.fillStyle = `rgba(200,220,255,${op})`;
+            ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+</script>
+
+{{-- ═══════════════════════════════════════════
+     PRICING SECTION
+     ═══════════════════════════════════════════ --}}
+<section id="pricing" class="py-24 section-light" x-data="{ activeNetwork: 'ALL' }">
+    <div class="container mx-auto px-4 md:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 class="text-2xl md:text-4xl font-semibold tracking-tight text-slate-900">Interactive Bundle Deck</h2>
+            <p class="text-slate-500">Select a telecom network to filter available high-speed bundle cards instantly.</p>
+
+            <div class="flex flex-wrap justify-center items-center gap-3 pt-6">
+                <button @click="activeNetwork = 'ALL'"
+                    :class="activeNetwork === 'ALL' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white hover:bg-slate-50 text-slate-600'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-semibold transition-all border border-slate-200">All Networks</button>
+                <button @click="activeNetwork = 'MTN'"
+                    :class="activeNetwork === 'MTN' ? 'bg-yellow-400 text-yellow-950 shadow-md' : 'bg-white hover:bg-slate-50 text-slate-600'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-semibold transition-all border border-slate-200 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-yellow-400 border border-yellow-500"></span>MTN
+                </button>
+                <button @click="activeNetwork = 'TELECEL'"
+                    :class="activeNetwork === 'TELECEL' ? 'bg-red-600 text-white shadow-md' : 'bg-white hover:bg-slate-50 text-slate-600'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-semibold transition-all border border-slate-200 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>Telecel
+                </button>
+                <button @click="activeNetwork = 'AIRTELTIGO'"
+                    :class="activeNetwork === 'AIRTELTIGO' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-50 text-slate-600'"
+                    class="px-5 py-2.5 rounded-xl text-xs font-semibold transition-all border border-slate-200 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>AirtelTigo
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @forelse($bundles as $product)
+                @php
+                    $net = strtoupper($product->network);
+                    if ($net === 'AT') $net = 'AIRTELTIGO';
+                    $netMap = [
+                        'MTN'        => ['bg'=>'bg-yellow-400','text'=>'text-yellow-950'],
+                        'TELECEL'    => ['bg'=>'bg-red-600',   'text'=>'text-white'],
+                        'AIRTELTIGO' => ['bg'=>'bg-blue-600',  'text'=>'text-white'],
+                    ];
+                    $th = $netMap[$net] ?? ['bg'=>'bg-slate-800','text'=>'text-white'];
+                @endphp
+                <div x-show="activeNetwork === 'ALL' || activeNetwork === '{{ $net }}'"
+                     class="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
+                    <div class="p-6 space-y-5 flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase {{ $th['bg'] }} {{ $th['text'] }}">{{ $product->network }}</span>
+                            <span class="px-3 py-1 rounded-lg text-[10px] font-semibold bg-slate-50 border border-slate-100 text-slate-500">{{ $product->validity ?? 'No Expiry' }}</span>
+                        </div>
+                        <div class="space-y-1.5">
+                            <p class="text-[9px] font-semibold uppercase tracking-widest text-slate-400">Data Package</p>
+                            <h3 class="text-xl font-bold text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors">{{ $product->name }}</h3>
+                            <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mt-1">{{ $product->data_amount }}</div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Price</p>
+                            <p class="text-2xl font-bold text-slate-900 tracking-tight">₵{{ number_format($product->price, 2) }}</p>
+                        </div>
+                        <a href="{{ url('/login?redirect=purchase&bundle=' . $product->id) }}"
+                           class="h-10 px-5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-all shadow-sm flex items-center gap-1.5 group/btn">
+                            Buy Now
+                            <svg class="w-3 h-3 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full py-16 text-center">
+                    <p class="text-sm font-semibold text-slate-500">No Packages Available</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+
+{{-- ═══════════════════════════════════════════
+     FEATURES SECTION
+     ═══════════════════════════════════════════ --}}
+<section id="features" class="py-24 section-white border-t border-slate-100">
+    <div class="container mx-auto px-4 md:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-20 space-y-4">
+            <h2 class="text-2xl md:text-4xl font-semibold tracking-tight text-slate-900">Engineered to scale</h2>
+            <p class="text-slate-500">Everything you need to buy, distribute, resell, or develop high-speed automated data products in Ghana.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <x-feature-card title="Fulfillment API Engine" description="Send request, get success. Our automated system queries operators and executes top-ups the instant payment verifies.">
+                <x-slot name="icon"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></x-slot>
+            </x-feature-card>
+            <x-feature-card title="Custom Storefronts" description="Become a reseller. Launch a white-labeled web application storefront and start accepting client data orders under your brand.">
+                <x-slot name="icon"><svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></x-slot>
+            </x-feature-card>
+            <x-feature-card title="Developer Infrastructure" description="Integrate data refills into your custom apps, ERP systems, or bot platforms using our RESTful API keys and webhooks.">
+                <x-slot name="icon"><svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></x-slot>
+            </x-feature-card>
+            <x-feature-card title="Prefix Validation Guard" description="Stop losing money to invalid numbers. Our prefix validator automatically verifies networks before running API requests.">
+                <x-slot name="icon"><svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04L3 14.535a45.24 45.24 0 0012 8.192 45.24 45.24 0 0012-8.192l-.382-8.51z"/></svg></x-slot>
+            </x-feature-card>
+            <x-feature-card title="Analytics Suite" description="Visualize wallet expenditures, average order execution speeds, and reseller margin reports via real-time charts.">
+                <x-slot name="icon"><svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></x-slot>
+            </x-feature-card>
+            <x-feature-card title="Paystack Wallet Top-ups" description="Instant automated credit. Fund your user wallet securely via Paystack with cards, mobile money, or bank transfers.">
+                <x-slot name="icon"><svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg></x-slot>
+            </x-feature-card>
+        </div>
+    </div>
+</section>
+
+
+{{-- ═══════════════════════════════════════════
+     HOW IT WORKS
+     ═══════════════════════════════════════════ --}}
+<section class="py-24" style="background:#f3f4ff;">
+    <div class="container mx-auto px-4 md:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-20 space-y-4">
+            <h2 class="text-2xl md:text-4xl font-semibold tracking-tight text-slate-900">Seamless Setup</h2>
+            <p class="text-slate-500">Start processing automated network bundles in three simple steps.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+            <div class="space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-600/20">1</div>
+                <h3 class="text-lg font-semibold text-slate-900">Register Account</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Sign up instantly. Access your developer dashboard, wallet management tools, and storefront settings immediately.</p>
+            </div>
+            <div class="space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-purple-600/20">2</div>
+                <h3 class="text-lg font-semibold text-slate-900">Fund Wallet</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Add funds to your secure escrow wallet using Mobile Money or bank cards powered by Paystack.</p>
+            </div>
+            <div class="space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-pink-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-pink-600/20">3</div>
+                <h3 class="text-lg font-semibold text-slate-900">Deploy &amp; Vend</h3>
+                <p class="text-slate-500 text-sm leading-relaxed">Initiate data purchases instantly, configure your public storefront, or grab your developer API keys to automate.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{{-- ═══════════════════════════════════════════
+     CTA SECTION
+     ═══════════════════════════════════════════ --}}
+<section class="py-24 section-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-white pointer-events-none"></div>
+    <div class="container mx-auto px-4 md:px-8 relative z-10 text-center max-w-3xl space-y-8">
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tight text-slate-900 leading-tight">
+            Ready to accelerate<br>your data business?
+        </h2>
+        <p class="text-slate-500 text-base md:text-lg max-w-xl mx-auto">
+            Join developers and data resellers across Ghana. Integrate our API, launch your storefront, or buy instant data bundles at unmatched rates.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="{{ url('/register') }}"
+               class="h-14 px-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-xl shadow-indigo-600/30 w-full sm:w-auto flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+                Get Started Now
+            </a>
+            <a href="https://wa.me/233000000000" target="_blank"
+               class="h-14 px-10 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold w-full sm:w-auto flex items-center justify-center gap-2 transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.73-1.464L0 24zm6.059-3.567l.354.21c1.554.922 3.51 1.41 5.534 1.411 5.674 0 10.293-4.617 10.297-10.297.002-2.753-1.071-5.339-3.023-7.291-1.951-1.952-4.536-3.023-7.287-3.025-5.681 0-10.3 4.618-10.304 10.298-.002 1.936.505 3.829 1.468 5.489l.23.398-.98 3.578 3.661-.963z"/>
+                </svg>
+                Contact Sales
+            </a>
+        </div>
+    </div>
+</section>
 @endsection

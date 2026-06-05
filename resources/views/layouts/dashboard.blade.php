@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'CloudTech') }} - @yield('title', 'Dashboard')</title>
+    <title>{{ config('app.name', 'RocketDataHub') }} - @yield('title', 'Dashboard')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,16 +20,12 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.remove('dark');
     </script>
 </head>
 
 <body
-    class="antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen"
+    class="antialiased text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen"
     x-data="{ 
           sidebarOpen: false,
           isCollapsed: localStorage.getItem('compact_sidebar') === 'true'
@@ -37,7 +33,10 @@
           $watch('isCollapsed', val => localStorage.setItem('compact_sidebar', val));
       ">
 
-    <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950 transition-all duration-300">
+    {{-- Site-wide gradient background --}}
+    @include('partials._site_bg')
+
+    <div class="min-h-screen transition-all duration-300">
         <x-sidebar />
 
         <div class="flex flex-col min-h-screen transition-all duration-300"

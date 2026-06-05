@@ -4,167 +4,139 @@
 @endphp
 @extends('layouts.app')
 
-@section('title', 'Login')
+@section('title', 'Sign In')
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center bg-[#f5f5f9] dark:bg-slate-950 p-4 transition-colors duration-300"
-        x-data="{ 
-                                loading: false,
-                                submit() {
-                                    this.loading = true;
-                                    this.$refs.loginForm.submit();
-                                }
-                             }">
-        <div class="w-full max-w-[400px] animate-in fade-in zoom-in duration-500">
-            <!-- Logo Header -->
-            <a href="{{ url('/') }}" class="flex flex-col items-center gap-3 mb-8 group">
-                <div
-                    class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 transition-transform group-hover:scale-105 duration-300">
-                    <img src="{{ asset('favicon.ico') }}" alt="Logo"
-                        class="w-8 h-8 transition-transform group-hover:rotate-12">
-                </div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
-                    {{ config('app.name') }}
-                </h1>
+
+{{-- Auth page root --}}
+<div class="auth-page" x-data="{
+        loading: false,
+        showPass: false,
+        submit() { this.loading = true; this.$refs.loginForm.submit(); }
+    }">
+
+    {{-- ── Gradient background ── --}}
+    <div class="auth-bg">
+        <div class="auth-bg-orb auth-bg-orb-1"></div>
+        <div class="auth-bg-orb auth-bg-orb-2"></div>
+    </div>
+
+    {{-- ── Inner card ── --}}
+    <div class="auth-card">
+
+        {{-- ─── Left: Brand copy ─── --}}
+        <div class="auth-left">
+            {{-- Logo --}}
+            <a href="{{ url('/') }}" class="auth-logo-link">
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="auth-logo-img">
+                <span class="auth-logo-name">{{ config('app.name') }}</span>
             </a>
 
-            <!-- Login Card -->
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl shadow-[0_2px_10px_0_rgba(67,89,113,0.1)] dark:shadow-none border-none overflow-hidden">
-                <div class="p-8">
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-1">Welcome to
-                            {{ config('app.name') }}! 👋
-                        </h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Please sign-in to your account
-                        </p>
-                    </div>
-
-                    @if(session('error'))
-                        <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">{{ session('error') }}</p>
-                        </div>
-                    @endif
-
-                    @if($errors->any())
-                        <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-lg animate-in slide-in-from-top-2">
-                            <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">{{ $errors->first() }}</p>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('login') }}" x-ref="loginForm" @submit.prevent="submit"
-                        class="space-y-5">
-                        @csrf
-
-                        <div class="space-y-2">
-                            <label for="login"
-                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">Email
-                                or Username</label>
-                            <input id="login" type="text" name="login" value="{{ old('login') }}" required autofocus
-                                class="w-full h-11 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/10 transition-all text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-300"
-                                placeholder="Enter your email or username">
-                        </div>
-
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between ml-1">
-                                <label for="password"
-                                    class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Password</label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}"
-                                        class="text-[11px] font-bold text-primary hover:underline transition-all">Forgot
-                                        Password?</a>
-                                @endif
-                            </div>
-                            <div class="relative" x-data="{ show: false }">
-                                <input id="password" :type="show ? 'text' : 'password'" name="password" required
-                                    class="w-full h-11 pl-4 pr-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-primary focus:ring-[3px] focus:ring-primary/10 transition-all text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-300"
-                                    placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;">
-                                <button type="button" @click="show = !show"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
-                                    <svg x-show="!show" class="w-5 h-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    <svg x-show="show" x-cloak class="w-5 h-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.04m4.066-1.426A10.05 10.05 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21m-4.223-4.223l-2.408-2.408m0 0L9.966 9.966m0 0L5 5" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center ml-1">
-                            <input type="checkbox" name="remember" id="remember"
-                                class="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary/20">
-                            <label for="remember"
-                                class="ml-2 text-sm text-slate-500 dark:text-slate-400 cursor-pointer">Remember Me</label>
-                        </div>
-
-                        <button type="submit" :disabled="loading"
-                            class="w-full h-11 bg-primary text-white rounded-lg font-bold text-sm shadow-[0_4px_12px_rgba(105,108,255,0.4)] hover:bg-primary/90 hover:shadow-[0_4px_12px_rgba(105,108,255,0.5)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
-                            <template x-if="!loading">
-                                <span>Sign in</span>
-                            </template>
-                            <template x-if="loading">
-                                <div class="flex items-center gap-1 animate-pulse-text font-bold">
-                                    <span>Signing in</span>
-                                    <span class="flex items-center">
-                                        <span class="animate-typing-dot" style="animation-delay: 0s">.</span>
-                                        <span class="animate-typing-dot" style="animation-delay: 0.2s">.</span>
-                                        <span class="animate-typing-dot" style="animation-delay: 0.4s">.</span>
-                                    </span>
-                                </div>
-                            </template>
-                        </button>
-
-                        <div class="relative flex items-center pt-2">
-                            <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-                            <span
-                                class="flex-shrink-0 mx-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest">Or</span>
-                            <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-                        </div>
-
-                        <a href="{{ route('google.login') }}"
-                            class="w-full h-11 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:bg-slate-50 dark:hover:bg-slate-700/50 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                    fill="#4285F4" />
-                                <path
-                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                    fill="#34A853" />
-                                <path
-                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                    fill="#FBBC05" />
-                                <path
-                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                    fill="#EA4335" />
-                            </svg>
-                            Continue with Google
-                        </a>
-
-                        <div class="pt-2 text-center">
-                            <p class="text-sm text-slate-500 dark:text-slate-400">
-                                New on our platform?
-                                <a href="{{ route('register') }}" class="text-primary font-bold hover:underline ml-1">Create
-                                    an account</a>
-                            </p>
-                        </div>
-                    </form>
-                </div>
+            <div class="auth-brand-copy">
+                <h1 class="auth-heading">Sign In to<br>{{ config('app.name') }}</h1>
+                <p class="auth-subtext">
+                    If you don't have an account<br>
+                    you can <a href="{{ route('register') }}" class="auth-link-blue">Register here!</a>
+                </p>
             </div>
-
-            <!-- Footer -->
-            @if(config('app.env') === 'demo')
-                <div class="mt-8 p-4 bg-primary/10 rounded-xl text-center border border-primary/20">
-                    <p class="text-xs font-bold text-primary uppercase tracking-widest">Demo Credentials</p>
-                    <p class="text-[11px] text-slate-600 mt-1 uppercase tracking-tight">Admin: admin@test.com / password</p>
-                </div>
-            @endif
         </div>
+
+        {{-- ─── Center: 3D Character ─── --}}
+        <div class="auth-character">
+            <img src="{{ asset('images/auth-character.png') }}"
+                 alt="Floating character"
+                 class="auth-char-img"
+                 onerror="this.style.display='none'">
+        </div>
+
+        {{-- ─── Right: Form ─── --}}
+        <div class="auth-right">
+
+            {{-- Alerts --}}
+            @if(session('error'))
+                <div class="auth-alert auth-alert-error">{{ session('error') }}</div>
+            @endif
+            @if($errors->any())
+                <div class="auth-alert auth-alert-error">{{ $errors->first() }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" x-ref="loginForm" @submit.prevent="submit" class="auth-form">
+                @csrf
+
+                {{-- Email --}}
+                <div class="auth-field">
+                    <input id="login" type="text" name="login" value="{{ old('login') }}"
+                           required autofocus placeholder="Enter Email"
+                           class="auth-input">
+                    <span class="auth-input-icon">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </span>
+                </div>
+
+                {{-- Password --}}
+                <div class="auth-field">
+                    <input id="password" :type="showPass ? 'text' : 'password'" name="password"
+                           required placeholder="••••••••"
+                           class="auth-input">
+                    <button type="button" @click="showPass = !showPass" class="auth-input-icon auth-eye-btn">
+                        <svg x-show="!showPass" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg x-show="showPass" x-cloak width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.04m4.066-1.426A10.05 10.05 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                    </button>
+                </div>
+
+                {{-- Recover --}}
+                @if(Route::has('password.request'))
+                    <div class="auth-recover">
+                        <a href="{{ route('password.request') }}" class="auth-recover-link">Recover Password ?</a>
+                    </div>
+                @endif
+
+                {{-- Submit --}}
+                <button type="submit" :disabled="loading" class="auth-btn-primary">
+                    <template x-if="!loading"><span>Sign In</span></template>
+                    <template x-if="loading">
+                        <span class="auth-loading">
+                            Signing in
+                            <span class="auth-dots"><span>.</span><span>.</span><span>.</span></span>
+                        </span>
+                    </template>
+                </button>
+
+                {{-- Divider --}}
+                <div class="auth-divider">
+                    <span class="auth-divider-line"></span>
+                    <span class="auth-divider-text">Or continue with</span>
+                    <span class="auth-divider-line"></span>
+                </div>
+
+                {{-- Social buttons --}}
+                <div class="auth-social-row">
+                    <a href="{{ route('google.login') }}" class="auth-social-btn" title="Google">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                    </a>
+                    <a href="{{ url('/') }}" class="auth-social-btn auth-social-apple" title="Apple">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                        </svg>
+                    </a>
+                    <a href="{{ url('/') }}" class="auth-social-btn auth-social-facebook" title="Facebook">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
     </div>
+</div>
+
+@include('auth._auth_styles')
+
 @endsection

@@ -43,8 +43,6 @@
                 class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Live</span>
         </div>
 
-        <x-theme-toggle />
-
         @php
             $unreadNotifications = \App\Models\AdminNotification::with('user')->where('is_read', 0)->latest()->take(5)->get();
             $unreadCount = \App\Models\AdminNotification::where('is_read', 0)->count();

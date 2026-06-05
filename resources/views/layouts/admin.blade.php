@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'CloudTech Admin') }} - @yield('title', 'Admin')</title>
+    <title>{{ config('app.name', 'RocketDataHub Admin') }} - @yield('title', 'Admin')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <!-- Styles & Scripts -->
@@ -21,16 +21,13 @@
 
     <!-- Scripts -->
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.remove('dark');
     </script>
 </head>
 
 <body
-    class="antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen"
+    class="antialiased text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen"
+    style="font-family: 'Poppins', 'Geist', sans-serif;"
     x-data="{ 
           sidebarOpen: false,
           isCollapsed: localStorage.getItem('admin_compact_sidebar') === 'true'
@@ -38,7 +35,10 @@
           $watch('isCollapsed', val => localStorage.setItem('admin_compact_sidebar', val));
       ">
 
-    <div class="min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
+    {{-- Site-wide gradient background --}}
+    @include('partials._site_bg')
+
+    <div class="min-h-screen">
 
         <x-admin-sidebar />
 

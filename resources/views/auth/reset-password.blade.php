@@ -17,7 +17,7 @@
             <div class="flex flex-col items-center gap-3 mb-8">
                 <div
                     class="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 transition-transform hover:scale-105 duration-300">
-                    <img src="{{ asset('favicon.ico') }}" alt="Logo" class="w-8 h-8">
+                    <img src="{{ asset('logo.png') }}" alt="Logo" class="w-8 h-8">
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100 uppercase">
                     {{ config('app.name') }}
