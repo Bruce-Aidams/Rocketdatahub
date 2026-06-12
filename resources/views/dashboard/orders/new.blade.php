@@ -233,8 +233,8 @@
                             <p class="text-sm text-slate-500">Follow the steps to complete your purchase.</p>
                         </div>
                         <div class="p-6">
-                            {{-- Tab switch --}}
-                            <div class="flex border-b border-slate-100 dark:border-slate-800 mb-6 pb-4 gap-4">
+                            {{-- Tab switch - Bulk Orders Disabled --}}
+                            {{-- <div class="flex border-b border-slate-100 dark:border-slate-800 mb-6 pb-4 gap-4">
                                 <button type="button" @click="activeMode = 'single'"
                                     class="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 border-none cursor-pointer"
                                     :class="activeMode === 'single' ? getNetworkColor(selectedNetwork, 'btn') + ' text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'">
@@ -245,7 +245,7 @@
                                     :class="activeMode === 'bulk' ? getNetworkColor(selectedNetwork, 'btn') + ' text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'">
                                     Bulk Order
                                 </button>
-                            </div>
+                            </div> --}}
 
                             <div x-show="activeMode === 'single'">
                                 <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -326,7 +326,7 @@
                                         Recipient Phone Number
                                     </label>
                                     <div class="relative group">
-                                        <input type="tel" x-model="phone" @input="validatePhone" placeholder="0XXXXXXXXX"
+                                        <input type="tel" x-model="phone" @input="validatePhone" placeholder="0240276243"
                                             maxlength="10"
                                             class="w-full h-14 pl-4 pr-10 bg-slate-50 dark:bg-slate-800 border-2 rounded-xl outline-none transition-all font-mono font-bold text-lg tracking-wider"
                                             :class="phoneState.colorClass">

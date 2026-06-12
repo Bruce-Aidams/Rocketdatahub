@@ -325,7 +325,7 @@
                                         Recipient Phone Number
                                     </label>
                                     <div class="relative group">
-                                        <input type="tel" x-model="phone" @input="validatePhone" placeholder="0XXXXXXXXX"
+                                        <input type="tel" x-model="phone" @input="validatePhone" placeholder="0240276243"
                                             maxlength="10"
                                             class="w-full h-14 pl-4 pr-10 bg-slate-50 dark:bg-slate-800 border-2 rounded-xl outline-none transition-all font-mono font-bold text-lg tracking-wider"
                                             :class="phoneState.colorClass">

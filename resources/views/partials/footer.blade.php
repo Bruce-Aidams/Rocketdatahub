@@ -112,9 +112,11 @@
                 All rights reserved. Built with ❤️ in Ghana.
             </p>
             <div class="flex gap-5 text-[10px] font-semibold uppercase tracking-widest text-slate-600">
-                <span class="text-indigo-500">Powered by Webstech Digital</span>
-                <span>•</span>
-                <span>0551518931</span>
+                <span>
+                    <a href="https://wa.me/+233551518931" target="_blank" class="text-indigo-500 hover:text-indigo-400 transition-colors">
+                        Powered by Webstech Digital
+                    </a>
+                </span>
             </div>
         </div>
 

@@ -1,152 +1,117 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@php
+    $hideNav = true;
+@endphp
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Verification Required - {{ config('app.name') }}</title>
+@section('title', 'Verification Required')
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
+@section('content')
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{{-- Auth page root view --}}
+<div class="auth-viewport" x-data="{ requested: {{ session('success') ? 'true' : 'false' }} }">
 
-    <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-        }
+    {{-- Top Navigation Header --}}
+    <div class="w-full max-w-[440px] flex items-center justify-between px-2 mb-6">
+        <form action="{{ route('logout') }}" method="POST" id="logout-form">
+            @csrf
+            <button type="submit" class="w-10 h-10 rounded-full bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+                <svg class="w-5 h-5 text-slate-650 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </form>
+        <span class="text-lg font-black text-slate-850 dark:text-slate-100 tracking-tight">Access Restricted</span>
+    </div>
 
-        .glass {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(24px) saturate(1.5);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 8px 40px rgba(100,100,180,.12);
-        }
+    {{-- Premium Auth Card --}}
+    <div class="auth-mobile-card">
+        <div class="auth-card-gradient-bar"></div>
 
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .glow-blue {
-            box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
-        }
-    </style>
-</head>
-
-<body class="antialiased min-h-screen flex items-center justify-center p-4 md:p-6 text-slate-800">
-
-    {{-- Gradient background --}}
-    @include('partials._site_bg')
-
-    {{-- No neural grid needed on light bg --}}
-
-    <div class="relative w-full max-w-2xl z-10" x-data="{ requested: {{ session('success') ? 'true' : 'false' }} }">
-        <!-- Main Card -->
-        <div class="glass rounded-3xl md:rounded-[3rem] p-6 sm:p-8 md:p-12 text-center relative overflow-hidden">
-            <!-- Animated Shield Icon -->
-            <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 mb-6 sm:mb-8 animate-float">
-                <div class="relative w-full h-full flex items-center justify-center">
-                    <div class="absolute inset-0 bg-blue-500/10 blur-[30px] md:blur-[40px] rounded-full"></div>
-                    <div
-                        class="relative z-10 w-full h-full glass rounded-2xl md:rounded-[2rem] border border-blue-500/20 flex items-center justify-center glow-blue">
-                        <svg class="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-blue-500" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content -->
-            <div class="space-y-4 sm:space-y-6">
-                <div>
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter mb-2 text-slate-800">Access
-                        Restricted</h1>
-                    <p class="text-indigo-500 font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[8px] sm:text-[10px] md:text-xs">
-                        Verification Pending</p>
-                </div>
-
-                <div class="max-w-md mx-auto">
-                    <p class="text-slate-500 text-xs sm:text-sm md:text-base leading-relaxed">
-                        Your account is currently in a <strong>Pending Verification</strong> state. To maintain the
-                        security of our data ecosystem, all new accounts must be manually approved by our security team.
-                    </p>
-                </div>
-
-                <!-- Status Indicator -->
-                <div
-                    class="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 bg-amber-50 rounded-xl sm:rounded-2xl border border-amber-200">
-                    <div class="relative flex h-2 w-2 sm:h-3 sm:w-3">
-                        <span
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-amber-500"></span>
-                    </div>
-                    <span class="text-[9px] sm:text-xs font-black uppercase tracking-widest text-amber-500">Status:
-                        Awaiting Approval</span>
-                </div>
-
-                <!-- Action Button -->
-                <div class="pt-4 sm:pt-8">
-                    <template x-if="!requested">
-                        <form action="{{ route('verification.request') }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="group relative inline-flex items-center justify-center px-8 sm:px-12 h-12 sm:h-14 bg-blue-600 rounded-xl sm:rounded-2xl text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-blue-700 hover:scale-[1.02] active:scale-95 shadow-2xl shadow-blue-600/20">
-                                Verify My Identity
-                                <svg class="w-3 h-3 sm:w-4 sm:h-4 ml-2 sm:ml-3 group-hover:translate-x-1 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M14 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </form>
-                    </template>
-                    <template x-if="requested">
-                        <div class="flex flex-col items-center gap-3 sm:gap-4">
-                            <div
-                                class="px-6 sm:px-8 py-3 sm:py-4 bg-emerald-500/10 text-emerald-500 rounded-xl sm:rounded-2xl border border-emerald-500/20 text-[9px] sm:text-xs font-black uppercase tracking-widest">
-                                Request Received
-                            </div>
-                            <p class="text-slate-500 text-[8px] sm:text-[10px] font-medium tracking-wide">Expected
-                                approval time: 2-4 hours</p>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Secondary Links -->
-                <div class="pt-8 sm:pt-12 flex items-center justify-center gap-6 sm:gap-8">
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit"
-                            class="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Sign
-                            Out</button>
-                    </form>
-                </div>
+        <!-- Avatar Icon (Displays user profile initials avatar) -->
+        <div class="auth-avatar-wrapper">
+            <div class="auth-avatar-inner border-2 border-primary/20">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&color=696CFF&background=F1F5F9&size=128&font-size=0.35&bold=true"
+                     alt="Profile Picture"
+                     class="w-full h-full object-cover">
             </div>
         </div>
 
-        <!-- System Meta -->
-        <div class="mt-6 sm:mt-8 flex justify-between items-center px-2 sm:px-4">
-            <div class="flex items-center gap-1.5">
-                <div class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-indigo-500"></div>
-                <span class="font-mono text-[8px] sm:text-[9px] text-slate-400 uppercase">RocketDataHub</span>
+        <h2 class="text-2xl font-black text-slate-850 dark:text-white text-center tracking-tight mb-2">Access Restricted</h2>
+        <p class="text-[10px] text-primary font-black text-center uppercase tracking-[0.2em] mb-6">Verification Pending</p>
+
+        <div class="space-y-6 text-center">
+            <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-sm mx-auto">
+                Your account is currently in a <strong>Pending Verification</strong> state. To maintain the security of our data ecosystem, all new accounts must be manually approved by our security team.
+            </p>
+
+            <!-- Status Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-2xl mx-auto">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span class="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-450">Awaiting Approval</span>
             </div>
-            <span class="font-mono text-[8px] sm:text-[9px] text-slate-400">ID:
-                {{ strtoupper(substr(auth()->user()->id, 0, 8)) }}</span>
+
+            <!-- Action Button -->
+            <div class="pt-2">
+                <template x-if="!requested">
+                    <form action="{{ route('verification.request') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="auth-submit-btn">
+                            <span>Request Activation</span>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </form>
+                </template>
+                <template x-if="requested">
+                    <div class="space-y-3">
+                        <div class="px-6 py-4 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-450 rounded-2xl border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest">
+                            Request Submitted
+                        </div>
+                        <p class="text-slate-400 dark:text-slate-500 text-[10px] font-bold tracking-wide">Expected approval time: 2-4 hours</p>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
-</body>
 
-</html>
+    {{-- Bottom Navigation Bar --}}
+    <div class="auth-bottom-nav">
+        <a href="{{ url('/') }}" class="auth-bottom-nav-item">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Home</span>
+        </a>
+        <a href="{{ url('/#features') }}" class="auth-bottom-nav-item">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span>Services</span>
+        </a>
+        <a href="{{ route('orders.new') }}" class="auth-bottom-nav-book-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+        </a>
+        <a href="{{ url('/#pricing') }}" class="auth-bottom-nav-item">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span>Shop</span>
+        </a>
+        <a href="{{ route('dashboard') }}" class="auth-bottom-nav-item active">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+            <span>Account</span>
+        </a>
+    </div>
+</div>
+
+@include('auth._auth_styles')
+
+@endsection

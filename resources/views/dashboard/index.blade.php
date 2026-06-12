@@ -190,7 +190,7 @@
                             class="text-[9px] md:text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-tighter">Buy
                             Data</span>
                     </a>
-                    <a href="{{ route('referrals.index') }}"
+                    {{-- <a href="{{ route('referrals.index') }}"
                         class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-transparent hover:border-primary/20 transition-all">
                         <div
                             class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -202,7 +202,7 @@
                         </div>
                         <span
                             class="text-[9px] md:text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-tighter">Refer</span>
-                    </a>
+                    </a> --}}
                     <a href="{{ route('notifications.index') }}"
                         class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-transparent hover:border-primary/20 transition-all">
                         <div

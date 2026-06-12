@@ -200,15 +200,9 @@
 
                     {{-- Social proof --}}
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-5 pt-4 border-t border-white/10">
-                        <div class="flex items-center -space-x-3">
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
-                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
-                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full border-2 border-indigo-900 object-cover">
-                        </div>
                         <div>
-                            <div class="flex text-yellow-400 text-sm">★★★★★</div>
-                            <p class="text-xs text-slate-400 font-medium">50k+ Happy Customers</p>
+                            <div class="flex text-yellow-400 text-sm">★★★★★★</div>
+                            <p class="text-xs text-slate-400 font-medium">50k+ Happy Data Buyers</p>
                         </div>
                         <div class="w-px h-8 bg-white/10 hidden sm:block"></div>
                         <div class="hidden sm:block">
@@ -255,9 +249,9 @@
                     {{-- Stat Card: Insights (top-right) --}}
                     <div class="stat-2 absolute z-20" style="top: 2%; right: 2%;">
                         <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 px-4 py-3.5 shadow-2xl min-w-[140px]">
-                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Insights Delivered</p>
-                            <p class="text-2xl font-bold text-white leading-none">12.6K</p>
-                            <p class="text-[9px] text-emerald-400 font-semibold mt-1">↑ 18.3%</p>
+                            <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Data Delivered</p>
+                            <p class="text-2xl font-bold text-white leading-none">5000 GB</p>
+                            <p class="text-[9px] text-emerald-400 font-semibold mt-1">↑ 98%</p>
                             <div class="flex items-end gap-0.5 mt-2 h-6">
                                 <div class="w-2 h-2 bg-indigo-400/40 rounded-sm"></div>
                                 <div class="w-2 h-3 bg-indigo-400/50 rounded-sm"></div>
@@ -273,8 +267,8 @@
                     <div class="stat-3 absolute z-20" style="bottom: 8%; left: 2%;">
                         <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/15 px-4 py-3.5 shadow-2xl min-w-[145px]">
                             <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Data Points Processed</p>
-                            <p class="text-2xl font-bold text-white leading-none">2.4B</p>
-                            <p class="text-[9px] text-emerald-400 font-semibold mt-1">↑ 24.5%</p>
+                            <p class="text-2xl font-bold text-white leading-none">4.4B</p>
+                            <p class="text-[9px] text-emerald-400 font-semibold mt-1">↑ 38.5%</p>
                             <svg class="mt-2" width="100" height="22" viewBox="0 0 100 22">
                                 <defs>
                                     <linearGradient id="sg" x1="0" x2="0" y1="0" y2="1">
